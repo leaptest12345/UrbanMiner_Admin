@@ -97,7 +97,7 @@ export default function Items()
         color:"white",
         marginLeft:40
     }
-    
+
     const addedOrNot = () => {
         let temp = false;
         data.map(item => {
@@ -198,9 +198,7 @@ export default function Items()
             >
             Add
             </Button>
-            {/* <button 
-            type="submit"
-            className={classes.btn}>Add</button> */}
+    
             </div>
             </form>
             <TableContainer
