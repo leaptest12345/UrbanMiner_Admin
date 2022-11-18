@@ -18,7 +18,7 @@ import { Delete } from '@material-ui/icons';
 import { uploadProductImage } from 'util/uploadProductImage';
 import productStyle from './styles';
 import { formateData } from 'util/formateData';
-import { async } from '@firebase/util';
+
 function AddProduct() {
     const [imgfile, setImageFile] = useState('');
     const [progress, setProgress] = useState(0);
@@ -36,6 +36,8 @@ function AddProduct() {
     const [productId, setProductId] = useState(null);
     const [productSubId, setProductSubId] = useState(null);
     const [isImageChange, setIsImageChange] = useState(false);
+    const [addToDatabase, setAddToDatabase] = useState(false);
+    const [item, setItem] = useState('');
     const { styles } = productStyle;
     const uniqueId = uuid().slice(0, 8);
     const imgFilehandler = (e) => {
@@ -47,7 +49,6 @@ function AddProduct() {
             setSubImageFile(e.target.files[0]);
         } else setSubImageFile(e.target.files[0]);
     };
-
     useEffect(() => {
         getProduct();
     }, []);
@@ -220,7 +221,6 @@ function AddProduct() {
                 });
                 notify('Product detail has been updated!', 2);
             }
-
             onModalClose();
             setLoading(false);
         } catch (error) {
@@ -284,6 +284,43 @@ function AddProduct() {
                 notify('Sub_Product Successfully Deleted!', 0);
             }
         } catch (error) {
+            console.log(error);
+        }
+    };
+    const addSubProductInDatabase = async () => {
+        try {
+            if (subImgFile) {
+                setLoading(true);
+                const url = await uploadProductImage(item.img);
+                const id = item.SUB_PRODUCT ? formateData(item.SUB_PRODUCT).length + 1 : 1;
+                const starCount = ref(database, `/ADMIN/PRODUCT/${item.ID}/SUB_PRODUCT/${id}`);
+                await set(starCount, {
+                    id: id,
+                    productName: subProductName,
+                    productImage: url,
+                    prodductDescription: subProductDesc
+                });
+                setOpen(false);
+                setAddToDatabase(false);
+                notify('Sub_Product Successfully Added', `1`);
+                setLoading(false);
+            } else {
+                setLoading(true);
+                const id = item.SUB_PRODUCT ? formateData(item.SUB_PRODUCT).length + 1 : 1;
+                const starCount = ref(database, `/ADMIN/PRODUCT/${item.ID}/SUB_PRODUCT/${id}`);
+                await set(starCount, {
+                    id: id,
+                    productName: subProductName,
+                    productImage: '',
+                    prodductDescription: subProductDesc
+                });
+                setOpen(false);
+                setAddToDatabase(false);
+                notify('Sub_Product Successfully Added', `1`);
+                setLoading(false);
+            }
+        } catch (error) {
+            setLoading(false);
             console.log(error);
         }
     };
@@ -460,6 +497,16 @@ function AddProduct() {
                                                 >
                                                     EDIT
                                                 </Button>
+                                                <Button
+                                                    style={styles.btnStyle1}
+                                                    onClick={() =>
+                                                        setItem(item) +
+                                                        setAddToDatabase(true) +
+                                                        setOpen(true)
+                                                    }
+                                                >
+                                                    ADD SUB_PRODUCT
+                                                </Button>
                                             </StyledTableCell>
                                             <StyledTableCell align='left' style={{ width: '10%' }}>
                                                 <Delete
@@ -586,7 +633,9 @@ function AddProduct() {
                                 <span>
                                     <img
                                         src={
-                                            isEditable
+                                            addToDatabase
+                                                ? window.URL.createObjectURL(subImgFile)
+                                                : isEditable
                                                 ? isImageChange
                                                     ? window.URL.createObjectURL(subImgFile)
                                                     : subImgFile
@@ -605,7 +654,9 @@ function AddProduct() {
                                 ...styles.btnStyle1
                             }}
                             onClick={() =>
-                                isEditable
+                                addToDatabase
+                                    ? addSubProductInDatabase()
+                                    : isEditable
                                     ? productType == 0
                                         ? editProductDetail()
                                         : editSubProductDetail()
