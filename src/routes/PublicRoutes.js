@@ -11,7 +11,7 @@ function PublicRoutes() {
             <Route path={SLUGS.login} component={Login} render={() => <div>login</div>} />
             <Route path={SLUGS.signup} render={() => <div>signup</div>} />
             <Route path={SLUGS.forgotPassword} render={() => <div>forgotPassword</div>} />
-            <Redirect to={SLUGS.login} />
+            <Redirect to={SLUGS.login} component={Login} />
             <Route exact path='/' component={Login} />
         </Switch>
     );
