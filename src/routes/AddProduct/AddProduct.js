@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useEffect, useState } from 'react';
 import { database } from 'configs/firebaseConfig';
-import { set, ref as dataRef } from 'firebase/database';
+import { set, onValue, ref, update } from 'firebase/database';
 import { v4 as uuid } from 'uuid';
 import { notify } from 'util/notify';
 import { ToastContainer } from 'react-toastify';
@@ -18,6 +17,8 @@ import { withStyles } from '@material-ui/core/styles';
 import { Delete } from '@material-ui/icons';
 import { uploadProductImage } from 'util/uploadProductImage';
 import productStyle from './styles';
+import { formateData } from 'util/formateData';
+import { async } from '@firebase/util';
 function AddProduct() {
     const [imgfile, setImageFile] = useState('');
     const [progress, setProgress] = useState(0);
@@ -29,12 +30,27 @@ function AddProduct() {
     const [subProductName, setSubProductName] = useState('');
     const [subProductDesc, setSubProductDesc] = useState('');
     const [subImgFile, setSubImageFile] = useState('');
+    const [productList, setProductList] = useState([]);
+    const [isEditable, setIsEditable] = useState(false);
+    const [productType, setProductType] = useState(0);
+    const [productId, setProductId] = useState(null);
+    const [productSubId, setProductSubId] = useState(null);
+    const [isImageChange, setIsImageChange] = useState(false);
     const { styles } = productStyle;
     const uniqueId = uuid().slice(0, 8);
     const imgFilehandler = (e) => {
-        console.log(e.target.files);
         setImageFile(e.target.files[0]);
     };
+    const imgFilehandler1 = (e) => {
+        if (isEditable) {
+            setIsImageChange(true);
+            setSubImageFile(e.target.files[0]);
+        } else setSubImageFile(e.target.files[0]);
+    };
+
+    useEffect(() => {
+        getProduct();
+    }, []);
     const setProductDetail = async () => {
         try {
             setLoading(true);
@@ -48,13 +64,12 @@ function AddProduct() {
     };
     const addSubProductDatabase = async (id) => {
         try {
-            const uniqueId = uuid().slice(0, 8);
             subProduct.map(async (item, index) => {
                 if (item.img) {
                     const url = await uploadProductImage(item.img);
-                    const starCount = dataRef(
+                    const starCount = ref(
                         database,
-                        `/ADMIN/PRODUCT/${id}/SUB_PRODUCT/${uniqueId}/${index + 1}`
+                        `/ADMIN/PRODUCT/${id}/SUB_PRODUCT/${index + 1}`
                     );
                     await set(starCount, {
                         id: index + 1,
@@ -63,9 +78,9 @@ function AddProduct() {
                         prodductDescription: item.description
                     });
                 } else {
-                    const starCount = dataRef(
+                    const starCount = ref(
                         database,
-                        `/ADMIN/PRODUCT/${id}/SUB_PRODUCT/${uniqueId}/${index + 1}`
+                        `/ADMIN/PRODUCT/${id}/SUB_PRODUCT/${index + 1}`
                     );
                     await set(starCount, {
                         id: index + 1,
@@ -79,12 +94,23 @@ function AddProduct() {
             console.log(error);
         }
     };
-
+    const getProduct = () => {
+        try {
+            const refDetail = ref(database, `/ADMIN/PRODUCT`);
+            onValue(refDetail, (snapShot) => {
+                const arr = formateData(snapShot.val());
+                console.log('all Product', arr);
+                setProductList(arr);
+            });
+        } catch (error) {
+            console.log('product error', error);
+        }
+    };
     const createProduct = async (downloadURL) => {
         try {
             if (productName && productDesc && imgfile) {
                 const id = uuid().slice(0, 8);
-                const starCount = dataRef(database, `/ADMIN/PRODUCT/${id}`);
+                const starCount = ref(database, `/ADMIN/PRODUCT/${id}`);
                 await set(starCount, {
                     ID: id,
                     productName: productName,
@@ -118,7 +144,18 @@ function AddProduct() {
             color: theme.color.white
         },
         body: {
-            fontSize: 14
+            fontSize: 14,
+            backgroundColor: theme.color.BG
+        }
+    }))(TableCell);
+    const StyledTableCell1 = withStyles(() => ({
+        head: {
+            backgroundColor: theme.color.veryDarkGrayishBlue,
+            color: theme.color.white
+        },
+        body: {
+            fontSize: 14,
+            backgroundColor: theme.color.lightGrayishBlue
         }
     }))(TableCell);
     const StyledTableRow = withStyles(() => ({
@@ -152,10 +189,107 @@ function AddProduct() {
         setSubProduct(result);
         console.log('after delete', subProduct, result);
     };
+    const editProduct = (item) => {
+        try {
+            setIsEditable(true);
+            setOpen(true);
+            setSubProductName(item.productName);
+            setSubProductDesc(item.prodductDescription);
+            setSubImageFile(item.productImage);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const editProductDetail = async () => {
+        try {
+            setLoading(true);
+            if (isImageChange) {
+                const url = await uploadProductImage(subImgFile);
+                const refDetail = ref(database, `ADMIN/PRODUCT/${productId}`);
+                update(refDetail, {
+                    productName: subProductName,
+                    prodductDescription: subProductDesc,
+                    productImage: url
+                });
+                notify('Product detail has been updated!', 2);
+            } else {
+                const refDetail = ref(database, `ADMIN/PRODUCT/${productId}`);
+                update(refDetail, {
+                    productName: subProductName,
+                    prodductDescription: subProductDesc
+                });
+                notify('Product detail has been updated!', 2);
+            }
+
+            onModalClose();
+            setLoading(false);
+        } catch (error) {
+            setOpen(false);
+            console.log(error);
+            setLoading(false);
+        }
+    };
+    const editSubProductDetail = async () => {
+        try {
+            setLoading(true);
+            if (isImageChange) {
+                const url = await uploadProductImage(subImgFile);
+                const refDetail = ref(
+                    database,
+                    `ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${productSubId}`
+                );
+                update(refDetail, {
+                    productName: subProductName,
+                    prodductDescription: subProductDesc,
+                    productImage: url
+                });
+                notify('Sub_Product detail has been updated!', 2);
+            } else {
+                const refDetail = ref(
+                    database,
+                    `ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${productSubId}`
+                );
+                update(refDetail, {
+                    productName: subProductName,
+                    prodductDescription: subProductDesc
+                });
+                notify('Sub_Product detail has been updated!', 2);
+            }
+            onModalClose();
+            setLoading(false);
+        } catch (error) {
+            setOpen(false);
+            console.log(error);
+            setLoading(false);
+        }
+    };
+    const onModalClose = () => {
+        setOpen(false);
+        setIsEditable(false);
+        setSubProductName('');
+        setSubProductDesc('');
+        setSubImageFile('');
+        setIsImageChange(false);
+    };
+    const deleteProduct = () => {
+        console.log('delet Product called', productType);
+        const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
+        const refDetail1 = ref(database, `/ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${productSubId}`);
+        try {
+            if (productType == 0) {
+                set(refDetail, null);
+                notify('Product Successfully Deleted!', 0);
+            } else {
+                set(refDetail1, null);
+                notify('Sub_Product Successfully Deleted!', 0);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
     return (
         <div>
             {loading ? <LoadingSpinner /> : null}
-
             <text>Enter Product Name: </text>
             <br />
             <input
@@ -199,8 +333,10 @@ function AddProduct() {
                 <Button onClick={() => setProductDetail()} style={styles.btnStyle1}>
                     Upload Product
                 </Button>
+                <br />
+                {subProduct.length != 0 ? <text style={styles.title}>SUB_PRODUCT LIST</text> : null}
                 {subProduct.length != 0 ? (
-                    <Table aria-label='customized table'>
+                    <Table aria-label='customized table' style={{ marginTop: '20px' }}>
                         <TableHead>
                             <TableRow>
                                 <StyledTableCell align='left'>No.</StyledTableCell>
@@ -215,35 +351,200 @@ function AddProduct() {
                         <TableBody>
                             {subProduct &&
                                 subProduct.map((item, index) => (
-                                    <StyledTableRow align='left' key={item.id}>
-                                        <StyledTableCell component='th' scope='row'>
-                                            {index + 1}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='left'>
-                                            {item.img ? (
-                                                <img
-                                                    src={
-                                                        item.img != ''
-                                                            ? window.URL.createObjectURL(item.img)
-                                                            : ''
+                                    <>
+                                        <StyledTableRow align='left' key={item.id}>
+                                            <StyledTableCell component='th' scope='row'>
+                                                {index + 1}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left'>
+                                                {item.img ? (
+                                                    <img
+                                                        src={
+                                                            item.img != ''
+                                                                ? window.URL.createObjectURL(
+                                                                      item.img
+                                                                  )
+                                                                : ''
+                                                        }
+                                                        loading='lazy'
+                                                        style={styles.img}
+                                                    />
+                                                ) : (
+                                                    <div style={styles.img}>-</div>
+                                                )}
+                                            </StyledTableCell>
+                                            <StyledTableCell component='th' scope='row'>
+                                                {item.name}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left'>
+                                                {item.description ? item.description : '-'}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left'>
+                                                <Delete
+                                                    onClick={() => deleteSubProduct(item)}
+                                                ></Delete>
+                                            </StyledTableCell>
+                                        </StyledTableRow>
+                                    </>
+                                ))}
+                        </TableBody>
+                    </Table>
+                ) : null}
+                <br />
+                {productList.length != 0 ? <text style={styles.title}>PRODUCT_LIST</text> : null}
+                {productList.length != 0 ? (
+                    <Table aria-label='customized table' style={{ marginTop: '20px' }}>
+                        <TableHead>
+                            <TableRow>
+                                <StyledTableCell align='left' style={{ width: '10%' }}>
+                                    No.
+                                </StyledTableCell>
+                                <StyledTableCell align='left' style={{ width: '20%' }}>
+                                    Photo
+                                </StyledTableCell>
+                                <StyledTableCell align='left' style={{ width: '20%' }}>
+                                    ProductName
+                                </StyledTableCell>
+                                <StyledTableCell align='left' style={{ width: '40%' }}>
+                                    ProductDescription
+                                </StyledTableCell>
+                                <StyledTableCell align='left' style={{ width: '10%' }}>
+                                    Actions
+                                </StyledTableCell>
+                                <StyledTableCell align='left' style={{ width: '10%' }}>
+                                    Delete
+                                </StyledTableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {productList &&
+                                productList.map((item, index) => (
+                                    <>
+                                        <StyledTableRow align='left' key={item.id}>
+                                            <StyledTableCell
+                                                component='th'
+                                                scope='row'
+                                                style={{ width: '10%' }}
+                                            >
+                                                {index + 1}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left' style={{ width: '20%' }}>
+                                                {item.productImage ? (
+                                                    <img
+                                                        src={item.productImage}
+                                                        loading='lazy'
+                                                        style={styles.productImage}
+                                                    />
+                                                ) : (
+                                                    <div style={styles.img}>-</div>
+                                                )}
+                                            </StyledTableCell>
+                                            <StyledTableCell
+                                                component='th'
+                                                scope='row'
+                                                style={{ width: '10%' }}
+                                            >
+                                                {item.productName}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left' style={{ width: '35%' }}>
+                                                {item.prodductDescription
+                                                    ? item.prodductDescription
+                                                    : '-'}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left' style={{ width: '10%' }}>
+                                                <Button
+                                                    style={styles.dangerBtn}
+                                                    onClick={() =>
+                                                        setProductId(item.ID) + editProduct(item)
                                                     }
-                                                    loading='lazy'
-                                                    style={styles.img}
-                                                />
-                                            ) : (
-                                                <div style={styles.img}>-</div>
-                                            )}
-                                        </StyledTableCell>
-                                        <StyledTableCell component='th' scope='row'>
-                                            {item.name}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='left'>
-                                            {item.description ? item.description : '-'}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='left'>
-                                            <Delete onClick={() => deleteSubProduct(item)}></Delete>
-                                        </StyledTableCell>
-                                    </StyledTableRow>
+                                                >
+                                                    EDIT
+                                                </Button>
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left' style={{ width: '10%' }}>
+                                                <Delete
+                                                    onClick={() =>
+                                                        setProductType(0) +
+                                                        setProductId(item.ID) +
+                                                        deleteProduct()
+                                                    }
+                                                ></Delete>
+                                            </StyledTableCell>
+                                        </StyledTableRow>
+                                        {item.SUB_PRODUCT
+                                            ? formateData(item.SUB_PRODUCT).map((item1, index1) => {
+                                                  return (
+                                                      <StyledTableRow align='left' key={item1.id}>
+                                                          <StyledTableCell1
+                                                              component='th'
+                                                              scope='row'
+                                                              style={{ width: '10%' }}
+                                                          >
+                                                              {index + 1 + '.' + (index1 + 1)}
+                                                          </StyledTableCell1>
+                                                          <StyledTableCell1
+                                                              align='left'
+                                                              style={{ width: '20%' }}
+                                                          >
+                                                              {item1.productImage ? (
+                                                                  <img
+                                                                      src={item1.productImage}
+                                                                      loading='lazy'
+                                                                      style={styles.productImage}
+                                                                  />
+                                                              ) : (
+                                                                  <div style={styles.img}>-</div>
+                                                              )}
+                                                          </StyledTableCell1>
+                                                          <StyledTableCell1
+                                                              component='th'
+                                                              scope='row'
+                                                              style={{ width: '10%' }}
+                                                          >
+                                                              {item1.productName}
+                                                          </StyledTableCell1>
+                                                          <StyledTableCell1
+                                                              align='left'
+                                                              style={{ width: '35%' }}
+                                                          >
+                                                              {item1.prodductDescription
+                                                                  ? item1.prodductDescription
+                                                                  : '-'}
+                                                          </StyledTableCell1>
+                                                          <StyledTableCell1
+                                                              align='left'
+                                                              style={{ width: '10%' }}
+                                                          >
+                                                              <Button
+                                                                  style={styles.dangerBtn}
+                                                                  onClick={() =>
+                                                                      setProductId(item.ID) +
+                                                                      setProductSubId(item1.id) +
+                                                                      editProduct(item1) +
+                                                                      setProductType(1)
+                                                                  }
+                                                              >
+                                                                  EDIT
+                                                              </Button>
+                                                          </StyledTableCell1>
+                                                          <StyledTableCell1
+                                                              align='left'
+                                                              style={{ width: '10%' }}
+                                                          >
+                                                              <Delete
+                                                                  onClick={() =>
+                                                                      setProductType(1) +
+                                                                      setProductId(item.ID) +
+                                                                      setProductSubId(item1.id) +
+                                                                      deleteProduct()
+                                                                  }
+                                                              ></Delete>
+                                                          </StyledTableCell1>
+                                                      </StyledTableRow>
+                                                  );
+                                              })
+                                            : null}
+                                    </>
                                 ))}
                         </TableBody>
                     </Table>
@@ -252,7 +553,8 @@ function AddProduct() {
             <ToastContainer />
             <Modal onClose={() => setOpen(false)} open={open} style={styles.modal}>
                 <div style={styles.modalDiv}>
-                    <Button style={styles.closeBtn} onClick={() => setOpen(false)}>
+                    {loading ? <LoadingSpinner /> : null}
+                    <Button style={styles.closeBtn} onClick={() => onModalClose()}>
                         Close
                     </Button>
                     <div>
@@ -277,16 +579,19 @@ function AddProduct() {
                     <div style={styles.rowDiv}>
                         <div>
                             <h4>Upload Sub_Product Image (Optional)</h4>
-                            <input
-                                type='file'
-                                onChange={(e) => setSubImageFile(e.target.files[0])}
-                            />
+                            <input type='file' onChange={imgFilehandler1} />
                         </div>
                         <div>
                             {subImgFile != '' ? (
                                 <span>
                                     <img
-                                        src={window.URL.createObjectURL(subImgFile)}
+                                        src={
+                                            isEditable
+                                                ? isImageChange
+                                                    ? window.URL.createObjectURL(subImgFile)
+                                                    : subImgFile
+                                                : window.URL.createObjectURL(subImgFile)
+                                        }
                                         style={styles.imgStyle1}
                                         alt='Photo'
                                     />
@@ -299,9 +604,15 @@ function AddProduct() {
                             style={{
                                 ...styles.btnStyle1
                             }}
-                            onClick={() => addSubProduct()}
+                            onClick={() =>
+                                isEditable
+                                    ? productType == 0
+                                        ? editProductDetail()
+                                        : editSubProductDetail()
+                                    : addSubProduct()
+                            }
                         >
-                            ADD SUBPRODUCT
+                            {isEditable ? 'Edit Product' : 'ADD SUBPRODUCT'}
                         </Button>
                     </div>
                 </div>

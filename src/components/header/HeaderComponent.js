@@ -10,7 +10,7 @@ import DropdownComponent from 'components/dropdown';
 import { onValue, ref } from 'firebase/database';
 import { database } from 'configs/firebaseConfig';
 import { UserContext } from 'util/userContext';
-import {useSelector} from 'react-redux'
+import { useSelector } from 'react-redux';
 const useStyles = createUseStyles((theme) => ({
     avatar: {
         height: 35,
@@ -21,7 +21,7 @@ const useStyles = createUseStyles((theme) => ({
         border: `1px solid ${theme.color.lightGrayishBlue2}`,
         '@media (max-width: 768px)': {
             marginLeft: 14
-        },
+        }
     },
     container: {
         height: 40
@@ -67,11 +67,11 @@ function HeaderComponent() {
     const { currentItem } = useContext(SidebarContext);
     const theme = useTheme();
     const classes = useStyles({ theme });
-    const [name,setName]=useState('')
-    const [photo,setPhoto]=useState('')
-    const {signOut1} = React.useContext(UserContext);
-   const user=useSelector(state=>state)
-   console.log("userdetail from header",user.userReducer)
+    const [name, setName] = useState('');
+    const [photo, setPhoto] = useState('');
+    const { signOut1 } = React.useContext(UserContext);
+    const user = useSelector((state) => state);
+    console.log('userdetail from header', user.userReducer);
     let title;
     switch (true) {
         case currentItem === SLUGS.dashboard:
@@ -80,27 +80,27 @@ function HeaderComponent() {
         case currentItem === SLUGS.items:
             title = 'items';
             break;
-        case currentItem===SLUGS.UserList:
+        case currentItem === SLUGS.UserList:
             title = 'UserList';
             break;
-            case currentItem===SLUGS.AddAdmin:
-                title = 'AddAdmin';
-                break;
-            case currentItem===SLUGS.AddProduct:
+        case currentItem === SLUGS.AddAdmin:
+            title = 'AddAdmin';
+            break;
+        case currentItem === SLUGS.AddProduct:
             title = 'AddProduct';
             break;
-            case currentItem===SLUGS.UserDetail:
+        case currentItem === SLUGS.UserDetail:
             title = 'UserDetail';
             break;
-            case currentItem===SLUGS.ViewDraft:
-                title = 'ViewDraft';
-                break;
+        case currentItem === SLUGS.ViewDraft:
+            title = 'ViewDraft';
+            break;
         case currentItem === SLUGS.PaymentList:
             title = 'PaymentList';
             break;
-            case currentItem === SLUGS.CustomerDetail:
-                title = 'CustomerDetail';
-                break;
+        case currentItem === SLUGS.CustomerDetail:
+            title = 'CustomerDetail';
+            break;
         case currentItem === SLUGS.FeedBack:
             title = 'FeedBack';
             break;
@@ -120,38 +120,31 @@ function HeaderComponent() {
     function onSettingsClick() {
         push(SLUGS.settings);
     }
- 
 
-    useEffect(()=>{
-        getUserDetail()
-    },[])
-    const getUserDetail=async()=>{
-        try{
-            const userID=await localStorage.getItem('userID')
-            if(userID!=null)
-            {
-              const result=ref(database,`/USERS/${userID}`)
-              onValue(result,snapshot=>{
-                const {firstName,lastName,photo}=snapshot.val()
-                console.log("getting user Detail",firstName,lastName,photo)
-                setName(firstName+lastName)
-                setPhoto(photo)
-              })
+    useEffect(() => {
+        getUserDetail();
+    }, []);
+    const getUserDetail = async () => {
+        try {
+            const userID = await localStorage.getItem('userID');
+            if (userID != null) {
+                const result = ref(database, `/ADMIN/USERS/${userID}`);
+                onValue(result, (snapshot) => {
+                    const { firstName, lastName, photo } = snapshot.val();
+                    console.log('getting user Detail', firstName, lastName, photo);
+                    setName(firstName + lastName);
+                    setPhoto(photo);
+                });
             }
-
+        } catch (error) {
+            console.log(error);
         }
-        catch(error)
-        {
-            console.log(error)
-        }
-    }
+    };
     return (
         <Row className={classes.container} vertical='center' horizontal='space-between'>
             <span className={classes.title}>{title}</span>
             <Row vertical='center'>
-                <div className={classes.iconStyles}>
-                    {/* <IconSearch /> */}
-                </div>
+                <div className={classes.iconStyles}>{/* <IconSearch /> */}</div>
                 <div className={classes.iconStyles}>
                     {/* <DropdownComponent
                         label={<IconBell />}
@@ -183,9 +176,13 @@ function HeaderComponent() {
                 <DropdownComponent
                     label={
                         <>
-                            <span className={classes.name}>{name?name:'Germán Llorente'}</span>
+                            <span className={classes.name}>{name ? name : 'Germán Llorente'}</span>
                             <img
-                                src={photo?photo:'https://avatars3.githubusercontent.com/u/21162888?s=460&v=4'}
+                                src={
+                                    photo
+                                        ? photo
+                                        : 'https://avatars3.githubusercontent.com/u/21162888?s=460&v=4'
+                                }
                                 alt='avatar'
                                 className={classes.avatar}
                             />

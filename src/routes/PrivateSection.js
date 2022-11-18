@@ -26,36 +26,33 @@ const useStyles = createUseStyles({
 
 function PrivateSection() {
     const theme = useTheme();
-    const [permissionStatus,setPermissionStatus]=useState(null)
+    const [permissionStatus, setPermissionStatus] = useState(null);
     const classes = useStyles({ theme });
-    const getUserPermissionDetail=async()=>{
-        try{
-           const id=await localStorage.getItem('userID')
-           if(id!=null)
-           {
-            const refDetail=ref(database,`USERS/${id}`)
-            onValue(refDetail,snapShot=>{
-                console.log("permissionStatus",snapShot.val().role.PermissionStatus)
-                setPermissionStatus(snapShot.val().role.PermissionStatus)
-            })
-           }
+    const getUserPermissionDetail = async () => {
+        try {
+            const id = await localStorage.getItem('userID');
+            if (id != null) {
+                const refDetail = ref(database, `/ADMIN/USERS/${id}`);
+                onValue(refDetail, (snapShot) => {
+                    console.log('permissionStatus', snapShot.val().role.PermissionStatus);
+                    setPermissionStatus(snapShot.val().role.PermissionStatus);
+                });
+            }
+        } catch (error) {
+            console.log(error);
         }
-        catch(error)
-        {
-            console.log(error)
-        }
-    }
+    };
 
-    useEffect(()=>{
-        getUserPermissionDetail()
-    },[])
-    
+    useEffect(() => {
+        getUserPermissionDetail();
+    }, []);
+
     return (
         <SidebarContext>
             <Row className={classes.container}>
-                <SidebarComponent permission={permissionStatus}   />
+                <SidebarComponent permission={permissionStatus} />
                 <Column flexGrow={1} className={classes.mainBlock}>
-                    <HeaderComponent  />
+                    <HeaderComponent />
                     <div className={classes.contentBlock}>
                         <PrivateRoutes />
                     </div>

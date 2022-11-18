@@ -70,6 +70,11 @@ const styles = {
         color: 'white',
         marginBottom: '5%'
     },
+    dangerBtn: {
+        background: '#ff8785',
+        color: 'white',
+        marginBottom: '5%'
+    },
     imgStyle: {
         height: '30vh',
         width: '20vw',
@@ -88,9 +93,13 @@ const styles = {
         top: '5%',
         background: '#707070',
         color: 'white'
+    },
+    title: {
+        fontSize: '25px',
+        color: 'black',
+        fontWeight: 'bold'
     }
 };
-
 export default {
     styles
 };

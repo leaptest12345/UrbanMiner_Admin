@@ -46,11 +46,13 @@ const Login = () => {
         else {
             setLoading(true);
             try {
+                let emailResult = false;
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 if (userCredential.user.uid) {
                     users &&
                         users.map((item, index) => {
                             if (item.email == email) {
+                                emailResult = true;
                                 signIn1(item.ID + '', item.role.PermissionStatus);
                                 dispatch(setUser(item));
                                 notify('Login Successfully Done!', 1);
@@ -58,6 +60,11 @@ const Login = () => {
                                 return;
                             }
                         });
+                }
+
+                if (!emailResult) {
+                    notify('Invalid UserName and Password', 0);
+                    setLoading(false);
                 }
                 // const refDetail=ref(database,'/USERS/1')
                 // update(refDetail,{
@@ -95,7 +102,7 @@ const Login = () => {
 
     const getDetail = () => {
         try {
-            const starCountRef = ref(database, '/USERS');
+            const starCountRef = ref(database, '/ADMIN/USERS');
             onValue(starCountRef, (snapshot) => {
                 let data = snapshot.val();
                 setUsers(formateData(data));
