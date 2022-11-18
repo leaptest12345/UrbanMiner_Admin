@@ -1,5 +1,4 @@
-import { Button, TextField } from '@material-ui/core';
-import { RefreshRounded } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
@@ -12,7 +11,6 @@ import { v4 as uuid } from 'uuid';
 
 export default function AddAdmin() {
     const uniqueId = uuid().slice(0, 8);
-
     const [email, setEmail] = useState('');
     const [users, setUsers] = useState([]);
     const [password, setPassword] = useState('');
@@ -25,12 +23,10 @@ export default function AddAdmin() {
     const [privacyPermission, setPrivacyPermission] = useState(false);
     const [adminPermission, setAdminPermission] = useState(false);
     const [addProduct, setAddProduct] = useState(false);
-    const classes = useStyles();
     const theme = useTheme();
     useEffect(() => {
         getUsers();
     }, []);
-
     const getUsers = () => {
         try {
             const refDetail = ref(database, '/ADMIN/USERS');
@@ -51,48 +47,6 @@ export default function AddAdmin() {
                 }
             });
         return result;
-    };
-    const matchUser = () => {
-        try {
-            let result = false;
-            let id = null;
-
-            if (result) {
-            } else {
-                notify('This User hasn"t created Account!', 0);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-    const updateUserDetail = async (id) => {
-        try {
-            const userID = await localStorage.getItem('userID');
-            if (id != null) {
-                // &&id!=userID
-                const refDetail = ref(database, `/ADMIN/USERS/${id}`);
-                update(refDetail, {
-                    role: {
-                        roleName: 'admin',
-                        PermissionStatus: {
-                            user: userPermission,
-                            item: itemPermission,
-                            payment: paymentPermission,
-                            privacy: privacyPermission,
-                            term: termPermission,
-                            addAdmin: adminPermission,
-                            feedback: feedbackPermission,
-                            addProduct: addProduct
-                        }
-                    }
-                });
-                notify('User Permission Successfully Updated!', 1);
-            } else {
-                notify('Invalid Request', 2);
-            }
-        } catch (error) {
-            console.log(error);
-        }
     };
     const createAdmin = async () => {
         try {
