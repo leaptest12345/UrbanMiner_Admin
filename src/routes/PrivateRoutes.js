@@ -70,7 +70,7 @@ function PrivateRoutes() {
                 <Route exact path={SLUGS.AddProduct} component={AddProduct} />
                 <Route exact path='/' component={DashboardComponent} />
                 {/* render={() => <div>PrivacyPolicy</div>} */}
-                <Redirect to={SLUGS.dashboard} />
+                <Redirect to={SLUGS.dashboard} component={DashboardComponent} />
             </Switch>
         </Suspense>
     );
