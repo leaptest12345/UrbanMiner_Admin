@@ -78,6 +78,7 @@ function AddProduct() {
                         productImage: url,
                         prodductDescription: item.description
                     });
+                    onModalClose();
                 } else {
                     const starCount = ref(
                         database,
@@ -89,6 +90,7 @@ function AddProduct() {
                         productImage: '',
                         prodductDescription: item.description
                     });
+                    onModalClose();
                 }
             });
         } catch (error) {
@@ -270,6 +272,7 @@ function AddProduct() {
         setSubProductDesc('');
         setSubImageFile('');
         setIsImageChange(false);
+        setAddToDatabase(false);
     };
     const deleteProduct = () => {
         console.log('delet Product called', productType);
@@ -291,7 +294,7 @@ function AddProduct() {
         try {
             if (subImgFile) {
                 setLoading(true);
-                const url = await uploadProductImage(item.img);
+                const url = await uploadProductImage(subImgFile);
                 const id = item.SUB_PRODUCT ? formateData(item.SUB_PRODUCT).length + 1 : 1;
                 const starCount = ref(database, `/ADMIN/PRODUCT/${item.ID}/SUB_PRODUCT/${id}`);
                 await set(starCount, {
