@@ -176,7 +176,7 @@ function HeaderComponent() {
                 <DropdownComponent
                     label={
                         <>
-                            <span className={classes.name}>{name ? name : 'Germán Llorente'}</span>
+                            {/* <span className={classes.name}>{name ? name : 'Germán Llorente'}</span> */}
                             <img
                                 src={
                                     photo

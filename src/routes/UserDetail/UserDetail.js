@@ -1,5 +1,5 @@
 import { database } from 'configs/firebaseConfig';
-import { onValue, ref, set } from 'firebase/database';
+import { onValue, ref, set, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'react-jss';
 import { withStyles } from '@material-ui/core/styles';
@@ -23,6 +23,7 @@ export default function UserDetail(props) {
     const { push } = useHistory();
     const [data, setData] = useState([]);
     const [user, setUser] = useState('');
+    const [isApproved, setIsApproved] = useState(false);
     function onClick(slug, data, parameters = {}) {
         // push(convertSlugToUrl(slug, parameters),data);
         push({
@@ -31,7 +32,18 @@ export default function UserDetail(props) {
             state: data
         });
     }
-
+    const btn = {
+        position: 'absolute',
+        top: '20%',
+        right: '8%',
+        height: 50,
+        width: '10%',
+        borderRadius: 10,
+        borderWidth: 0.5,
+        backgroundColor: theme.color.veryDarkGrayishBlue,
+        color: 'white',
+        marginLeft: 40
+    };
     const StyledTableCell = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -73,8 +85,20 @@ export default function UserDetail(props) {
             const refDetail = ref(database, `USERS/${id}`);
             onValue(refDetail, (snapShot) => {
                 console.log('userDetail:::', snapShot.val());
+                setIsApproved(snapShot.val().isApproved);
                 setUser(snapShot.val());
             });
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const onApproved = () => {
+        try {
+            const refDetail = ref(database, `/USERS/${id}`);
+            update(refDetail, {
+                isApproved: true
+            });
+            setIsApproved(true);
         } catch (error) {
             console.log(error);
         }
@@ -166,6 +190,11 @@ export default function UserDetail(props) {
                     <br />
                 </div>
             </div>
+            {!isApproved ? (
+                <Button type='Approve' style={btn} onClick={() => onApproved()}>
+                    Approved
+                </Button>
+            ) : null}
             {data.length != 0 && (
                 <h1
                     style={{

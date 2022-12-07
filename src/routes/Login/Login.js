@@ -175,3 +175,27 @@ const Login = () => {
 };
 
 export default Login;
+
+// const user = await createUserWithEmailAndPassword(
+//     auth,
+//     'sutharbipinn25899@gmail.com',
+//     '12345678'
+// );
+// const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
+// await set(refDetail, {
+//     ID: uniqueId,
+//     email: 'sutharbipinn25899@gmail.com',
+//     role: {
+//         roleName: 'admin',
+//         PermissionStatus: {
+//             user: true,
+//             item: true,
+//             payment: true,
+//             privacy: true,
+//             term: true,
+//             addAdmin: true,
+//             feedback: true,
+//             addProduct: true
+//         }
+//     }
+// });

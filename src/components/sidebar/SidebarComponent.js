@@ -32,145 +32,137 @@ const useStyles = createUseStyles({
 
 function SidebarComponent(props) {
     // setPermissionStatus(localStorage.getItem('permission'))
-   const {permission}=props
-   console.log("location values",permission)
-
-    const {signOut1} = React.useContext(UserContext);
-    const [permissionStatus,setPermissionStatus]=useState('')
+    const { permission } = props;
+    console.log('location values', permission);
+    const [show, setShow] = useState(true);
+    const { signOut1 } = React.useContext(UserContext);
+    const [permissionStatus, setPermissionStatus] = useState('');
     const { push } = useHistory();
     const theme = useTheme();
     const classes = useStyles({ theme });
     const isMobile = window.innerWidth <= 1080;
     async function logout() {
-        signOut1()
+        signOut1();
     }
     function onClick(slug, parameters = {}) {
         push(convertSlugToUrl(slug, parameters));
     }
-    const data= JSON.parse(localStorage.getItem('permission'))
-    console.log("permission detail",data)
+    const data = JSON.parse(localStorage.getItem('permission'));
+    console.log('permission detail', data);
 
-//    const getUserPermissionDetail=async()=>{
-//     try{
-//        const id=await localStorage.getItem('userID')
-//        if(id!=null)
-//        {
-//         const refDetail=ref(database,`USERS/${id}`)
-//         onValue(refDetail,snapShot=>{
-//             // console.log("permissionStatus",snapShot.val().role.PermissionStatus)
-//             setPermissionStatus(snapShot.val().role.PermissionStatus)
-//         })
-//        }
-//     }
+    //    const getUserPermissionDetail=async()=>{
+    //     try{
+    //        const id=await localStorage.getItem('userID')
+    //        if(id!=null)
+    //        {
+    //         const refDetail=ref(database,`USERS/${id}`)
+    //         onValue(refDetail,snapShot=>{
+    //             // console.log("permissionStatus",snapShot.val().role.PermissionStatus)
+    //             setPermissionStatus(snapShot.val().role.PermissionStatus)
+    //         })
+    //        }
+    //     }
     // catch(error)
     // {
     //     console.log(error)
     // }
-//    }
-    useEffect(()=>{
+    //    }
+    const handler = (e) => setShow(e.matches);
+    window.matchMedia('(min-width: 768px)').addEventListener('change', handler);
+    useEffect(() => {
         // getUserPermissionDetail()
-    setPermissionStatus(data)
-    },[])
-    return (
-        <Menu isMobile={isMobile}>
-            <div style={{ paddingTop: 30, paddingBottom: 30 }}>
-                <LogoComponent />
-            </div>
-            <MenuItem
-                id={SLUGS.dashboard}
-                title='Dashboard'
-                icon={IconSubscription}
-                onClick={() => onClick(SLUGS.dashboard)}
-            />
-            {
-                permission?.user?
+        setPermissionStatus(data);
+    }, []);
+    return show ? (
+        <div>
+            <Menu isMobile={isMobile}>
+                <div style={{ paddingTop: 30, paddingBottom: 30 }}>
+                    <LogoComponent />
+                </div>
                 <MenuItem
-                id={SLUGS.UserList}
-                title='UserList'
-                icon={IconContacts}
-                onClick={() => onClick(SLUGS.UserList)}
-            />:null
-            }
-                {
-                permission?.item?
-                <MenuItem
-                id={SLUGS.items}
-                title='Items'
-                icon={IconTickets}
-                onClick={() => onClick(SLUGS.items)}
-            />:null
-            }
-                {
-                permission?.payment?
-                <MenuItem
-                id={SLUGS.PaymentList}
-                title='PaymentList'
-                icon={IconTickets}
-                onClick={() => onClick(SLUGS.PaymentList)}
-            />:null
-            }
-             
-            
-           
-           
-            {
-                permission?.addAdmin?
-                <MenuItem
-                id={SLUGS.AddAdmin}
-                title='AddAdmin'
-                icon={IconAgents}
-                onClick={() => onClick(SLUGS.AddAdmin)}
-            />:null
-            }
-          
-            {
-                permission?.addProduct?
-                <MenuItem
-                id={SLUGS.AddProduct}
-                title='AddProduct'
-                icon={IconSubscription}
-                onClick={() => onClick(SLUGS.AddProduct)}
-            />
-                :null
-            }
-               {
-                permission?.feedback?
-                <MenuItem
-                id={SLUGS.FeedBack}
-                title='FeedBack'
-                icon={IconAgents}
-                onClick={() => onClick(SLUGS.FeedBack)}
-            />:null
-            }
-            
-              {
-                permission?.privacy?
-                <MenuItem
-                id={SLUGS.privacyPolicy}
-                title='PrivacyPolicy'
-                icon={IconSubscription}
-                onClick={() => onClick(SLUGS.privacyPolicy)}
-            />:null
-            }
-            {
-                permission?.term?
-                <MenuItem
-                id={SLUGS.TermAndCondition}
-                title='TermAndCondition'
-                icon={IconArticles}
-                onClick={() => onClick(SLUGS.TermAndCondition)}
-            />:null
-            }
-            <div className={classes.separator}></div>
-            {/* <MenuItem
-                id={SLUGS.settings}
-                title='Settings'
-                icon={IconSettings}
-                onClick={() => onClick(SLUGS.settings)}
-            /> */}
-            <MenuItem id='logout' title='Logout' icon={IconLogout} onClick={logout} />
-        </Menu>
-    );
+                    id={SLUGS.dashboard}
+                    title='Dashboard'
+                    icon={IconSubscription}
+                    onClick={() => onClick(SLUGS.dashboard)}
+                />
+                {permission?.user ? (
+                    <MenuItem
+                        id={SLUGS.UserList}
+                        title='UserList'
+                        icon={IconContacts}
+                        onClick={() => onClick(SLUGS.UserList)}
+                    />
+                ) : null}
+                {permission?.item ? (
+                    <MenuItem
+                        id={SLUGS.items}
+                        title='Items'
+                        icon={IconTickets}
+                        onClick={() => onClick(SLUGS.items)}
+                    />
+                ) : null}
+                {permission?.payment ? (
+                    <MenuItem
+                        id={SLUGS.PaymentList}
+                        title='PaymentList'
+                        icon={IconTickets}
+                        onClick={() => onClick(SLUGS.PaymentList)}
+                    />
+                ) : null}
+
+                {permission?.addAdmin ? (
+                    <MenuItem
+                        id={SLUGS.AddAdmin}
+                        title='AddAdmin'
+                        icon={IconAgents}
+                        onClick={() => onClick(SLUGS.AddAdmin)}
+                    />
+                ) : null}
+
+                {permission?.addProduct ? (
+                    <MenuItem
+                        id={SLUGS.AddProduct}
+                        title='AddProduct'
+                        icon={IconSubscription}
+                        onClick={() => onClick(SLUGS.AddProduct)}
+                    />
+                ) : null}
+                {permission?.feedback ? (
+                    <MenuItem
+                        id={SLUGS.FeedBack}
+                        title='FeedBack'
+                        icon={IconAgents}
+                        onClick={() => onClick(SLUGS.FeedBack)}
+                    />
+                ) : null}
+
+                {permission?.privacy ? (
+                    <MenuItem
+                        id={SLUGS.privacyPolicy}
+                        title='PrivacyPolicy'
+                        icon={IconSubscription}
+                        onClick={() => onClick(SLUGS.privacyPolicy)}
+                    />
+                ) : null}
+                {permission?.term ? (
+                    <MenuItem
+                        id={SLUGS.TermAndCondition}
+                        title='TermAndCondition'
+                        icon={IconArticles}
+                        onClick={() => onClick(SLUGS.TermAndCondition)}
+                    />
+                ) : null}
+                <div className={classes.separator}></div>
+                {/* <MenuItem
+            id={SLUGS.settings}
+            title='Settings'
+            icon={IconSettings}
+            onClick={() => onClick(SLUGS.settings)}
+        /> */}
+                <MenuItem id='logout' title='Logout' icon={IconLogout} onClick={logout} />
+            </Menu>
+        </div>
+    ) : null;
 }
 
 export default SidebarComponent;
