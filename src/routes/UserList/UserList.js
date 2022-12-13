@@ -1,7 +1,7 @@
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { createUseStyles, useTheme } from 'react-jss';
+import { useTheme } from 'react-jss';
 import { useHistory } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
