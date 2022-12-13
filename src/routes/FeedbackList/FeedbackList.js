@@ -1,8 +1,7 @@
 import { database } from 'configs/firebaseConfig';
-import { onValue, ref, set } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { createUseStyles, useTheme } from 'react-jss';
-
+import { useTheme } from 'react-jss';
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,16 +10,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { Link } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
-import { notify } from 'util/notify';
 import { ToastContainer } from 'react-toastify';
 
 export default function FeedBackList() {
     const theme = useTheme();
-    const classes = useStyles(theme);
     const [data, setData] = useState([]);
-
     const ReadMore = ({ children }) => {
         const text = children;
         const [isReadMore, setIsReadMore] = useState(true);
@@ -51,7 +45,6 @@ export default function FeedBackList() {
             onValue(starCountRef, (snapshot) => {
                 if (Array.isArray(snapshot.val())) {
                     let newArr = snapshot.val();
-                    //  let newArr=data.filter(item=>item)
                     setData(newArr);
                 } else {
                     let arr = [];
@@ -121,21 +114,3 @@ export default function FeedBackList() {
         </TableContainer>
     );
 }
-
-const useStyles = createUseStyles((theme) => ({
-    mainDiv: {
-        display: 'flex',
-        height: '100%',
-        width: '100%'
-    },
-    img: {
-        width: 50,
-        height: 50,
-        borderRadius: 100,
-        justifyContent: 'center',
-        alignItems: 'center'
-    },
-    read: {
-        color: 'red'
-    }
-}));

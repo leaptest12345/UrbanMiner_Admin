@@ -10,7 +10,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { Button, Link } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 import { notify } from 'util/notify';
 import { ToastContainer } from 'react-toastify';
@@ -18,14 +18,16 @@ import { formateData } from 'util/formateData';
 import { useHistory } from 'react-router-dom';
 import { convertSlugToUrl } from 'resources/utilities';
 import SLUGS from 'resources/slugs';
+import ImageModal from 'components/ImageModal/ImageModal';
+import userDetailStyle from './styles';
 export default function UserDetail(props) {
     const theme = useTheme();
     const { push } = useHistory();
     const [data, setData] = useState([]);
     const [user, setUser] = useState('');
+    const { styles } = userDetailStyle;
     const [isApproved, setIsApproved] = useState(false);
     function onClick(slug, data, parameters = {}) {
-        // push(convertSlugToUrl(slug, parameters),data);
         push({
             pathname: convertSlugToUrl(slug, parameters),
 
@@ -72,7 +74,6 @@ export default function UserDetail(props) {
             onValue(refDetail, (snapShot) => {
                 const data = snapShot.val();
                 if (data) {
-                    console.log('customerDetial', formateData(data?.CUSTOMER));
                     setData(formateData(data?.CUSTOMER));
                 }
             });
@@ -84,7 +85,6 @@ export default function UserDetail(props) {
         try {
             const refDetail = ref(database, `USERS/${id}`);
             onValue(refDetail, (snapShot) => {
-                console.log('userDetail:::', snapShot.val());
                 setIsApproved(snapShot.val().isApproved);
                 setUser(snapShot.val());
             });
@@ -104,7 +104,6 @@ export default function UserDetail(props) {
         }
     };
     const onDelete = async (item) => {
-        console.log('customerDetail', item);
         try {
             const id = await localStorage.getItem('userID');
             const starCountRef = ref(database, `/USER_CUSTOMER/${id}/CUSTOMER/${item.ID}`);
@@ -114,78 +113,35 @@ export default function UserDetail(props) {
             console.log('error', error);
         }
     };
+    const onViewDetailClick = (item) => {
+        onClick(SLUGS.CustomerDetail, {
+            userId: id,
+            customerId: item.ID
+        });
+    };
+    const userUrl = user?.photo
+        ? user.photo
+        : 'https://avatars3.githubusercontent.com/u/21162888?s=460&v=4';
     return (
         <div>
-            <div
-                style={{
-                    height: '50%'
-                }}
-            >
-                <img
-                    src={
-                        user?.photo
-                            ? user.photo
-                            : 'https://avatars3.githubusercontent.com/u/21162888?s=460&v=4'
-                    }
-                    style={{
-                        height: 150,
-                        width: 150,
-                        borderRadius: 10
-                    }}
-                />
-                <div
-                    style={{
-                        backgroundColor: 'white',
-                        padding: 20,
-                        marginTop: 20,
-                        width: '50%',
-                        borderRadius: 10,
-                        boxShadow: ' 1px 1px 1px 1px #9E9E9E'
-                    }}
-                >
-                    <span
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            borderBottom: '0.5px solid grey',
-                            paddingBottom: 10
-                        }}
-                    >
-                        <h4 style={{}}>UserName </h4> : <h4> {user?.firstName + user?.lastName}</h4>
+            <div style={styles.div}>
+                <ImageModal url={userUrl} imageStyle={styles.img} />
+                <div style={styles.div1}>
+                    <span style={styles.text}>
+                        <h4>UserName </h4> : <h4> {user?.firstName + user?.lastName}</h4>
                     </span>
                     <br />
-                    <span
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            borderBottom: '0.5px solid grey',
-                            paddingBottom: 10
-                        }}
-                    >
-                        <h4 style={{}}>Eamil </h4> : <h4> {user?.email}</h4>
+                    <span style={styles.text}>
+                        <h4>Eamil </h4> : <h4> {user?.email}</h4>
                     </span>
                     <br />
 
-                    <span
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            borderBottom: '0.5px solid grey',
-                            paddingBottom: 10
-                        }}
-                    >
-                        <h4 style={{}}>PhoneNumer</h4> : <h4>{user?.phoneNumber}</h4>
+                    <span style={styles.text}>
+                        <h4>PhoneNumer</h4> : <h4>{user?.phoneNumber}</h4>
                     </span>
                     <br />
-                    <span
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            borderBottom: '0.5px solid grey',
-                            paddingBottom: 10
-                        }}
-                    >
-                        <h4 style={{}}>Role </h4> : <h4>{user?.role?.roleName}</h4>
+                    <span style={styles.text}>
+                        <h4>Role </h4> : <h4>{user?.role?.roleName}</h4>
                     </span>
                     <br />
                 </div>
@@ -195,19 +151,7 @@ export default function UserDetail(props) {
                     Approved
                 </Button>
             ) : null}
-            {data.length != 0 && (
-                <h1
-                    style={{
-                        fontSize: 30,
-                        marginTop: 20,
-                        marginBottom: 20,
-                        fontWeight: 'bold'
-                    }}
-                >
-                    CustomerList
-                </h1>
-            )}
-
+            {data.length != 0 && <h1 style={styles.title}>CustomerList</h1>}
             <TableContainer component={Paper}>
                 <Table aria-label='customized table'>
                     {data.length != 0 && (
@@ -233,22 +177,8 @@ export default function UserDetail(props) {
                                     <StyledTableCell component='th' scope='row'>
                                         {item.BusinessEmail}
                                     </StyledTableCell>
-                                    <StyledTableCell
-                                        align='left'
-                                        style={{
-                                            alignItems: 'center',
-                                            display: 'flex',
-                                            gap: 10
-                                        }}
-                                    >
-                                        <Button
-                                            onClick={() =>
-                                                onClick(SLUGS.CustomerDetail, {
-                                                    userId: id,
-                                                    customerId: item.ID
-                                                })
-                                            }
-                                        >
+                                    <StyledTableCell align='left' style={styles.leftDiv}>
+                                        <Button onClick={() => onViewDetailClick(item)}>
                                             View Detail
                                         </Button>
                                         <Delete onClick={() => onDelete(item)}></Delete>

@@ -2,8 +2,6 @@ import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import SLUGS from 'resources/slugs';
 import Login from './Login/Login';
-import SignUp from './signUp/SignUp';
-import Register from './TermAndConditions/Register';
 
 function PublicRoutes() {
     return (

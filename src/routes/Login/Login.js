@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Grid, Paper, Avatar, TextField, Button, Typography, Link } from '@material-ui/core';
+import { Grid, Paper, Avatar, TextField, Button } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
@@ -7,10 +7,10 @@ import { useTheme } from 'react-jss';
 import { UserContext } from 'util/userContext';
 import { notify } from 'util/notify';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { onValue, ref, set, update } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import { database } from 'configs/firebaseConfig';
 import { formateData } from 'util/formateData';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { setUser } from 'Redux/actions/userAction';
 import { ToastContainer } from 'react-toastify';
 import LoadingSpinner from 'components/Spinner/LoadingSpinner';
@@ -20,11 +20,7 @@ const Login = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState('');
     const { signIn1 } = React.useContext(UserContext);
-
     const dispatch = useDispatch();
-
-    const user = useSelector((state) => state);
-
     const theme = useTheme();
     const paperStyle = {
         padding: 20,
@@ -165,9 +161,6 @@ const Login = () => {
                 >
                     Sign in
                 </Button>
-                {/* <Typography style={{marginTop:20}}> Do you have an account ?
-                     <Link href="/signup" > Sign Up </Link>
-                </Typography> */}
             </Paper>
             <ToastContainer />
         </div>

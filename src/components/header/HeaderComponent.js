@@ -5,12 +5,10 @@ import { Row } from 'simple-flexbox';
 import { createUseStyles, useTheme } from 'react-jss';
 import { SidebarContext } from 'hooks/useSidebar';
 import SLUGS from 'resources/slugs';
-import { IconBell, IconSearch } from 'assets/icons';
 import DropdownComponent from 'components/dropdown';
 import { onValue, ref } from 'firebase/database';
 import { database } from 'configs/firebaseConfig';
 import { UserContext } from 'util/userContext';
-import { useSelector } from 'react-redux';
 const useStyles = createUseStyles((theme) => ({
     avatar: {
         height: 35,
@@ -70,8 +68,6 @@ function HeaderComponent() {
     const [name, setName] = useState('');
     const [photo, setPhoto] = useState('');
     const { signOut1 } = React.useContext(UserContext);
-    const user = useSelector((state) => state);
-    console.log('userdetail from header', user.userReducer);
     let title;
     switch (true) {
         case currentItem === SLUGS.dashboard:
@@ -131,7 +127,6 @@ function HeaderComponent() {
                 const result = ref(database, `/ADMIN/USERS/${userID}`);
                 onValue(result, (snapshot) => {
                     const { firstName, lastName, photo } = snapshot.val();
-                    console.log('getting user Detail', firstName, lastName, photo);
                     setName(firstName + lastName);
                     setPhoto(photo);
                 });
@@ -145,38 +140,11 @@ function HeaderComponent() {
             <span className={classes.title}>{title}</span>
             <Row vertical='center'>
                 <div className={classes.iconStyles}>{/* <IconSearch /> */}</div>
-                <div className={classes.iconStyles}>
-                    {/* <DropdownComponent
-                        label={<IconBell />}
-                        options={[
-                            {
-                                label: 'Notification #1',
-                                onClick: () => console.log('Notification #1')
-                            },
-                            {
-                                label: 'Notification #2',
-                                onClick: () => console.log('Notification #2')
-                            },
-                            {
-                                label: 'Notification #3',
-                                onClick: () => console.log('Notification #3')
-                            },
-                            {
-                                label: 'Notification #4',
-                                onClick: () => console.log('Notification #4')
-                            }
-                        ]}
-                        position={{
-                            top: 42,
-                            right: -14
-                        }}
-                    /> */}
-                </div>
+                <div className={classes.iconStyles}></div>
                 <div className={classes.separator}></div>
                 <DropdownComponent
                     label={
                         <>
-                            {/* <span className={classes.name}>{name ? name : 'Germán Llorente'}</span> */}
                             <img
                                 src={
                                     photo

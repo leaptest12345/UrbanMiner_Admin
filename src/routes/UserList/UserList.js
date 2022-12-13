@@ -1,152 +1,132 @@
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set } from 'firebase/database';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { createUseStyles, useTheme } from 'react-jss';
 import { useHistory } from 'react-router-dom';
-
-import { withStyles } from '@material-ui/core/styles'; 
-import Table from '@material-ui/core/Table'; 
-import TableBody from '@material-ui/core/TableBody'; 
-import TableCell from '@material-ui/core/TableCell'; 
-import TableContainer from '@material-ui/core/TableContainer'; 
-import TableHead from '@material-ui/core/TableHead'; 
-import TableRow from '@material-ui/core/TableRow'; 
+import { withStyles } from '@material-ui/core/styles';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { Button, Link } from '@material-ui/core';
-import {Delete} from '@material-ui/icons'
+import { Button } from '@material-ui/core';
+import { Delete } from '@material-ui/icons';
 import { notify } from 'util/notify';
 import { ToastContainer } from 'react-toastify';
 import { formateData } from 'util/formateData';
 import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
+import ImageModal from 'components/ImageModal/ImageModal';
 
-
-export default function UserList()
-{
-    const theme=useTheme()
+import styles from './styles';
+export default function UserList() {
+    const theme = useTheme();
     const { push } = useHistory();
 
-    const classes=useStyles(theme)
-    const [user,setUsers]=useState([1,2])
-    const getUserList=()=>{
-        try{
+    const [user, setUsers] = useState([1, 2]);
+    const getUserList = () => {
+        try {
             const starCountRef = ref(database, '/USERS');
             onValue(starCountRef, (snapshot) => {
-            const data = snapshot.val();
-            setUsers(formateData(data))
-            })
+                const data = snapshot.val();
+                setUsers(formateData(data));
+            });
+        } catch (error) {
+            console.log(error);
         }
-        catch(error)
-        {
-            console.log(error)
-        }
-    }
-    useEffect(()=>{
-        getUserList()
-    },[])
+    };
+    useEffect(() => {
+        getUserList();
+    }, []);
 
-    function onClick(slug,data, parameters = {}) {
-      push({
-         pathname: convertSlugToUrl(slug,parameters),
-         state: data
-      })
-  }
-   const StyledTableCell = withStyles(() => ({
-    head: {
-       backgroundColor: theme.color.veryDarkGrayishBlue,
-       color: theme.color.white,
-    },
-    body: {
-       fontSize: 14,
-    },
- }))(TableCell);
- const StyledTableRow = withStyles(() => ({
-    root: {
-       '&:nth-of-type(odd)': {
-          backgroundColor:theme.color.lightGrayishBlue,
-       },
-    },
- }))(TableRow);
-    const onDelete=async(item)=>{
-      try{
-         const id=await localStorage.getItem('userID')
-         if(id!=item.ID)
-         {
-            const starCountRef = ref(database, `/USERS/${item.ID}`);
-            set(starCountRef,null)
-           setTimeout(() => {
-            notify("User has been Deleted Successfully",0)
-           }, 200);
-         }
-         else 
-         {
-            notify("You can't delete this User",0)
-         }
-        
-      }
-      catch(error)
-      {
-        console.log("error")
-      }
+    function onClick(slug, data, parameters = {}) {
+        push({
+            pathname: convertSlugToUrl(slug, parameters),
+            state: data
+        });
     }
-    return(
-    <TableContainer component={Paper}>
-   <Table aria-label="customized table">
-      <TableHead>
-         <TableRow>
-         <StyledTableCell align="left">No.</StyledTableCell>
-         <StyledTableCell align="left">Photo</StyledTableCell>
-            <StyledTableCell align="left">Name</StyledTableCell>
-            <StyledTableCell align="left">PhoneNumber</StyledTableCell>
-            <StyledTableCell align="left">Detail</StyledTableCell>
-            <StyledTableCell align="left">Delete</StyledTableCell>
-         </TableRow>
-      </TableHead>
-      <TableBody>
-        {user&&user.map((item,index) => 
-          <StyledTableRow align="left" key={item.id}>
-            <StyledTableCell component="th" scope="row">
-             {index+1}
-          </StyledTableCell>
-              <StyledTableCell align="left">{item.photo?<img
-       src={item.photo}
-       loading="lazy"
-       className={classes.img}
-     />:<div className={classes.img}>-</div>}</StyledTableCell>
-          <StyledTableCell component="th" scope="row">
-             {item.firstName+item.lastName}
-          </StyledTableCell>
-          <StyledTableCell align="left">
-           {item.phoneNumber?item.phoneNumber:'-'}
-          </StyledTableCell>
-          <StyledTableCell align='left'>
-          <Button
-          onClick={()=>onClick(SLUGS.UserDetail,{id:item.ID})}>
-            View Detail
-          </Button>
-          </StyledTableCell>
-          <StyledTableCell align="left"><Delete onClick={()=>onDelete(item)}></Delete></StyledTableCell>
-       </StyledTableRow>
-          )}
-      </TableBody>
-   </Table>
-   <ToastContainer/>
-  </TableContainer>
-    )
+    const StyledTableCell = withStyles(() => ({
+        head: {
+            backgroundColor: theme.color.veryDarkGrayishBlue,
+            color: theme.color.white
+        },
+        body: {
+            fontSize: 14
+        }
+    }))(TableCell);
+    const StyledTableRow = withStyles(() => ({
+        root: {
+            '&:nth-of-type(odd)': {
+                backgroundColor: theme.color.lightGrayishBlue
+            }
+        }
+    }))(TableRow);
+    const onDelete = async (item) => {
+        try {
+            const id = await localStorage.getItem('userID');
+            if (id != item.ID) {
+                const starCountRef = ref(database, `/USERS/${item.ID}`);
+                set(starCountRef, null);
+                setTimeout(() => {
+                    notify('User has been Deleted Successfully', 0);
+                }, 200);
+            } else {
+                notify("You can't delete this User", 0);
+            }
+        } catch (error) {
+            console.log('error');
+        }
+    };
+    return (
+        <TableContainer component={Paper}>
+            <Table aria-label='customized table'>
+                <TableHead>
+                    <TableRow>
+                        <StyledTableCell align='left'>No.</StyledTableCell>
+                        <StyledTableCell align='left'>Photo</StyledTableCell>
+                        <StyledTableCell align='left'>Name</StyledTableCell>
+                        <StyledTableCell align='left'>PhoneNumber</StyledTableCell>
+                        <StyledTableCell align='left'>Detail</StyledTableCell>
+                        <StyledTableCell align='left'>Delete</StyledTableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {user &&
+                        user.map((item, index) => (
+                            <StyledTableRow align='left' key={item.id}>
+                                <StyledTableCell component='th' scope='row'>
+                                    {index + 1}
+                                </StyledTableCell>
+                                <StyledTableCell align='left'>
+                                    {item.photo ? (
+                                        <ImageModal url={item.photo} imageStyle={styles.img} />
+                                    ) : (
+                                        <div className={styles.img}>-</div>
+                                    )}
+                                </StyledTableCell>
+                                <StyledTableCell component='th' scope='row'>
+                                    {item.firstName + item.lastName}
+                                </StyledTableCell>
+                                <StyledTableCell align='left'>
+                                    {item.phoneNumber ? item.phoneNumber : '-'}
+                                </StyledTableCell>
+                                <StyledTableCell align='left'>
+                                    <Button
+                                        onClick={() => onClick(SLUGS.UserDetail, { id: item.ID })}
+                                    >
+                                        View Detail
+                                    </Button>
+                                </StyledTableCell>
+                                <StyledTableCell align='left'>
+                                    <Delete onClick={() => onDelete(item)}></Delete>
+                                </StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                </TableBody>
+            </Table>
+            <ToastContainer />
+        </TableContainer>
+    );
 }
-
-const useStyles = createUseStyles((theme)=>({
-    mainDiv:{
-     display:'flex',
-     height:'100%',
-     width:'100%',
-    },
-    img:{
-      width:50,
-      height:50,
-      borderRadius:100,
-      justifyContent:'center',
-      alignItems:'center',
-      display:'flex'
-    }
- }));

@@ -18,10 +18,9 @@ import { Delete } from '@material-ui/icons';
 import { uploadProductImage } from 'util/uploadProductImage';
 import productStyle from './styles';
 import { formateData } from 'util/formateData';
-
+import ImageModal from 'components/ImageModal/ImageModal';
 function AddProduct() {
     const [imgfile, setImageFile] = useState('');
-    const [progress, setProgress] = useState(0);
     const [productName, setProductName] = useState('');
     const [productDesc, setProductDesc] = useState('');
     const [open, setOpen] = useState(false);
@@ -102,11 +101,10 @@ function AddProduct() {
             const refDetail = ref(database, `/ADMIN/PRODUCT`);
             onValue(refDetail, (snapShot) => {
                 const arr = formateData(snapShot.val());
-                console.log('all Product', arr);
                 setProductList(arr);
             });
         } catch (error) {
-            console.log('product error', error);
+            console.log(error);
         }
     };
     const createProduct = async (downloadURL) => {
@@ -186,11 +184,9 @@ function AddProduct() {
     };
     const deleteSubProduct = (data) => {
         const result = subProduct.filter((item) => {
-            console.log(item.id, data.id);
             return item.id != data.id;
         });
         setSubProduct(result);
-        console.log('after delete', subProduct, result);
     };
     const editProduct = (item) => {
         try {
@@ -275,7 +271,6 @@ function AddProduct() {
         setAddToDatabase(false);
     };
     const deleteProduct = () => {
-        console.log('delet Product called', productType);
         const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
         const refDetail1 = ref(database, `/ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${productSubId}`);
         try {
@@ -327,6 +322,17 @@ function AddProduct() {
             console.log(error);
         }
     };
+    const onEdit = () => {
+        addToDatabase
+            ? addSubProductInDatabase()
+            : isEditable
+            ? productType == 0
+                ? editProductDetail()
+                : editSubProductDetail()
+            : addSubProduct();
+    };
+    const imageFileUrl = imgfile != '' ? window.URL.createObjectURL(imgfile) : '';
+
     return (
         <div>
             {loading ? <LoadingSpinner /> : null}
@@ -337,7 +343,7 @@ function AddProduct() {
                 onChange={(e) => setProductName(e.target.value)}
                 style={styles.inputStyle}
             />
-            <div style={{ marginTop: '20px', marginBottom: '20px' }}>
+            <div style={styles.productDescView}>
                 <br />
                 <text>Enter Product Description: </text>
                 <br />
@@ -348,7 +354,7 @@ function AddProduct() {
                 />
             </div>
             <h2>Upload</h2>
-            <input style={{ marginTop: '20px' }} type='file' onChange={imgFilehandler} />
+            <input style={styles.marginTopView} type='file' onChange={imgFilehandler} />
 
             {imgfile != '' ? (
                 <>
@@ -356,17 +362,13 @@ function AddProduct() {
                     <div>
                         <h2>Preview</h2>
                         <span>
-                            <img
-                                src={imgfile != '' ? URL.createObjectURL(imgfile) : ''}
-                                style={styles.imgStyle}
-                                alt='Photo'
-                            />
+                            <ImageModal imageStyle={styles.imgStyle} url={imageFileUrl} />
                         </span>
                     </div>
                 </>
             ) : null}
             <br />
-            <div style={{ marginTop: '20px' }}>
+            <div style={styles.marginTopView}>
                 <Button style={styles.btnStyle} onClick={() => setOpen(true)}>
                     ADD SUB_PRODUCT
                 </Button>
@@ -376,7 +378,7 @@ function AddProduct() {
                 <br />
                 {subProduct.length != 0 ? <text style={styles.title}>SUB_PRODUCT LIST</text> : null}
                 {subProduct.length != 0 ? (
-                    <Table aria-label='customized table' style={{ marginTop: '20px' }}>
+                    <Table aria-label='customized table' style={styles.marginTopView}>
                         <TableHead>
                             <TableRow>
                                 <StyledTableCell align='left'>No.</StyledTableCell>
@@ -398,16 +400,15 @@ function AddProduct() {
                                             </StyledTableCell>
                                             <StyledTableCell align='left'>
                                                 {item.img ? (
-                                                    <img
-                                                        src={
+                                                    <ImageModal
+                                                        imageStyle={styles.img}
+                                                        url={
                                                             item.img != ''
                                                                 ? window.URL.createObjectURL(
                                                                       item.img
                                                                   )
                                                                 : ''
                                                         }
-                                                        loading='lazy'
-                                                        style={styles.img}
                                                     />
                                                 ) : (
                                                     <div style={styles.img}>-</div>
@@ -436,7 +437,7 @@ function AddProduct() {
                     <Table aria-label='customized table' style={{ marginTop: '20px' }}>
                         <TableHead>
                             <TableRow>
-                                <StyledTableCell align='left' style={{ width: '10%' }}>
+                                <StyledTableCell align='left' style={styles.width10}>
                                     No.
                                 </StyledTableCell>
                                 <StyledTableCell align='left' style={{ width: '20%' }}>
@@ -448,10 +449,10 @@ function AddProduct() {
                                 <StyledTableCell align='left' style={{ width: '40%' }}>
                                     ProductDescription
                                 </StyledTableCell>
-                                <StyledTableCell align='left' style={{ width: '10%' }}>
+                                <StyledTableCell align='left' style={styles.width10}>
                                     Actions
                                 </StyledTableCell>
-                                <StyledTableCell align='left' style={{ width: '10%' }}>
+                                <StyledTableCell align='left' style={styles.width10}>
                                     Delete
                                 </StyledTableCell>
                             </TableRow>
@@ -464,15 +465,14 @@ function AddProduct() {
                                             <StyledTableCell
                                                 component='th'
                                                 scope='row'
-                                                style={{ width: '10%' }}
+                                                style={styles.width10}
                                             >
                                                 {index + 1}
                                             </StyledTableCell>
                                             <StyledTableCell align='left' style={{ width: '20%' }}>
                                                 {item.productImage ? (
-                                                    <img
-                                                        src={item.productImage}
-                                                        loading='lazy'
+                                                    <ImageModal
+                                                        url={item.productImage}
                                                         style={styles.productImage}
                                                     />
                                                 ) : (
@@ -482,7 +482,7 @@ function AddProduct() {
                                             <StyledTableCell
                                                 component='th'
                                                 scope='row'
-                                                style={{ width: '10%' }}
+                                                style={styles.width10}
                                             >
                                                 {item.productName}
                                             </StyledTableCell>
@@ -491,7 +491,7 @@ function AddProduct() {
                                                     ? item.prodductDescription
                                                     : '-'}
                                             </StyledTableCell>
-                                            <StyledTableCell align='left' style={{ width: '10%' }}>
+                                            <StyledTableCell align='left' style={styles.width10}>
                                                 <Button
                                                     style={styles.dangerBtn}
                                                     onClick={() =>
@@ -511,7 +511,7 @@ function AddProduct() {
                                                     ADD SUB_PRODUCT
                                                 </Button>
                                             </StyledTableCell>
-                                            <StyledTableCell align='left' style={{ width: '10%' }}>
+                                            <StyledTableCell align='left' style={styles.width10}>
                                                 <Delete
                                                     onClick={() =>
                                                         setProductType(0) +
@@ -528,7 +528,7 @@ function AddProduct() {
                                                           <StyledTableCell1
                                                               component='th'
                                                               scope='row'
-                                                              style={{ width: '10%' }}
+                                                              style={styles.width10}
                                                           >
                                                               {index + 1 + '.' + (index1 + 1)}
                                                           </StyledTableCell1>
@@ -537,9 +537,8 @@ function AddProduct() {
                                                               style={{ width: '20%' }}
                                                           >
                                                               {item1.productImage ? (
-                                                                  <img
-                                                                      src={item1.productImage}
-                                                                      loading='lazy'
+                                                                  <ImageModal
+                                                                      url={item1.productImage}
                                                                       style={styles.productImage}
                                                                   />
                                                               ) : (
@@ -549,7 +548,7 @@ function AddProduct() {
                                                           <StyledTableCell1
                                                               component='th'
                                                               scope='row'
-                                                              style={{ width: '10%' }}
+                                                              style={styles.width10}
                                                           >
                                                               {item1.productName}
                                                           </StyledTableCell1>
@@ -563,23 +562,23 @@ function AddProduct() {
                                                           </StyledTableCell1>
                                                           <StyledTableCell1
                                                               align='left'
-                                                              style={{ width: '10%' }}
+                                                              style={styles.width10}
                                                           >
                                                               <Button
                                                                   style={styles.dangerBtn}
-                                                                  onClick={() =>
-                                                                      setProductId(item.ID) +
-                                                                      setProductSubId(item1.id) +
-                                                                      editProduct(item1) +
-                                                                      setProductType(1)
-                                                                  }
+                                                                  onClick={() => {
+                                                                      setProductId(item.ID);
+                                                                      setProductSubId(item1.id);
+                                                                      editProduct(item1);
+                                                                      setProductType(1);
+                                                                  }}
                                                               >
                                                                   EDIT
                                                               </Button>
                                                           </StyledTableCell1>
                                                           <StyledTableCell1
                                                               align='left'
-                                                              style={{ width: '10%' }}
+                                                              style={styles.width10}
                                                           >
                                                               <Delete
                                                                   onClick={() =>
@@ -634,8 +633,8 @@ function AddProduct() {
                         <div>
                             {subImgFile != '' ? (
                                 <span>
-                                    <img
-                                        src={
+                                    <ImageModal
+                                        url={
                                             addToDatabase
                                                 ? window.URL.createObjectURL(subImgFile)
                                                 : isEditable
@@ -644,8 +643,7 @@ function AddProduct() {
                                                     : subImgFile
                                                 : window.URL.createObjectURL(subImgFile)
                                         }
-                                        style={styles.imgStyle1}
-                                        alt='Photo'
+                                        imageStyle={styles.imgStyle1}
                                     />
                                 </span>
                             ) : null}
