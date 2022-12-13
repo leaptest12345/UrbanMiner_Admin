@@ -10,8 +10,6 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { onValue, ref } from 'firebase/database';
 import { database } from 'configs/firebaseConfig';
 import { formateData } from 'util/formateData';
-import { useDispatch } from 'react-redux';
-import { setUser } from 'Redux/actions/userAction';
 import { ToastContainer } from 'react-toastify';
 import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 const Login = () => {
@@ -20,7 +18,6 @@ const Login = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState('');
     const { signIn1 } = React.useContext(UserContext);
-    const dispatch = useDispatch();
     const theme = useTheme();
     const paperStyle = {
         padding: 20,
@@ -50,7 +47,6 @@ const Login = () => {
                             if (item.email == email) {
                                 emailResult = true;
                                 signIn1(item.ID + '', item.role.PermissionStatus);
-                                dispatch(setUser(item));
                                 notify('Login Successfully Done!', 1);
                                 setLoading(false);
                                 return;
