@@ -6,7 +6,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import { useTheme } from 'react-jss';
 import { UserContext } from 'util/userContext';
 import { notify } from 'util/notify';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { onValue, ref, set, update } from 'firebase/database';
 import { database } from 'configs/firebaseConfig';
 import { formateData } from 'util/formateData';
@@ -14,15 +14,57 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from 'Redux/actions/userAction';
 import { ToastContainer } from 'react-toastify';
 import LoadingSpinner from 'components/Spinner/LoadingSpinner';
+import { v4 as uuid } from 'uuid';
 const Login = () => {
+    const uniqueId = uuid().slice(0, 8);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState('');
     const { signIn1 } = React.useContext(UserContext);
-
+    const auth = getAuth();
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        setValues();
+    }, []);
+    const setValues = async () => {
+        try {
+            const user = await createUserWithEmailAndPassword(
+                auth,
+                'sutharbipinn25899@gmail.com',
+                '12345678'
+            );
+            const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
+            await set(refDetail, {
+                ID: uniqueId,
+                email: 'sutharbipinn25899@gmail.com',
+                role: {
+                    roleName: 'admin',
+                    PermissionStatus: {
+                        user: true,
+                        item: true,
+                        payment: true,
+                        privacy: true,
+                        term: true,
+                        addAdmin: true,
+                        feedback: true,
+                        addProduct: true
+                    }
+                }
+            });
+            const id = uuid().slice(0, 8);
+            const starCount = ref(database, `/ADMIN/PRODUCT/${id}`);
+            await set(starCount, {
+                ID: id,
+                productName: 'new product',
+                productImage: '',
+                prodductDescription: 'urbanminer product has been added'
+            });
+        } catch (error) {
+            console.log('error details', error.message);
+        }
+    };
     const user = useSelector((state) => state);
 
     const theme = useTheme();
@@ -39,7 +81,7 @@ const Login = () => {
         backgroundColor: theme.color.veryDarkGrayishBlue,
         color: theme.color.white
     };
-    const auth = getAuth();
+
     const onSubmit = async () => {
         if (!email) notify('Please Fill The Email Filed!', 0);
         else if (!password) notify('Please Fill The password Field!', 0);
@@ -175,27 +217,3 @@ const Login = () => {
 };
 
 export default Login;
-
-// const user = await createUserWithEmailAndPassword(
-//     auth,
-//     'sutharbipinn25899@gmail.com',
-//     '12345678'
-// );
-// const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-// await set(refDetail, {
-//     ID: uniqueId,
-//     email: 'sutharbipinn25899@gmail.com',
-//     role: {
-//         roleName: 'admin',
-//         PermissionStatus: {
-//             user: true,
-//             item: true,
-//             payment: true,
-//             privacy: true,
-//             term: true,
-//             addAdmin: true,
-//             feedback: true,
-//             addProduct: true
-//         }
-//     }
-// });

@@ -2,14 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getDatabase } from 'firebase/database';
 
 const firebaseConfig = {
-    apiKey: 'AIzaSyDRQTyNvgMNENz1AwFeNngEjcOV1WM3oTA',
-    authDomain: 'reactnative-5b22f.firebaseapp.com',
-    databaseURL: 'https://reactnative-5b22f-default-rtdb.firebaseio.com',
-    projectId: 'reactnative-5b22f',
-    storageBucket: 'reactnative-5b22f.appspot.com',
-    messagingSenderId: '236743556994',
-    appId: '1:236743556994:web:85fdbf8ac722bdfc75199b',
-    measurementId: 'G-82DREJ5KE9'
+    apiKey: 'AIzaSyCPpB5u96_fKUOhrpLfTD6Lhdxs6-pCSGU',
+    authDomain: 'urbanminer-49466.firebaseapp.com',
+    databaseURL: 'https://urbanminer-49466-default-rtdb.firebaseio.com',
+    projectId: 'urbanminer-49466',
+    storageBucket: 'urbanminer-49466.appspot.com',
+    messagingSenderId: '281440786865',
+    appId: '1:281440786865:web:0922bf95a2e82242510590',
+    measurementId: 'G-0NR3F1Z5HB'
 };
 const app = initializeApp(firebaseConfig);
 export const database = getDatabase(app);
