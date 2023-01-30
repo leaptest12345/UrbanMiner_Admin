@@ -98,7 +98,10 @@ const styles = {
         fontSize: '25px',
         color: 'black',
         fontWeight: 'bold'
-    }
+    },
+    productDescView: { marginTop: '20px', marginBottom: '20px' },
+    marginTopView: { marginTop: '20px' },
+    width10: { width: '10%' }
 };
 export default {
     styles

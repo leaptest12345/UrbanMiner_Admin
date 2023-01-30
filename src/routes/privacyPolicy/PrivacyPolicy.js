@@ -32,7 +32,6 @@ export default function PrivacyPolicy() {
     };
     function handleSubmit(e) {
         e.preventDefault();
-        console.log('You clicked submit.');
         try {
             const result = ref(database, '/ADMIN/privacyPolicy');
             set(result, {

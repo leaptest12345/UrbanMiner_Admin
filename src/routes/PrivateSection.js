@@ -34,7 +34,6 @@ function PrivateSection() {
             if (id != null) {
                 const refDetail = ref(database, `/ADMIN/USERS/${id}`);
                 onValue(refDetail, (snapShot) => {
-                    console.log('permissionStatus', snapShot.val().role.PermissionStatus);
                     setPermissionStatus(snapShot.val().role.PermissionStatus);
                 });
             }

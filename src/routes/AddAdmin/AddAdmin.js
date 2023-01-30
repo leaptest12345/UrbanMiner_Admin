@@ -2,7 +2,7 @@ import { Button } from '@material-ui/core';
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { createUseStyles, useTheme } from 'react-jss';
+import { useTheme } from 'react-jss';
 import { ToastContainer } from 'react-toastify';
 import { formateData } from 'util/formateData';
 import { notify } from 'util/notify';
@@ -14,7 +14,6 @@ export default function AddAdmin() {
     const [email, setEmail] = useState('');
     const [users, setUsers] = useState([]);
     const [password, setPassword] = useState('');
-    const [id, setId] = useState(null);
     const [itemPermission, setItemPermission] = useState(false);
     const [userPermission, setUserPermission] = useState(false);
     const [paymentPermission, setPaymentPermission] = useState(false);
@@ -51,7 +50,6 @@ export default function AddAdmin() {
     const createAdmin = async () => {
         try {
             const result = await getUserId();
-            console.log('account alredy', result);
             if (result == 0) {
                 const auth = getAuth();
                 const user = await createUserWithEmailAndPassword(auth, email, password);
@@ -100,7 +98,6 @@ export default function AddAdmin() {
             const { message } = error;
             if (message == 'Firebase: Error (auth/email-already-in-use).') {
                 const result = await getUserId();
-                console.log('account alredy', result);
                 try {
                     if (result == 0) {
                         const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
@@ -345,21 +342,3 @@ export default function AddAdmin() {
         </div>
     );
 }
-
-const useStyles = createUseStyles({
-    btn: {
-        backgroundColor: 'red'
-    },
-    checkBox: {
-        width: 100,
-        height: 100
-    },
-    textField: {
-        width: '90%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        paddingBottom: 0,
-        marginTop: 0,
-        backgroundColor: 'red'
-    }
-});

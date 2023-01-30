@@ -24,7 +24,6 @@ function Routes() {
     useEffect(() => {
         window.scrollTo(0, 0);
         const items = localStorage.getItem('userID');
-        console.log('user detail', items);
         setUser(items);
     }, [pathname]);
 

@@ -20,6 +20,7 @@
         "react-collapsible-content": "^1.0.0",
         "react-dom": "^16.8.6",
         "react-jss": "^10.4.0",
+        "react-modal-image": "^2.6.0",
         "react-pdf": "^6.0.2",
         "react-redux": "^8.0.5",
         "react-router-dom": "^5.2.0",

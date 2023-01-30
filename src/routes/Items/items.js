@@ -102,7 +102,6 @@ export default function Items() {
     };
 
     function handleSubmit(e) {
-        console.log('inside');
         e.preventDefault();
         try {
             if (itemName.trim() && !addedOrNot()) {
@@ -123,7 +122,6 @@ export default function Items() {
     }
 
     const onchange = (event) => {
-        console.log(event.target.value);
         setItemName(event.target.value);
     };
     useEffect(() => {

@@ -6,10 +6,7 @@ import {
     IconAgents,
     IconArticles,
     IconContacts,
-    IconIdeas,
     IconLogout,
-    IconOverview,
-    IconSettings,
     IconSubscription,
     IconTickets
 } from 'assets/icons';
@@ -18,8 +15,6 @@ import LogoComponent from './LogoComponent';
 import Menu from './MenuComponent';
 import MenuItem from './MenuItemComponent';
 import { UserContext } from 'util/userContext';
-import { onValue, ref } from 'firebase/database';
-import { database } from 'configs/firebaseConfig';
 
 const useStyles = createUseStyles({
     separator: {
@@ -31,9 +26,7 @@ const useStyles = createUseStyles({
 });
 
 function SidebarComponent(props) {
-    // setPermissionStatus(localStorage.getItem('permission'))
     const { permission } = props;
-    console.log('location values', permission);
     const [show, setShow] = useState(true);
     const { signOut1 } = React.useContext(UserContext);
     const [permissionStatus, setPermissionStatus] = useState('');
@@ -48,29 +41,10 @@ function SidebarComponent(props) {
         push(convertSlugToUrl(slug, parameters));
     }
     const data = JSON.parse(localStorage.getItem('permission'));
-    console.log('permission detail', data);
 
-    //    const getUserPermissionDetail=async()=>{
-    //     try{
-    //        const id=await localStorage.getItem('userID')
-    //        if(id!=null)
-    //        {
-    //         const refDetail=ref(database,`USERS/${id}`)
-    //         onValue(refDetail,snapShot=>{
-    //             // console.log("permissionStatus",snapShot.val().role.PermissionStatus)
-    //             setPermissionStatus(snapShot.val().role.PermissionStatus)
-    //         })
-    //        }
-    //     }
-    // catch(error)
-    // {
-    //     console.log(error)
-    // }
-    //    }
     const handler = (e) => setShow(e.matches);
     window.matchMedia('(min-width: 768px)').addEventListener('change', handler);
     useEffect(() => {
-        // getUserPermissionDetail()
         setPermissionStatus(data);
     }, []);
     return show ? (
@@ -153,12 +127,6 @@ function SidebarComponent(props) {
                     />
                 ) : null}
                 <div className={classes.separator}></div>
-                {/* <MenuItem
-            id={SLUGS.settings}
-            title='Settings'
-            icon={IconSettings}
-            onClick={() => onClick(SLUGS.settings)}
-        /> */}
                 <MenuItem id='logout' title='Logout' icon={IconLogout} onClick={logout} />
             </Menu>
         </div>

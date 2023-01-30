@@ -10,15 +10,19 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { Button, Link } from '@material-ui/core';
+import { Button } from '@material-ui/core';
 import { ToastContainer } from 'react-toastify';
 import { formateData } from 'util/formateData';
 import { convertIntoDoller } from 'util/convertIntoDoller';
 import { useHistory } from 'react-router-dom';
 import { convertSlugToUrl } from 'resources/utilities';
 import slugs from 'resources/slugs';
+import ImageModal from 'components/ImageModal/ImageModal';
+import customerStyle from './styles';
 export default function CustomerDetail(props) {
     const theme = useTheme();
+    const { styles } = customerStyle;
+
     const [data, setData] = useState([]);
     const { push } = useHistory();
     const [customerImages, setCustomerImages] = useState([]);
@@ -29,7 +33,6 @@ export default function CustomerDetail(props) {
             state: data
         });
     }
-
     const StyledTableCell = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -58,7 +61,6 @@ export default function CustomerDetail(props) {
             const refDetail = ref(database, `/CUSTOMER_IMG/user:${userId}/customer:${customerId}`);
             onValue(refDetail, (snapShot) => {
                 const data = formateData(snapShot.val());
-                console.log('all iamges', data);
                 setCustomerImages(data);
             });
         } catch (error) {
@@ -70,8 +72,6 @@ export default function CustomerDetail(props) {
             const refDetail = ref(database, `/USER_CUSTOMER/${userId}/CUSTOMER/${customerId}`);
             onValue(refDetail, (snapShot) => {
                 const data = snapShot.val();
-                console.log('customerDetial', data);
-                // setData(formateData(data.CUSTOMER))
                 setUser(data);
             });
         } catch (error) {
@@ -87,7 +87,6 @@ export default function CustomerDetail(props) {
                 data.map((item) => {
                     if (item.userId == userId && item.customerId == customerId) {
                         arr.push(item);
-                        console.log('invoice type', item);
                     }
                 });
                 setData(arr);
@@ -109,7 +108,6 @@ export default function CustomerDetail(props) {
             );
             onValue(refDetail, (snapShot) => {
                 const data = formateData(snapShot.val());
-                console.log('url', data[0]);
                 openInNewTab(data[0]?.url);
             });
         } catch (error) {
@@ -128,72 +126,23 @@ export default function CustomerDetail(props) {
     return (
         <div>
             <div style={{ height: '330' }}>
-                <span
-                    style={{
-                        fontWeight: 'bold'
-                    }}
-                >
-                    UserFirstName : {user?.UserFirstName}
-                </span>
+                <span style={styles.text}>UserFirstName : {user?.UserFirstName}</span>
                 <br />
-                <span
-                    style={{
-                        fontWeight: 'bold'
-                    }}
-                >
-                    UserLastName : {user?.UserLastName}
-                </span>
+                <span style={styles.text}>UserLastName : {user?.UserLastName}</span>
                 <br />
-                <span
-                    style={{
-                        fontWeight: 'bold'
-                    }}
-                >
-                    BusinessEmail : {user?.BusinessEmail}
-                </span>
+                <span style={styles.text}>BusinessEmail : {user?.BusinessEmail}</span>
                 <br />
-                <span
-                    style={{
-                        fontWeight: 'bold'
-                    }}
-                >
-                    BusinessName : {user?.BusinessName}
-                </span>
+                <span style={styles.text}>BusinessName : {user?.BusinessName}</span>
                 <br />
-                <span
-                    style={{
-                        fontWeight: 'bold'
-                    }}
-                >
-                    Address : {user?.BusinessAddress}
-                </span>
+                <span style={styles.text}>Address : {user?.BusinessAddress}</span>
                 <br />
-                <div
-                    style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        height: 250
-                    }}
-                >
+                <div style={styles.div}>
                     {customerImages &&
                         customerImages.map((item) => {
                             return (
-                                <div
-                                    style={{
-                                        margin: 20
-                                    }}
-                                >
+                                <div style={styles.marginDiv}>
                                     <span>{item.photoName}</span>
-                                    <img
-                                        src={item.url}
-                                        style={{
-                                            width: 120,
-                                            height: 120,
-                                            borderRadius: 10,
-                                            margin: 20
-                                        }}
-                                        className='img-fluid'
-                                    />
+                                    <ImageModal url={item.url} imageStyle={styles.img} />
                                 </div>
                             );
                         })}
@@ -231,14 +180,7 @@ export default function CustomerDetail(props) {
                                         <StyledTableCell component='th' scope='row'>
                                             {convertIntoDoller(item.Amount)}
                                         </StyledTableCell>
-                                        <StyledTableCell
-                                            align='left'
-                                            style={{
-                                                alignItems: 'center',
-                                                display: 'flex',
-                                                gap: 10
-                                            }}
-                                        >
+                                        <StyledTableCell align='left' style={styles.flexDiv}>
                                             <Button
                                                 onClick={() => onActions(item)}
                                                 style={{
@@ -248,7 +190,6 @@ export default function CustomerDetail(props) {
                                             >
                                                 {item.type == 'sent' ? 'View PDF' : 'View Detail'}
                                             </Button>
-                                            {/* <Delete></Delete> */}
                                         </StyledTableCell>
                                     </StyledTableRow>
                                 ))}
