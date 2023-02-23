@@ -107,10 +107,21 @@ export default function UserList() {
                                     )}
                                 </StyledTableCell>
                                 <StyledTableCell component='th' scope='row'>
-                                    {item.firstName + item.lastName}
+                                    {item.firstName + '   ' + item.lastName}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
-                                    {item.phoneNumber ? item.phoneNumber : '-'}
+                                    {item.phoneNumber
+                                        ? (item.phoneNumber + '').substring(0, 3) +
+                                          '   ' +
+                                          (item.phoneNumber + '').substring(3, 6) +
+                                          '   ' +
+                                          (item.phoneNumber + '').substring(6, 9) +
+                                          '   ' +
+                                          (item.phoneNumber + '').substring(
+                                              9,
+                                              item.phoneNumber.length
+                                          )
+                                        : '-'}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
                                     <Button
