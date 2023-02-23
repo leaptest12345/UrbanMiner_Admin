@@ -115,12 +115,8 @@ export default function UserList() {
                                           '   ' +
                                           (item.phoneNumber + '').substring(3, 6) +
                                           '   ' +
-                                          (item.phoneNumber + '').substring(6, 9) +
-                                          '   ' +
-                                          (item.phoneNumber + '').substring(
-                                              9,
-                                              item.phoneNumber.length
-                                          )
+                                          (item.phoneNumber + '').substring(6, 10) +
+                                          '   '
                                         : '-'}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
