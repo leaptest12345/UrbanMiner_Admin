@@ -145,15 +145,15 @@ function HeaderComponent() {
                 <DropdownComponent
                     label={
                         <>
-                            <img
+                            {/* <img
                                 src={
                                     photo
                                         ? photo
-                                        : 'https://avatars3.githubusercontent.com/u/21162888?s=460&v=4'
+                                        : ''
                                 }
                                 alt='avatar'
                                 className={classes.avatar}
-                            />
+                            /> */}
                         </>
                     }
                     options={[

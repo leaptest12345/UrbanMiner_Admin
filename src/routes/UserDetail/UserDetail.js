@@ -119,13 +119,10 @@ export default function UserDetail(props) {
             customerId: item.ID
         });
     };
-    const userUrl = user?.photo
-        ? user.photo
-        : 'https://avatars3.githubusercontent.com/u/21162888?s=460&v=4';
     return (
         <div>
             <div style={styles.div}>
-                <ImageModal url={userUrl} imageStyle={styles.img} />
+                {user?.photo ? <ImageModal url={user?.photo} imageStyle={styles.img} /> : null}
                 <div style={styles.div1}>
                     <span style={styles.text}>
                         <h4>UserName </h4> : <h4> {user?.firstName + user?.lastName}</h4>

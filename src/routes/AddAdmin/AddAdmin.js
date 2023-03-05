@@ -52,28 +52,33 @@ export default function AddAdmin() {
             const result = await getUserId();
             if (result == 0) {
                 const auth = getAuth();
-                const user = await createUserWithEmailAndPassword(auth, email, password);
-                if (user) {
-                    const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-                    await set(refDetail, {
-                        ID: uniqueId,
-                        email: email,
-                        role: {
-                            roleName: 'admin',
-                            PermissionStatus: {
-                                user: userPermission,
-                                item: itemPermission,
-                                payment: paymentPermission,
-                                privacy: privacyPermission,
-                                term: termPermission,
-                                addAdmin: adminPermission,
-                                feedback: feedbackPermission,
-                                addProduct: addProduct
-                            }
-                        }
-                    });
-                    notify(`New Admin has been created!`, 1);
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    console.log('successfully new user created ');
+                } catch (error) {
+                    if (error.message.includes('Error (auth/email-already-in-use')) {
+                        notify("This email already have user don't need to set password!");
+                    }
                 }
+                const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
+                await set(refDetail, {
+                    ID: uniqueId,
+                    email: email,
+                    role: {
+                        roleName: 'admin',
+                        PermissionStatus: {
+                            user: userPermission,
+                            item: itemPermission,
+                            payment: paymentPermission,
+                            privacy: privacyPermission,
+                            term: termPermission,
+                            addAdmin: adminPermission,
+                            feedback: feedbackPermission,
+                            addProduct: addProduct
+                        }
+                    }
+                });
+                notify(`New Admin has been created!`, 1);
             } else {
                 const refDetail = ref(database, `/ADMIN/USERS/${result}`);
                 await update(refDetail, {

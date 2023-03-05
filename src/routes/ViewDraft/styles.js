@@ -1,6 +1,7 @@
 const styles = {
     div: {
-        display: 'flex'
+        display: 'flex',
+        flexDirection: 'column'
     },
     subDiv: {
         height: 130,
@@ -19,6 +20,9 @@ const styles = {
         width: 100,
         height: 100,
         marginRight: '20px'
+    },
+    bottomView: {
+        marginTop: 50
     }
 };
 

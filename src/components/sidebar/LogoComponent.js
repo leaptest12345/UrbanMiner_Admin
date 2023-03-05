@@ -3,6 +3,7 @@ import { Row } from 'simple-flexbox';
 import { createUseStyles, useTheme } from 'react-jss';
 import { IconLogo } from 'assets/icons';
 import LOGO from 'assets/icons/urbanminer.png';
+
 const useStyles = createUseStyles((theme) => ({
     container: {},
     title: {
@@ -13,7 +14,8 @@ const useStyles = createUseStyles((theme) => ({
     },
     img: {
         width: '50px',
-        height: '50px'
+        height: '50px',
+        borderRadius: '10px'
     }
 }));
 
