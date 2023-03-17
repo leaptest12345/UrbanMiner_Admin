@@ -22,7 +22,7 @@ const styles = {
         marginRight: '20px'
     },
     bottomView: {
-        marginTop: 50
+        marginBottom: 50
     }
 };
 

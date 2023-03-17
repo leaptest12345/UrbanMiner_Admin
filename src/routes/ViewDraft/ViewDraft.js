@@ -73,6 +73,27 @@ export default function ViewDraft(props) {
     return (
         <div style={styles.div}>
             <div style={styles.subDiv}>
+                {note ? (
+                    <div style={styles.bottomView}>
+                        <TableContainer component={Paper}>
+                            <Table aria-label='customized table'>
+                                <TableHead>
+                                    <TableRow>
+                                        <StyledTableCell align='left'>Note</StyledTableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    <StyledTableRow align='left'>
+                                        <StyledTableCell component='th' scope='row'>
+                                            {note}
+                                        </StyledTableCell>
+                                    </StyledTableRow>
+                                </TableBody>
+                            </Table>
+                            <ToastContainer />
+                        </TableContainer>
+                    </div>
+                ) : null}
                 {invoices &&
                     invoices.map((item, index) => {
                         if (item.WeightType == 'unit') {
@@ -130,28 +151,6 @@ export default function ViewDraft(props) {
                         }
                     })}
             </div>
-
-            {note ? (
-                <div style={styles.bottomView}>
-                    <TableContainer component={Paper}>
-                        <Table aria-label='customized table'>
-                            <TableHead>
-                                <TableRow>
-                                    <StyledTableCell align='left'>Note</StyledTableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                <StyledTableRow align='left'>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {note}
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            </TableBody>
-                        </Table>
-                        <ToastContainer />
-                    </TableContainer>
-                </div>
-            ) : null}
         </div>
     );
 }
