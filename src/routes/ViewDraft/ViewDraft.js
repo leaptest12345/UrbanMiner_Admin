@@ -99,6 +99,11 @@ export default function ViewDraft(props) {
                         if (item.WeightType == 'unit') {
                             return (
                                 <div style={styles.div1}>
+                                    <span>
+                                        ({index + 1}).{item.itemName}
+                                    </span>
+                                    <br />
+                                    <br />
                                     <span>Unit:{item.unit}</span>
                                     <br />
                                     <span>Price:{item.price}</span>
@@ -123,6 +128,11 @@ export default function ViewDraft(props) {
                         } else {
                             return (
                                 <div>
+                                    <span>
+                                        ({index + 1}).{item.itemName}
+                                    </span>
+                                    <br />
+                                    <br />
                                     <span>GrossWeight:{item.grossWeight}</span>
                                     <br />
                                     <span>TareWeight:{item.tareWeight}</span>

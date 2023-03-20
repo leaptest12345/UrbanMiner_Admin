@@ -1,30 +1,30 @@
 {
   "files": {
     "main.css": "/UrbanMiner_Admin/static/css/main.7deb2159.chunk.css",
-    "main.js": "/UrbanMiner_Admin/static/js/main.c9ab904d.chunk.js",
-    "main.js.map": "/UrbanMiner_Admin/static/js/main.c9ab904d.chunk.js.map",
+    "main.js": "/UrbanMiner_Admin/static/js/main.f23d9196.chunk.js",
+    "main.js.map": "/UrbanMiner_Admin/static/js/main.f23d9196.chunk.js.map",
     "runtime-main.js": "/UrbanMiner_Admin/static/js/runtime-main.3fd6f691.js",
     "runtime-main.js.map": "/UrbanMiner_Admin/static/js/runtime-main.3fd6f691.js.map",
     "static/css/2.12770553.chunk.css": "/UrbanMiner_Admin/static/css/2.12770553.chunk.css",
-    "static/js/2.08876fc6.chunk.js": "/UrbanMiner_Admin/static/js/2.08876fc6.chunk.js",
-    "static/js/2.08876fc6.chunk.js.map": "/UrbanMiner_Admin/static/js/2.08876fc6.chunk.js.map",
+    "static/js/2.4f3e2f4f.chunk.js": "/UrbanMiner_Admin/static/js/2.4f3e2f4f.chunk.js",
+    "static/js/2.4f3e2f4f.chunk.js.map": "/UrbanMiner_Admin/static/js/2.4f3e2f4f.chunk.js.map",
     "static/js/3.a378654c.chunk.js": "/UrbanMiner_Admin/static/js/3.a378654c.chunk.js",
     "static/js/3.a378654c.chunk.js.map": "/UrbanMiner_Admin/static/js/3.a378654c.chunk.js.map",
     "index.html": "/UrbanMiner_Admin/index.html",
-    "precache-manifest.873d7196cfe853fff3a37d4eea21d6a4.js": "/UrbanMiner_Admin/precache-manifest.873d7196cfe853fff3a37d4eea21d6a4.js",
+    "precache-manifest.5e50a3b52cecbbd08bad227c3adc7513.js": "/UrbanMiner_Admin/precache-manifest.5e50a3b52cecbbd08bad227c3adc7513.js",
     "service-worker.js": "/UrbanMiner_Admin/service-worker.js",
     "static/css/2.12770553.chunk.css.map": "/UrbanMiner_Admin/static/css/2.12770553.chunk.css.map",
     "static/css/main.7deb2159.chunk.css.map": "/UrbanMiner_Admin/static/css/main.7deb2159.chunk.css.map",
-    "static/js/2.08876fc6.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/2.08876fc6.chunk.js.LICENSE.txt",
+    "static/js/2.4f3e2f4f.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/2.4f3e2f4f.chunk.js.LICENSE.txt",
     "static/js/3.a378654c.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/3.a378654c.chunk.js.LICENSE.txt",
-    "static/js/main.c9ab904d.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/main.c9ab904d.chunk.js.LICENSE.txt",
+    "static/js/main.f23d9196.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/main.f23d9196.chunk.js.LICENSE.txt",
     "static/media/urbanminer.png": "/UrbanMiner_Admin/static/media/urbanminer.6906ca8e.png"
   },
   "entrypoints": [
     "static/js/runtime-main.3fd6f691.js",
     "static/css/2.12770553.chunk.css",
-    "static/js/2.08876fc6.chunk.js",
+    "static/js/2.4f3e2f4f.chunk.js",
     "static/css/main.7deb2159.chunk.css",
-    "static/js/main.c9ab904d.chunk.js"
+    "static/js/main.f23d9196.chunk.js"
   ]
 }
