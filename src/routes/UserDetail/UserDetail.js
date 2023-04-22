@@ -129,7 +129,7 @@ export default function UserDetail(props) {
                     </span>
                     <br />
                     <span style={styles.text}>
-                        <h4>Eamil </h4> : <h4> {user?.email}</h4>
+                        <h4>Email </h4> : <h4> {user?.email}</h4>
                     </span>
                     <br />
 
@@ -169,7 +169,7 @@ export default function UserDetail(props) {
                                         {index + 1}
                                     </StyledTableCell>
                                     <StyledTableCell component='th' scope='row'>
-                                        {item.BusinessName}
+                                        {item.UserFirstName + '' + item.UserLastName}
                                     </StyledTableCell>
                                     <StyledTableCell component='th' scope='row'>
                                         {item.BusinessEmail}

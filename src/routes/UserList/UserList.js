@@ -1,5 +1,5 @@
 import { database } from 'configs/firebaseConfig';
-import { onValue, ref, set, update } from 'firebase/database';
+import { onValue, ref, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'react-jss';
 import { useHistory } from 'react-router-dom';
@@ -12,7 +12,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
 import { notify } from 'util/notify';
 import { ToastContainer } from 'react-toastify';
 import { formateData } from 'util/formateData';
@@ -21,7 +20,7 @@ import { convertSlugToUrl } from 'resources/utilities';
 import ImageModal from 'components/ImageModal/ImageModal';
 
 import styles from './styles';
-import { getAuth } from 'firebase/auth';
+import { Delete } from '@material-ui/icons';
 export default function UserList() {
     const theme = useTheme();
     const { push } = useHistory();
@@ -32,7 +31,7 @@ export default function UserList() {
             const starCountRef = ref(database, '/USERS');
             onValue(starCountRef, (snapshot) => {
                 const data = snapshot.val();
-                setUsers(formateData(data));
+                setUsers(formateData(data).filter((item) => item.isDeleted == false));
             });
         } catch (error) {
             console.log(error);
@@ -76,7 +75,7 @@ export default function UserList() {
                     setTimeout(() => {
                         notify(
                             `User has been ${
-                                !item.isDeleted ? 'DeActivated' : 'Activated'
+                                !item.isDeleted ? 'Deleted' : 'Activated'
                             } Successfully`,
                             !item.isDeleted ? 0 : 1
                         );
@@ -137,14 +136,7 @@ export default function UserList() {
                                     </Button>
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
-                                    <Button
-                                        style={{
-                                            backgroundColor: 'grey'
-                                        }}
-                                        onClick={() => onAction(item)}
-                                    >
-                                        {!item.isDeleted ? 'DeActivate' : 'Activate'}
-                                    </Button>
+                                    <Delete onClick={() => onAction(item)}></Delete>
                                 </StyledTableCell>
                             </StyledTableRow>
                         ))}
