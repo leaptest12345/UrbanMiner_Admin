@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/UrbanMiner_Admin/static/css/main.7deb2159.chunk.css",
-    "main.js": "/UrbanMiner_Admin/static/js/main.be1585ec.chunk.js",
-    "main.js.map": "/UrbanMiner_Admin/static/js/main.be1585ec.chunk.js.map",
+    "main.js": "/UrbanMiner_Admin/static/js/main.c0866764.chunk.js",
+    "main.js.map": "/UrbanMiner_Admin/static/js/main.c0866764.chunk.js.map",
     "runtime-main.js": "/UrbanMiner_Admin/static/js/runtime-main.2ada5fb3.js",
     "runtime-main.js.map": "/UrbanMiner_Admin/static/js/runtime-main.2ada5fb3.js.map",
     "static/css/2.12770553.chunk.css": "/UrbanMiner_Admin/static/css/2.12770553.chunk.css",
@@ -11,13 +11,13 @@
     "static/js/3.eea57488.chunk.js": "/UrbanMiner_Admin/static/js/3.eea57488.chunk.js",
     "static/js/3.eea57488.chunk.js.map": "/UrbanMiner_Admin/static/js/3.eea57488.chunk.js.map",
     "index.html": "/UrbanMiner_Admin/index.html",
-    "precache-manifest.bca08a6cfed9e3a25beef069405c9250.js": "/UrbanMiner_Admin/precache-manifest.bca08a6cfed9e3a25beef069405c9250.js",
+    "precache-manifest.c65675ae0ebd375714976903a50ec805.js": "/UrbanMiner_Admin/precache-manifest.c65675ae0ebd375714976903a50ec805.js",
     "service-worker.js": "/UrbanMiner_Admin/service-worker.js",
     "static/css/2.12770553.chunk.css.map": "/UrbanMiner_Admin/static/css/2.12770553.chunk.css.map",
     "static/css/main.7deb2159.chunk.css.map": "/UrbanMiner_Admin/static/css/main.7deb2159.chunk.css.map",
     "static/js/2.071cab15.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/2.071cab15.chunk.js.LICENSE.txt",
     "static/js/3.eea57488.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/3.eea57488.chunk.js.LICENSE.txt",
-    "static/js/main.be1585ec.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/main.be1585ec.chunk.js.LICENSE.txt",
+    "static/js/main.c0866764.chunk.js.LICENSE.txt": "/UrbanMiner_Admin/static/js/main.c0866764.chunk.js.LICENSE.txt",
     "static/media/urbanminer.png": "/UrbanMiner_Admin/static/media/urbanminer.6906ca8e.png"
   },
   "entrypoints": [
@@ -25,6 +25,6 @@
     "static/css/2.12770553.chunk.css",
     "static/js/2.071cab15.chunk.js",
     "static/css/main.7deb2159.chunk.css",
-    "static/js/main.be1585ec.chunk.js"
+    "static/js/main.c0866764.chunk.js"
   ]
 }
