@@ -86,10 +86,10 @@ function SidebarComponent(props) {
 
                 {permission?.addAdmin ? (
                     <MenuItem
-                        id={SLUGS.AddAdmin}
-                        title='AddAdmin'
+                        id={SLUGS.AdminList}
+                        title='AdminList'
                         icon={IconAgents}
-                        onClick={() => onClick(SLUGS.AddAdmin)}
+                        onClick={() => onClick(SLUGS.AdminList)}
                     />
                 ) : null}
 
@@ -107,6 +107,14 @@ function SidebarComponent(props) {
                         title='FeedBack'
                         icon={IconAgents}
                         onClick={() => onClick(SLUGS.FeedBack)}
+                    />
+                ) : null}
+                {permission?.pdfDetail ? (
+                    <MenuItem
+                        id={SLUGS.PdfDetail}
+                        title='PdfDetail'
+                        icon={IconArticles}
+                        onClick={() => onClick(SLUGS.PdfDetail)}
                     />
                 ) : null}
 

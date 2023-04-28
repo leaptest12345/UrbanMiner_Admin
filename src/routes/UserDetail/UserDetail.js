@@ -20,6 +20,7 @@ import { convertSlugToUrl } from 'resources/utilities';
 import SLUGS from 'resources/slugs';
 import ImageModal from 'components/ImageModal/ImageModal';
 import userDetailStyle from './styles';
+
 export default function UserDetail(props) {
     const theme = useTheme();
     const { push } = useHistory();
@@ -137,10 +138,6 @@ export default function UserDetail(props) {
                         <h4>PhoneNumer</h4> : <h4>{user?.phoneNumber}</h4>
                     </span>
                     <br />
-                    <span style={styles.text}>
-                        <h4>Role </h4> : <h4>{user?.role?.roleName}</h4>
-                    </span>
-                    <br />
                 </div>
             </div>
             {!isApproved ? (
@@ -169,7 +166,7 @@ export default function UserDetail(props) {
                                         {index + 1}
                                     </StyledTableCell>
                                     <StyledTableCell component='th' scope='row'>
-                                        {item.UserFirstName + '' + item.UserLastName}
+                                        {item?.UserFirstName + '  ' + item.UserLastName}
                                     </StyledTableCell>
                                     <StyledTableCell component='th' scope='row'>
                                         {item.BusinessEmail}

@@ -9,10 +9,12 @@ import FeedBackList from './FeedbackList/FeedbackList';
 import UserList from './UserList/UserList';
 import TermAndConditions from './TermAndConditions/TermAndConditions';
 import UserDetail from './UserDetail/UserDetail';
-import AddAdmin from './AddAdmin/AddAdmin';
 import CustomerDetail from './customerDetail/customerDetail';
 import ViewDraft from './ViewDraft/ViewDraft';
 import AddProduct from './AddProduct/AddProduct';
+import AdminList from './AdminList/adminList';
+import AddAdmin from './AddAdmin/AddAdmin';
+import PdfDetail from './PdfDetail/PdfDetail';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -60,9 +62,21 @@ function PrivateRoutes() {
                 />
                 <Route
                     exact
+                    path={SLUGS.AdminList}
+                    component={AdminList}
+                    render={() => <div>Admin</div>}
+                />
+                <Route
+                    exact
                     path={SLUGS.AddAdmin}
                     component={AddAdmin}
                     render={() => <div>Admin</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.PdfDetail}
+                    component={PdfDetail}
+                    render={() => <div>PdfDetail</div>}
                 />
                 <Route exact path={SLUGS.settings} render={() => <div>settings</div>} />
                 <Route exact path={SLUGS.privacyPolicy} component={PrivacyPolicy} />

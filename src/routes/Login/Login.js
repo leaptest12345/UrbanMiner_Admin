@@ -75,6 +75,7 @@ const Login = () => {
     const btnstyle = {
         margin: '10px 0',
         height: 50,
+        marginTop: 70,
         backgroundColor: theme.color.veryDarkGrayishBlue,
         color: theme.color.white
     };
@@ -187,11 +188,6 @@ const Login = () => {
                     variant='outlined'
                     fullWidth
                     required
-                />
-                <FormControlLabel
-                    style={{ marginTop: '50px' }}
-                    control={<Checkbox name='checkedB' color='primary' />}
-                    label='Remember me'
                 />
                 <Button
                     onClick={() => onSubmit()}

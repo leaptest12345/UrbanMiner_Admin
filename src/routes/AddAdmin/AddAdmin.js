@@ -1,15 +1,15 @@
 import { Button } from '@material-ui/core';
 import { database } from 'configs/firebaseConfig';
-import { onValue, ref, set, update } from 'firebase/database';
-import React, { useEffect, useState } from 'react';
-import { useTheme } from 'react-jss';
 import { ToastContainer } from 'react-toastify';
 import { formateData } from 'util/formateData';
 import { notify } from 'util/notify';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { v4 as uuid } from 'uuid';
+import { onValue, ref, set, update } from 'firebase/database';
+import React, { useEffect, useState } from 'react';
+import { useTheme } from 'react-jss';
 
-export default function AddAdmin() {
+export default function AddAdmin(props) {
     const uniqueId = uuid().slice(0, 8);
     const [email, setEmail] = useState('');
     const [users, setUsers] = useState([]);
@@ -21,12 +21,41 @@ export default function AddAdmin() {
     const [termPermission, setTermPermission] = useState(false);
     const [privacyPermission, setPrivacyPermission] = useState(false);
     const [adminPermission, setAdminPermission] = useState(false);
+    const [pdfDetailPermission, setpdfDetailPermission] = useState(false);
     const [addProduct, setAddProduct] = useState(false);
     const [userList, setUserList] = useState([]);
     const theme = useTheme();
+
+    const { id } = props.location.state;
+
     useEffect(() => {
         getUsers();
+        if (id) {
+            getAdminDetails(id);
+        }
     }, []);
+
+    const getAdminDetails = (id) => {
+        const refDetail = ref(database, `/ADMIN/USERS/${id}`);
+        onValue(refDetail, (snapshOT) => {
+            if (snapshOT.val()) {
+                setEmail(snapshOT.val()?.email);
+                const permissionStatus = snapshOT.val()?.role?.PermissionStatus;
+                if (permissionStatus) {
+                    setItemPermission(permissionStatus.item);
+                    setTermPermission(permissionStatus.term);
+                    setUserPermission(permissionStatus.user);
+                    setAdminPermission(permissionStatus.addAdmin);
+                    setpdfDetailPermission(permissionStatus.pdfDetail ? true : false);
+                    setFeedBackPermission(permissionStatus.feedback);
+                    setPaymentPermission(permissionStatus.payment);
+                    setPrivacyPermission(permissionStatus.privacy);
+                    setAddProduct(permissionStatus.addProduct);
+                }
+            }
+        });
+    };
+
     const getUsers = () => {
         try {
             const refDetail = ref(database, '/ADMIN/USERS');
@@ -62,60 +91,78 @@ export default function AddAdmin() {
         });
         return result;
     };
+
     const createAdmin = async () => {
         try {
             const result = await getUserId();
             if (result == 0) {
-                if (password) {
-                    const auth = getAuth();
-                    try {
-                        await createUserWithEmailAndPassword(auth, email, password);
-                    } catch (error) {
-                        if (error.message.includes('Error (auth/email-already-in-use')) {
-                            notify("This email already have user don't need to set password!", 1);
-                        }
-                    }
-                    const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-                    await set(refDetail, {
-                        ID: uniqueId,
-                        email: email,
-                        role: {
-                            roleName: 'admin',
-                            PermissionStatus: {
-                                user: userPermission,
-                                item: itemPermission,
-                                payment: paymentPermission,
-                                privacy: privacyPermission,
-                                term: termPermission,
-                                addAdmin: adminPermission,
-                                feedback: feedbackPermission,
-                                addProduct: addProduct
+                if (userAlreadyExist()) {
+                    notify('This email has  user please try with diffrent email address', 0);
+                } else {
+                    if (password) {
+                        const auth = getAuth();
+                        try {
+                            await createUserWithEmailAndPassword(auth, email, password);
+                        } catch (error) {
+                            if (error.message.includes('Error (auth/email-already-in-use')) {
+                                notify(
+                                    "This email already have user don't need to set password!",
+                                    1
+                                );
                             }
                         }
-                    });
-                    notify(`New Admin has been created!`, 1);
-                } else {
-                    notify('Password required for new user', 0);
+                        const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
+                        await set(refDetail, {
+                            ID: uniqueId,
+                            email: email,
+                            role: {
+                                roleName: 'admin',
+                                PermissionStatus: {
+                                    user: userPermission,
+                                    item: itemPermission,
+                                    payment: paymentPermission,
+                                    privacy: privacyPermission,
+                                    term: termPermission,
+                                    addAdmin: adminPermission,
+                                    feedback: feedbackPermission,
+                                    addProduct: addProduct,
+                                    pdfDetail: pdfDetailPermission
+                                }
+                            }
+                        });
+                        notify(`New Admin has been created!`, 1);
+                    } else {
+                        notify('Password required for new user', 0);
+                    }
                 }
             } else {
-                const refDetail = ref(database, `/ADMIN/USERS/${result}`);
-                await update(refDetail, {
-                    ID: result,
-                    role: {
-                        roleName: 'admin',
-                        PermissionStatus: {
-                            user: userPermission,
-                            item: itemPermission,
-                            payment: paymentPermission,
-                            privacy: privacyPermission,
-                            term: termPermission,
-                            addAdmin: adminPermission,
-                            feedback: feedbackPermission,
-                            addProduct: addProduct
-                        }
+                if (!id) {
+                    notify('Admin Already exists!', 0);
+                } else {
+                    const refDetail = ref(database, `/ADMIN/USERS/${result}`);
+                    try {
+                        await update(refDetail, {
+                            ID: result,
+                            role: {
+                                roleName: 'admin',
+                                PermissionStatus: {
+                                    user: userPermission,
+                                    item: itemPermission,
+                                    payment: paymentPermission,
+                                    privacy: privacyPermission,
+                                    term: termPermission,
+                                    addAdmin: adminPermission,
+                                    feedback: feedbackPermission,
+                                    addProduct: addProduct,
+                                    pdfDetail: pdfDetailPermission
+                                }
+                            }
+                        });
+                        notify(`User Permission updated!`, 1);
+                    } catch (error) {
+                        console.log(error);
                     }
-                });
-                notify(`User Permission updated!`, 1);
+                }
             }
         } catch (error) {
             const { message } = error;
@@ -137,7 +184,8 @@ export default function AddAdmin() {
                                     term: termPermission,
                                     addAdmin: adminPermission,
                                     feedback: feedbackPermission,
-                                    addProduct: addProduct
+                                    addProduct: addProduct,
+                                    pdfDetail: pdfDetailPermission
                                 }
                             }
                         });
@@ -156,7 +204,8 @@ export default function AddAdmin() {
                                     term: termPermission,
                                     addAdmin: adminPermission,
                                     feedback: feedbackPermission,
-                                    addProduct: addProduct
+                                    addProduct: addProduct,
+                                    pdfDetail: pdfDetailPermission
                                 }
                             }
                         });
@@ -172,8 +221,7 @@ export default function AddAdmin() {
         if (!email) {
             notify('Please Enter Email Value!', 0);
         } else {
-            if (userAlreadyExist()) notify('User Already Exist', 0);
-            else createAdmin();
+            createAdmin();
         }
     };
 
@@ -207,31 +255,36 @@ export default function AddAdmin() {
     const dangerLabel = {
         color: 'red'
     };
+
     return (
         <div>
             <div>
-                <input
-                    className='form-check-input'
-                    placeholder='Enter Email Address'
-                    style={inputStyle}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <input
-                    type='password'
-                    className='form-check-input'
-                    placeholder='Enter Password'
-                    style={inputStyle}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                {id ? null : (
+                    <>
+                        <input
+                            className='form-check-input'
+                            placeholder='Enter Email Address'
+                            style={inputStyle}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                        <input
+                            type='password'
+                            className='form-check-input'
+                            placeholder='Enter Password'
+                            style={inputStyle}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </>
+                )}
                 <div style={{ marginLeft: 40 }}>
                     <div className='form-check' style={formCheckStyle}>
                         <input
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={userPermission}
+                            checked={userPermission}
                             onChange={() => setUserPermission(!userPermission)}
                         />
                         <label
@@ -247,7 +300,7 @@ export default function AddAdmin() {
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={itemPermission}
+                            checked={itemPermission}
                             onChange={() => setItemPermission(!itemPermission)}
                         />
                         <label
@@ -263,7 +316,7 @@ export default function AddAdmin() {
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={paymentPermission}
+                            checked={paymentPermission}
                             onChange={() => setPaymentPermission(!paymentPermission)}
                         />
                         <label
@@ -279,7 +332,24 @@ export default function AddAdmin() {
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={feedbackPermission}
+                            checked={pdfDetailPermission}
+                            onChange={() => setpdfDetailPermission(!pdfDetailPermission)}
+                        />
+
+                        <label
+                            style={labelStyle}
+                            className='form-check-label'
+                            htmlFor='flexCheckChecked'
+                        >
+                            User can <label style={dangerLabel}>VIEW/UPDATE</label> pdfDetail
+                        </label>
+                    </div>
+                    <div className='form-check' style={formCheckStyle}>
+                        <input
+                            className='form-check-input'
+                            type='checkbox'
+                            style={checkboxStyle}
+                            checked={feedbackPermission}
                             onChange={() => setFeedBackPermission(!feedbackPermission)}
                         />
                         <label
@@ -295,7 +365,7 @@ export default function AddAdmin() {
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={adminPermission}
+                            checked={adminPermission}
                             onChange={() => setAdminPermission(!adminPermission)}
                         />
                         <label
@@ -312,7 +382,7 @@ export default function AddAdmin() {
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={termPermission}
+                            checked={termPermission}
                             onChange={() => setTermPermission(!termPermission)}
                         />
                         <label
@@ -329,7 +399,7 @@ export default function AddAdmin() {
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={privacyPermission}
+                            checked={privacyPermission}
                             onChange={() => setPrivacyPermission(!privacyPermission)}
                         />
                         <label
@@ -346,7 +416,7 @@ export default function AddAdmin() {
                             className='form-check-input'
                             type='checkbox'
                             style={checkboxStyle}
-                            value={addProduct}
+                            checked={addProduct}
                             onChange={() => setAddProduct(!addProduct)}
                         />
                         <label
@@ -360,8 +430,9 @@ export default function AddAdmin() {
                 </div>
             </div>
             <Button onClick={() => onSubmit()} style={btnStyle}>
-                <span style={{ color: 'white' }}>SUBMIT</span>
+                <span style={{ color: 'white' }}>{id ? 'UPDATE' : 'SUBMIT'}</span>
             </Button>
+
             <ToastContainer />
         </div>
     );

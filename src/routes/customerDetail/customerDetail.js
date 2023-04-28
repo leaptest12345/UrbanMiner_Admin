@@ -51,6 +51,7 @@ export default function CustomerDetail(props) {
     }))(TableRow);
 
     const { userId, customerId } = props.location.state;
+
     useEffect(() => {
         getCustomerDetail();
         getInvoiceList();

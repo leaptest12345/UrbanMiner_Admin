@@ -79,8 +79,8 @@ function HeaderComponent() {
         case currentItem === SLUGS.UserList:
             title = 'UserList';
             break;
-        case currentItem === SLUGS.AddAdmin:
-            title = 'AddAdmin';
+        case currentItem === SLUGS.AdminList:
+            title = 'AdminList';
             break;
         case currentItem === SLUGS.AddProduct:
             title = 'AddProduct';
@@ -108,6 +108,9 @@ function HeaderComponent() {
             break;
         case currentItem === SLUGS.settings:
             title = 'Settings';
+            break;
+        case currentItem === SLUGS.PdfDetail:
+            title = 'PdfDetail';
             break;
         default:
             title = '';

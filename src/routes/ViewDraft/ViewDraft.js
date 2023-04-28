@@ -15,7 +15,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { ToastContainer } from 'react-toastify';
 import { useTheme } from 'react-jss';
-import { style } from 'glamor';
 
 export default function ViewDraft(props) {
     const theme = useTheme();
