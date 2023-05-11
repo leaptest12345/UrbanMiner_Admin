@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "4cdf88f4106dd6f3fb6ab624575a4fb4",
+    "revision": "6322001322e7aa2fbc638f50602168be",
     "url": "/UrbanMiner_Admin/index.html"
   },
   {
