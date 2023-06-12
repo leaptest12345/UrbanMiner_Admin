@@ -270,7 +270,7 @@ function AddProduct() {
         setIsImageChange(false);
         setAddToDatabase(false);
     };
-    const deleteProduct = () => {
+    const deleteProduct = (productId) => {
         const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
         const refDetail1 = ref(database, `/ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${productSubId}`);
         try {
@@ -516,7 +516,7 @@ function AddProduct() {
                                                     onClick={() =>
                                                         setProductType(0) +
                                                         setProductId(item.ID) +
-                                                        deleteProduct()
+                                                        deleteProduct(item.ID)
                                                     }
                                                 ></Delete>
                                             </StyledTableCell>
