@@ -15,6 +15,7 @@ import AddProduct from './AddProduct/AddProduct';
 import AdminList from './AdminList/adminList';
 import AddAdmin from './AddAdmin/AddAdmin';
 import PdfDetail from './PdfDetail/PdfDetail';
+import PriceSheet from './PriceSheet/PriceSheet';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -46,6 +47,12 @@ function PrivateRoutes() {
                     path={SLUGS.UserList}
                     component={UserList}
                     render={() => <div>UserList</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.PriceSheet}
+                    component={PriceSheet}
+                    render={() => <div>PriceSheet</div>}
                 />
                 <Route exact path={SLUGS.items} component={Items} render={() => <div>items</div>} />
                 <Route

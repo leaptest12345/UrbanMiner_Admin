@@ -21,5 +21,6 @@ export default {
     UserDetail: '/UserDetail',
     CustomerDetail: '/CustomerDetail',
     ViewDraft: '/ViewDraft',
-    AddProduct: '/AddProduct'
+    AddProduct: '/AddProduct',
+    PriceSheet: '/PriceSheet'
 };
