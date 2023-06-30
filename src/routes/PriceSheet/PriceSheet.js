@@ -18,7 +18,10 @@ import { notify } from 'util/notify';
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set, update } from 'firebase/database';
 import { formateData } from 'util/formateData';
-import { uploadProductImage } from 'util/uploadProductImage';
+import { deleteProductImage, uploadProductImage } from 'util/uploadProductImage';
+import { useHistory } from 'react-router-dom';
+import { convertSlugToUrl } from 'resources/utilities';
+import SLUGS from 'resources/slugs';
 
 function PriceSheet() {
     const [imgfile, setImageFile] = useState('');
@@ -42,9 +45,10 @@ function PriceSheet() {
     const [productId, setProductId] = useState(null);
 
     const [ModalType, setModalType] = useState(0);
-
     const { styles } = productStyle;
     const uniqueId = uuid().slice(0, 8);
+
+    const { push } = useHistory();
 
     useEffect(() => {
         getCategories();
@@ -62,9 +66,7 @@ function PriceSheet() {
         }
     };
     const imgFilehandler = (e) => {
-        console.log(e.target.files);
         setImagesFile(formateData(e.target.files));
-        setImageFile(e.target.files[0]);
     };
 
     const StyledTableCell = withStyles(() => ({
@@ -96,8 +98,6 @@ function PriceSheet() {
     }))(TableRow);
     const theme = useTheme();
 
-    const imageFileUrl = imgfile != '' ? window.URL.createObjectURL(imgfile) : '';
-
     const addProductInDatabase = async (id) => {
         try {
             subProduct.map(async (item, index) => {
@@ -114,14 +114,17 @@ function PriceSheet() {
     };
     const createCategory = async () => {
         try {
-            const id = uuid().slice(0, 8);
+            const id = uuid().slice(0, 10);
             setLoading(true);
             if (imagesFile.length != 0) {
                 imagesFile.map(async (item, index) => {
-                    const url = await uploadProductImage(imgfile);
-                    const starCount = ref(database, `/ADMIN/CATEGORY_PHOTOS/${id}`);
+                    const uniqueId = uuid().slice(0, 8);
+                    const url = await uploadProductImage(item);
+                    console.log('uplaodded url', url);
+                    const starCount = ref(database, `/ADMIN/CATEGORY_PHOTOS/${id}/${uniqueId}`);
                     await set(starCount, {
-                        ID: index + 1,
+                        ID: uniqueId,
+                        name: item.name,
                         url: url
                     });
                 });
@@ -136,6 +139,7 @@ function PriceSheet() {
                 addProductInDatabase(id);
                 setCategoryName('');
                 setSubProduct([]);
+                setImagesFile([]);
             } else {
                 if (!categoryName) notify('Please Fill The ProductName', 2);
             }
@@ -148,10 +152,18 @@ function PriceSheet() {
     };
 
     const deleteCategory = (categoryId, productId, productType) => {
-        console.log(categoryId, productId, productType);
         const refDetail = ref(database, `/ADMIN/CATEGORY/${categoryId}`);
+        const imageRef = ref(database, `ADMIN/CATEGORY_PHOTOS/${categoryId}`);
         const refDetail1 = ref(database, `/ADMIN/CATEGORY/${categoryId}/PRODUCT/${productId}`);
+
         try {
+            onValue(imageRef, (snapShot) => {
+                const images = formateData(snapShot.val());
+                console.log('toatal iamges', snapShot.val());
+                images.map(async (item) => {
+                    await deleteProductImage(item.name);
+                });
+            });
             if (productType == 0) {
                 set(refDetail, null);
                 notify('Category Successfully Deleted!', 0);
@@ -347,7 +359,21 @@ function PriceSheet() {
                                                 align='left'
                                                 style={styles.width10}
                                             ></StyledTableCell>
-                                            <StyledTableCell align='left' style={styles.width10}>
+                                            <StyledTableCell style={{ ...styles.width10 }}>
+                                                <Button
+                                                    style={styles.dangerBtn1}
+                                                    onClick={() => {
+                                                        push({
+                                                            pathname: convertSlugToUrl(
+                                                                SLUGS.categoryImages,
+                                                                {}
+                                                            ),
+                                                            state: { categoryId: item.ID }
+                                                        });
+                                                    }}
+                                                >
+                                                    SEE IMAGES
+                                                </Button>
                                                 <Button
                                                     style={styles.dangerBtn}
                                                     onClick={() => {

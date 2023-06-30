@@ -96,6 +96,11 @@ const styles = {
         color: 'white',
         marginBottom: '5%'
     },
+    dangerBtn1: {
+        background: 'grey',
+        color: 'white',
+        marginBottom: '5%'
+    },
     imgStyle: {
         height: '30vh',
         width: '20vw',

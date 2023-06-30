@@ -22,5 +22,6 @@ export default {
     CustomerDetail: '/CustomerDetail',
     ViewDraft: '/ViewDraft',
     AddProduct: '/AddProduct',
-    PriceSheet: '/PriceSheet'
+    PriceSheet: '/PriceSheet',
+    categoryImages: '/CategoryImages'
 };

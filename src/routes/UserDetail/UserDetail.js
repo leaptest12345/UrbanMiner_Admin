@@ -28,6 +28,7 @@ export default function UserDetail(props) {
     const [user, setUser] = useState('');
     const { styles } = userDetailStyle;
     const [isApproved, setIsApproved] = useState(false);
+    
     function onClick(slug, data, parameters = {}) {
         push({
             pathname: convertSlugToUrl(slug, parameters),

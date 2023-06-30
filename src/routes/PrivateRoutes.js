@@ -16,6 +16,7 @@ import AdminList from './AdminList/adminList';
 import AddAdmin from './AddAdmin/AddAdmin';
 import PdfDetail from './PdfDetail/PdfDetail';
 import PriceSheet from './PriceSheet/PriceSheet';
+import CategoryImages from './CategoryImages/CategoryImages';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -86,6 +87,12 @@ function PrivateRoutes() {
                     render={() => <div>PdfDetail</div>}
                 />
                 <Route exact path={SLUGS.settings} render={() => <div>settings</div>} />
+                <Route
+                    exact
+                    path={SLUGS.categoryImages}
+                    component={CategoryImages}
+                    render={() => <div>CategoryImages</div>}
+                />
                 <Route exact path={SLUGS.privacyPolicy} component={PrivacyPolicy} />
                 <Route exact path={SLUGS.FeedBack} component={FeedBackList} />
                 <Route exact path={SLUGS.AddProduct} component={AddProduct} />
