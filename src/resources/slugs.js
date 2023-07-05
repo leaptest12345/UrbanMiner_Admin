@@ -11,6 +11,7 @@ export default {
     settings: '/settings',
     PdfDetail: '/PdfDetail',
     UserList: '/UserList',
+    EditCategory: '/EditCategory',
     AddAdmin: '/AddAdmin',
     AdminList: '/AdminList',
     login: '/login',

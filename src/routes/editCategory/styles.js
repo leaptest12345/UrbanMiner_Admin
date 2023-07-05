@@ -14,11 +14,6 @@ const styles = {
         alignItems: 'center',
         marginTop: '1%'
     },
-    rowWrap: {
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
     modalDiv: {
         backgroundColor: 'white',
         borderRadius: '10px',
@@ -125,6 +120,7 @@ const styles = {
         background: '#707070',
         color: 'white'
     },
+
     title: {
         fontSize: '25px',
         color: 'black',

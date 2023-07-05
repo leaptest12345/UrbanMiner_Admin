@@ -628,7 +628,7 @@ function AddProduct() {
                     <div style={styles.rowDiv}>
                         <div>
                             <h4>Upload Sub_Product Image (Optional)</h4>
-                            <input type='file' onChange={imgFilehandler1} />
+                            <input type='file' onChange={imgFilehandler1} accept='image/*' />
                         </div>
                         <div>
                             {subImgFile != '' ? (

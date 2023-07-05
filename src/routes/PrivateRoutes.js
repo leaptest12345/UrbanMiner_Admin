@@ -17,6 +17,7 @@ import AddAdmin from './AddAdmin/AddAdmin';
 import PdfDetail from './PdfDetail/PdfDetail';
 import PriceSheet from './PriceSheet/PriceSheet';
 import CategoryImages from './CategoryImages/CategoryImages';
+import EditCategory, { editCategory } from './editCategory/editCategory';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -48,6 +49,12 @@ function PrivateRoutes() {
                     path={SLUGS.UserList}
                     component={UserList}
                     render={() => <div>UserList</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.EditCategory}
+                    component={EditCategory}
+                    render={() => <div>Edit Category</div>}
                 />
                 <Route
                     exact

@@ -8,6 +8,7 @@ import { Delete } from '@material-ui/icons';
 import { deleteProductImage, uploadProductImage } from 'util/uploadProductImage';
 import { Button } from '@material-ui/core';
 import { v4 as uuid } from 'uuid';
+import { useHistory } from 'react-router-dom';
 
 export default function CategoryImages(props) {
     const { categoryId } = props.location.state;
@@ -17,6 +18,8 @@ export default function CategoryImages(props) {
     useEffect(() => {
         getPhotos();
     }, []);
+
+    const history = useHistory();
 
     const getPhotos = () => {
         try {
@@ -49,6 +52,7 @@ export default function CategoryImages(props) {
                 });
             });
             setImagesFile([]);
+            history.goBack();
         }
     };
 
@@ -68,6 +72,7 @@ export default function CategoryImages(props) {
             <input
                 style={styles.marginTopView}
                 type='file'
+                accept='image/*'
                 multiple
                 onChange={(e) => setImagesFile(formateData(e.target.files))}
             />
@@ -76,20 +81,12 @@ export default function CategoryImages(props) {
                     <hr />
                     <div>
                         <h2>Preview</h2>
-                        <div
-                            style={{
-                                flexDirection: 'row',
-                                flexWrap: 'wrap',
-                                flex: 1,
-                                backgroundColor: 'red'
-                            }}
-                        >
+                        <div style={styles.rowWrap}>
                             {imagesFile.map((item) => {
                                 return (
                                     <div
                                         style={{
                                             marginRight: 20,
-                                            backgroundColor: 'blue',
                                             width: '20vw'
                                         }}
                                     >
@@ -108,26 +105,26 @@ export default function CategoryImages(props) {
                 ADD IMAGE
             </Button>
             <br />
-            <div
-                style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-around'
-                }}
-            >
+            <div style={styles.rowWrap}>
                 {photoList.map((item) => {
                     console.log('getted images', item);
                     return (
                         <div
                             style={{
+                                display: 'flex',
                                 flexDirection: 'row',
-                                alignItems: 'center'
+                                alignItems: 'center',
+                                marginRight: 20
                             }}
                         >
                             <ImageModal
                                 imageStyle={styles.imgStyle}
                                 url={item != '' ? item.url : ''}
                             />
-                            <Delete onClick={() => deleteImage(item.ID, item.name)}></Delete>
+                            <Delete
+                                style={{ margin: 10 }}
+                                onClick={() => deleteImage(item.ID, item.name)}
+                            ></Delete>
                         </div>
                     );
                 })}

@@ -12,6 +12,11 @@ const styles = {
         right: '15%',
         top: '14%',
         paddingInline: '1em'
+    },
+    rowWrap: {
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap'
     }
 };
 

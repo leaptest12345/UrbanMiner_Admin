@@ -11,14 +11,14 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { withStyles } from '@material-ui/core/styles';
-import { Delete, Update } from '@material-ui/icons';
+import { Delete } from '@material-ui/icons';
 import productStyle from './styles';
 import ImageModal from 'components/ImageModal/ImageModal';
 import { notify } from 'util/notify';
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set, update } from 'firebase/database';
 import { formateData } from 'util/formateData';
-import { deleteProductImage, uploadProductImage } from 'util/uploadProductImage';
+import { uploadProductImage } from 'util/uploadProductImage';
 import { useHistory } from 'react-router-dom';
 import { convertSlugToUrl } from 'resources/utilities';
 import SLUGS from 'resources/slugs';
@@ -65,6 +65,7 @@ function PriceSheet() {
             console.log(error);
         }
     };
+
     const imgFilehandler = (e) => {
         setImagesFile(formateData(e.target.files));
     };
@@ -79,6 +80,7 @@ function PriceSheet() {
             backgroundColor: theme.color.BG
         }
     }))(TableCell);
+
     const StyledTableCell1 = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -89,6 +91,7 @@ function PriceSheet() {
             backgroundColor: theme.color.lightGrayishBlue
         }
     }))(TableCell);
+
     const StyledTableRow = withStyles(() => ({
         root: {
             '&:nth-of-type(odd)': {
@@ -96,14 +99,16 @@ function PriceSheet() {
             }
         }
     }))(TableRow);
+
     const theme = useTheme();
 
     const addProductInDatabase = async (id) => {
         try {
             subProduct.map(async (item, index) => {
-                const starCount = ref(database, `/ADMIN/CATEGORY/${id}/PRODUCT/${index + 1}`);
+                const uniqueId = uuid().slice(0, 10);
+                const starCount = ref(database, `/ADMIN/CATEGORY/${id}/PRODUCT/${uniqueId}`);
                 await set(starCount, {
-                    id: index + 1,
+                    id: uniqueId,
                     productName: item.name,
                     productPrice: item.price
                 });
@@ -141,7 +146,7 @@ function PriceSheet() {
                 setSubProduct([]);
                 setImagesFile([]);
             } else {
-                if (!categoryName) notify('Please Fill The ProductName', 2);
+                if (!categoryName) notify('Please Fill The CategoryName', 2);
             }
             setLoading(false);
         } catch (error) {
@@ -157,13 +162,13 @@ function PriceSheet() {
         const refDetail1 = ref(database, `/ADMIN/CATEGORY/${categoryId}/PRODUCT/${productId}`);
 
         try {
-            onValue(imageRef, (snapShot) => {
-                const images = formateData(snapShot.val());
-                console.log('toatal iamges', snapShot.val());
-                images.map(async (item) => {
-                    await deleteProductImage(item.name);
-                });
-            });
+            // onValue(imageRef, (snapShot) => {
+            //     const images = formateData(snapShot.val());
+            //     console.log('toatal iamges', snapShot.val());
+            //     images.map(async (item) => {
+            //         await deleteProductImage(item.name);
+            //     });
+            // });
             if (productType == 0) {
                 set(refDetail, null);
                 notify('Category Successfully Deleted!', 0);
@@ -232,6 +237,7 @@ function PriceSheet() {
             <input
                 style={styles.marginTopView}
                 type='file'
+                accept='image/*'
                 multiple={true}
                 onChange={imgFilehandler}
             />
@@ -241,20 +247,12 @@ function PriceSheet() {
                     <hr />
                     <div>
                         <h2>Preview</h2>
-                        <div
-                            style={{
-                                flexDirection: 'row',
-                                flexWrap: 'wrap',
-                                flex: 1,
-                                backgroundColor: 'red'
-                            }}
-                        >
+                        <div style={styles.rowWrap}>
                             {imagesFile.map((item) => {
                                 return (
                                     <div
                                         style={{
                                             marginRight: 20,
-                                            backgroundColor: 'blue',
                                             width: '20vw'
                                         }}
                                     >
@@ -274,7 +272,10 @@ function PriceSheet() {
                 <Button style={styles.btnStyle} onClick={() => setOpen(true)}>
                     ADD PRODUCT
                 </Button>
-                <Button onClick={() => createCategory()} style={styles.btnStyle1}>
+                <Button
+                    onClick={() => createCategory()}
+                    style={{ ...styles.btnStyle1, marginBottom: 50 }}
+                >
                     UPLOAD CATEGORY
                 </Button>
                 <br />
@@ -286,8 +287,6 @@ function PriceSheet() {
                                 <StyledTableCell align='left'>No.</StyledTableCell>
                                 <StyledTableCell align='left'>ProductName</StyledTableCell>
                                 <StyledTableCell align='left'>ProductPrice</StyledTableCell>
-                                <StyledTableCell align='left'>Actions</StyledTableCell>
-                                <StyledTableCell align='left'>Delete</StyledTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -303,9 +302,6 @@ function PriceSheet() {
                                             </StyledTableCell>
                                             <StyledTableCell align='left'>
                                                 $ {item.price ? item.price : '-'}
-                                            </StyledTableCell>
-                                            <StyledTableCell align='left'>
-                                                <Delete></Delete>
                                             </StyledTableCell>
                                         </StyledTableRow>
                                     </>
@@ -377,9 +373,16 @@ function PriceSheet() {
                                                 <Button
                                                     style={styles.dangerBtn}
                                                     onClick={() => {
-                                                        setEditCategoryName(item.categoryName);
-                                                        setOpenEditCategory(true);
-                                                        setCategoryId(item.ID);
+                                                        // setEditCategoryName(item.categoryName);
+                                                        // setOpenEditCategory(true);
+                                                        // setCategoryId(item.ID);
+                                                        push({
+                                                            pathname: convertSlugToUrl(
+                                                                SLUGS.EditCategory,
+                                                                {}
+                                                            ),
+                                                            state: { categoryId: item.ID }
+                                                        });
                                                     }}
                                                 >
                                                     EDIT
