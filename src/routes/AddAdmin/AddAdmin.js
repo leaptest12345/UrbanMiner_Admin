@@ -22,6 +22,7 @@ export default function AddAdmin(props) {
     const [privacyPermission, setPrivacyPermission] = useState(false);
     const [adminPermission, setAdminPermission] = useState(false);
     const [pdfDetailPermission, setpdfDetailPermission] = useState(false);
+    const [priceSheetPermission, setPriceSheetPermission] = useState(false);
     const [addProduct, setAddProduct] = useState(false);
     const [userList, setUserList] = useState([]);
     const [adminLevel, setAdminLevel] = useState('');
@@ -50,6 +51,7 @@ export default function AddAdmin(props) {
                     setAdminPermission(permissionStatus.addAdmin);
                     setpdfDetailPermission(permissionStatus.pdfDetail ? true : false);
                     setFeedBackPermission(permissionStatus.feedback);
+                    setPriceSheetPermission(permissionStatus.priceSheet ? true : false);
                     setPaymentPermission(permissionStatus.payment);
                     setPrivacyPermission(permissionStatus.privacy);
                     setAddProduct(permissionStatus.addProduct);
@@ -135,7 +137,8 @@ export default function AddAdmin(props) {
                                         addAdmin: adminLevel == 2 ? false : adminPermission,
                                         feedback: feedbackPermission,
                                         addProduct: addProduct,
-                                        pdfDetail: pdfDetailPermission
+                                        pdfDetail: pdfDetailPermission,
+                                        priceSheet: priceSheetPermission
                                     }
                                 }
                             });
@@ -192,7 +195,8 @@ export default function AddAdmin(props) {
                                             addAdmin: adminLevel == 2 ? false : adminPermission,
                                             feedback: feedbackPermission,
                                             addProduct: addProduct,
-                                            pdfDetail: pdfDetailPermission
+                                            pdfDetail: pdfDetailPermission,
+                                            priceSheet: priceSheetPermission
                                         }
                                     }
                                 });
@@ -211,8 +215,33 @@ export default function AddAdmin(props) {
                     }
                 }
             } else {
+                if (!id) {
+                    notify('Admin already Exist!', 0);
+                } else {
+                    const refDetail = ref(database, `/ADMIN/USERS/${id}`);
+                    try {
+                        await update(refDetail, {
+                            role: {
+                                PermissionStatus: {
+                                    user: userPermission,
+                                    item: itemPermission,
+                                    payment: paymentPermission,
+                                    privacy: privacyPermission,
+                                    term: termPermission,
+                                    addAdmin: adminLevel == 2 ? false : adminPermission,
+                                    feedback: feedbackPermission,
+                                    addProduct: addProduct,
+                                    pdfDetail: pdfDetailPermission,
+                                    priceSheet: priceSheetPermission
+                                }
+                            }
+                        });
+                        notify(`User Permission updated!`, 1);
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
                 //admin exist show message "admin already exist please try with differenet id"
-                notify('Admin already Exist!', 0);
                 // const subUserID = userAlreadyExist();
                 // const refDetail = ref(database, `/ADMIN/USERS/${result}`);
                 // try {
@@ -242,57 +271,60 @@ export default function AddAdmin(props) {
             }
         } catch (error) {
             const { message } = error;
-            if (message == 'Firebase: Error (auth/email-already-in-use).') {
-                const result = await getUserId();
-                try {
-                    if (result == 0) {
-                        const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-                        await set(refDetail, {
-                            ID: uniqueId,
-                            email: email,
-                            adminLevel: parseInt(adminLevel) + 1,
-                            role: {
-                                roleName: 'admin',
-                                PermissionStatus: {
-                                    user: userPermission,
-                                    item: itemPermission,
-                                    payment: paymentPermission,
-                                    privacy: privacyPermission,
-                                    term: termPermission,
-                                    addAdmin: adminLevel == 2 ? false : adminPermission,
-                                    feedback: feedbackPermission,
-                                    addProduct: addProduct,
-                                    pdfDetail: pdfDetailPermission
-                                }
-                            }
-                        });
-                    } else {
-                        const refDetail = ref(database, `/ADMIN/USERS/${result}`);
-                        await update(refDetail, {
-                            ID: result,
-                            email: email,
-                            adminLevel: parseInt(adminLevel) + 1,
-                            role: {
-                                roleName: 'admin',
-                                PermissionStatus: {
-                                    user: userPermission,
-                                    item: itemPermission,
-                                    payment: paymentPermission,
-                                    privacy: privacyPermission,
-                                    term: termPermission,
-                                    addAdmin: adminLevel == 2 ? false : adminPermission,
-                                    feedback: feedbackPermission,
-                                    addProduct: addProduct,
-                                    pdfDetail: pdfDetailPermission
-                                }
-                            }
-                        });
-                    }
-                    notify(`New Admin has been created!`, 1);
-                } catch (error) {
-                    console.log(error);
-                }
-            }
+            notify('somehting Went Wrong!, please try with diffrent email', 0);
+            // if (message == 'Firebase: Error (auth/email-already-in-use).') {
+            //     const result = await getUserId();
+            //     try {
+            //         if (result == 0) {
+            //             const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
+            //             await set(refDetail, {
+            //                 ID: uniqueId,
+            //                 email: email,
+            //                 adminLevel: parseInt(adminLevel) + 1,
+            //                 role: {
+            //                     roleName: 'admin',
+            //                     PermissionStatus: {
+            //                         user: userPermission,
+            //                         item: itemPermission,
+            //                         payment: paymentPermission,
+            //                         privacy: privacyPermission,
+            //                         term: termPermission,
+            //                         addAdmin: adminLevel == 2 ? false : adminPermission,
+            //                         feedback: feedbackPermission,
+            //                         addProduct: addProduct,
+            //                         pdfDetail: pdfDetailPermission,
+            //                         priceSheet: priceSheetPermission
+            //                     }
+            //                 }
+            //             });
+            //         } else {
+            //             const refDetail = ref(database, `/ADMIN/USERS/${result}`);
+            //             await update(refDetail, {
+            //                 ID: result,
+            //                 email: email,
+            //                 adminLevel: parseInt(adminLevel) + 1,
+            //                 role: {
+            //                     roleName: 'admin',
+            //                     PermissionStatus: {
+            //                         user: userPermission,
+            //                         item: itemPermission,
+            //                         payment: paymentPermission,
+            //                         privacy: privacyPermission,
+            //                         term: termPermission,
+            //                         addAdmin: adminLevel == 2 ? false : adminPermission,
+            //                         feedback: feedbackPermission,
+            //                         addProduct: addProduct,
+            //                         pdfDetail: pdfDetailPermission,
+            //                         priceSheet: priceSheetPermission
+            //                     }
+            //                 }
+            //             });
+            //         }
+            //         notify(`New Admin has been created!`, 1);
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // }
         }
     };
     const onSubmit = () => {
@@ -422,6 +454,24 @@ export default function AddAdmin(props) {
                                 htmlFor='flexCheckChecked'
                             >
                                 User can <label style={dangerLabel}>VIEW/UPDATE</label> pdfDetail
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={priceSheetPermission}
+                                onChange={() => setPriceSheetPermission(!priceSheetPermission)}
+                            />
+
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>VIEW/UPDATE</label> Category
+                                Price
                             </label>
                         </div>
                         <div className='form-check' style={formCheckStyle}>

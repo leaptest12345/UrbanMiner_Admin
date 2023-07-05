@@ -109,12 +109,14 @@ function SidebarComponent(props) {
                         onClick={() => onClick(SLUGS.FeedBack)}
                     />
                 ) : null}
-                <MenuItem
-                    id={SLUGS.PriceSheet}
-                    title='PriceSheet'
-                    icon={IconAgents}
-                    onClick={() => onClick(SLUGS.PriceSheet)}
-                />
+                {permission?.priceSheet ? (
+                    <MenuItem
+                        id={SLUGS.PriceSheet}
+                        title='PriceSheet'
+                        icon={IconAgents}
+                        onClick={() => onClick(SLUGS.PriceSheet)}
+                    />
+                ) : null}
                 {permission?.pdfDetail ? (
                     <MenuItem
                         id={SLUGS.PdfDetail}

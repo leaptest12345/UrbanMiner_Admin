@@ -118,7 +118,7 @@ export default function AdminList() {
                 AdminLevel:{adminLevel}
             </label>
             <Button type='submit' style={btn} onClick={() => onClick(SLUGS.AddAdmin, { id: null })}>
-                Create New Admin
+                {adminLevel == 1 ? 'Create New Admin' : 'Add New User'}
             </Button>
             <TableContainer
                 style={{
