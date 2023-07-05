@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Column, Row } from 'simple-flexbox';
 import { database } from 'configs/firebaseConfig';
-import { onValue, ref } from 'firebase/database';
+import { child, onValue, ref } from 'firebase/database';
 import { createUseStyles, useTheme } from 'react-jss';
 import { formateData } from 'util/formateData';
 import MiniCardComponent from 'components/cards/MiniCardComponent';
@@ -47,18 +47,44 @@ const useStyles = createUseStyles({
 
 function DashboardComponent() {
     const [totalUser, setTotalUser] = useState('');
+    const [totalSubUser, setTotalSubUser] = useState('');
     const [totalItem, setTotalItem] = useState('');
     const [totalInvoice, setTotalInvoice] = useState('');
+    const [subUserInvoice, setSubUserInvoice] = useState('');
+    const [adminLevel, setAdminLevel] = useState(1);
+    const [subUserIds, setSubUserId] = useState([]);
+
     const getAllData = async () => {
         try {
+            const id = await localStorage.getItem('userID');
+            const userRef = ref(database, `/ADMIN/USERS/${id}`);
+            onValue(userRef, (snapshot) => {
+                setAdminLevel(snapshot.val().adminLevel);
+            });
+            const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
+            onValue(subUserRef, (snapshot) => {
+                const newArr = snapshot.val();
+                snapshot.forEach((child) => {
+                    if (child.val()) {
+                        subUserIds.push(child.val().ID);
+                    }
+                });
+                setTotalSubUser(formateData(newArr).length);
+            });
             const starCountRef = ref(database, '/USERS');
             onValue(starCountRef, (snapshot) => {
                 const newArr = snapshot.val();
                 setTotalUser(formateData(newArr).length);
             });
-            const starCountRef1 = ref(database, '/INVOICE');
+            const starCountRef1 = ref(database, '/INVOICE_LIST');
             onValue(starCountRef1, (snapshot) => {
                 const newArr = snapshot.val();
+                formateData(newArr).map((item) => {
+                    console.log('total invoices', item.userId);
+                });
+                setSubUserInvoice(
+                    formateData(newArr).filter((item) => subUserIds.includes(item.userId)).length
+                );
                 setTotalInvoice(formateData(newArr).length);
             });
             const starCountRef2 = ref(database, '/ADMIN/ITEM');
@@ -94,8 +120,13 @@ function DashboardComponent() {
                 >
                     <MiniCardComponent
                         className={classes.miniCardContainer}
+                        title='AdminLevel'
+                        value={adminLevel}
+                    />
+                    <MiniCardComponent
+                        className={classes.miniCardContainer}
                         title='Total User'
-                        value={totalUser}
+                        value={adminLevel == 1 ? totalUser : totalSubUser}
                     />
                     <MiniCardComponent
                         className={classes.miniCardContainer}
@@ -106,7 +137,7 @@ function DashboardComponent() {
                 <MiniCardComponent
                     className={classes.miniCardContainer}
                     title='TotalInvoice'
-                    value={totalInvoice}
+                    value={adminLevel == 1 ? totalInvoice : subUserInvoice}
                 />
             </Row>
         </Column>

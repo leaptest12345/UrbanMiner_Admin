@@ -24,6 +24,8 @@ export default function AddAdmin(props) {
     const [pdfDetailPermission, setpdfDetailPermission] = useState(false);
     const [addProduct, setAddProduct] = useState(false);
     const [userList, setUserList] = useState([]);
+    const [adminLevel, setAdminLevel] = useState('');
+    const [adminUsers, setAdminUsers] = useState('');
     const theme = useTheme();
 
     const { id } = props.location.state;
@@ -56,8 +58,14 @@ export default function AddAdmin(props) {
         });
     };
 
-    const getUsers = () => {
+    const getUsers = async () => {
         try {
+            const id = await localStorage.getItem('userID');
+            const userRef = ref(database, `/ADMIN/USERS/${id}`);
+            onValue(userRef, (snapshot) => {
+                setAdminLevel(snapshot.val().adminLevel);
+                setAdminUsers(snapshot.val().users);
+            });
             const refDetail = ref(database, '/ADMIN/USERS');
             onValue(refDetail, (snapshOT) => {
                 const data = snapshOT.val();
@@ -83,10 +91,10 @@ export default function AddAdmin(props) {
         return result;
     };
     const userAlreadyExist = () => {
-        let result = false;
+        let result = null;
         formateData(userList).map((item) => {
             if (item.email == email) {
-                result = true;
+                result = item.ID;
             }
         });
         return result;
@@ -96,13 +104,99 @@ export default function AddAdmin(props) {
         try {
             const result = await getUserId();
             if (result == 0) {
-                if (userAlreadyExist()) {
-                    notify('This email has  user please try with diffrent email address', 0);
+                const subUserID = userAlreadyExist();
+                //check if user exist or not
+                if (subUserID != null) {
+                    //if user  exist
+                    const id = await localStorage.getItem('userID');
+                    const userDetailRef = ref(database, `/USERS/${subUserID}`);
+                    onValue(userDetailRef, async (snapShot) => {
+                        console.log('snapShot of the users ', snapShot.val());
+                        const userRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS/${subUserID}`);
+                        set(userRef, {
+                            ID: subUserID,
+                            email: email
+                        });
+                        if (adminLevel == 1) {
+                            //only add admin2 in the adminlist admin3 is user so no need to add them in adminlist
+                            const refDetail = ref(database, `/ADMIN/USERS/${subUserID}`);
+                            await set(refDetail, {
+                                ID: subUserID,
+                                email: email,
+                                adminLevel: parseInt(adminLevel) + 1,
+                                role: {
+                                    roleName: 'admin',
+                                    PermissionStatus: {
+                                        user: userPermission,
+                                        item: itemPermission,
+                                        payment: paymentPermission,
+                                        privacy: privacyPermission,
+                                        term: termPermission,
+                                        addAdmin: adminLevel == 2 ? false : adminPermission,
+                                        feedback: feedbackPermission,
+                                        addProduct: addProduct,
+                                        pdfDetail: pdfDetailPermission
+                                    }
+                                }
+                            });
+                        }
+                        notify(`New Admin has been created!`, 1);
+                    });
                 } else {
                     if (password) {
                         const auth = getAuth();
                         try {
+                            //add new user
                             await createUserWithEmailAndPassword(auth, email, password);
+                            const userUniqueID = uuid();
+                            const userDetailRef = ref(database, `USERS/${userUniqueID}`);
+                            set(userDetailRef, {
+                                ID: userUniqueID,
+                                email: email,
+                                isDeleted: false,
+                                firstName: email,
+                                lastName: '',
+                                photo: '',
+                                photoName: '',
+                                phoneNumber: '',
+                                isApproved: true,
+                                cca2: '',
+                                countryCode: ''
+                            });
+
+                            const id = await localStorage.getItem('userID');
+                            const userRef = ref(
+                                database,
+                                `/ADMIN/USERS/${id}/SUB_USERS/${userUniqueID}`
+                            );
+                            set(userRef, {
+                                ID: userUniqueID,
+                                email: email
+                            });
+                            notify(`New Admin has been created!`, 1);
+
+                            if (adminLevel == 1) {
+                                const refDetail = ref(database, `/ADMIN/USERS/${userUniqueID}`);
+                                await set(refDetail, {
+                                    ID: userUniqueID,
+                                    email: email,
+                                    adminLevel: parseInt(adminLevel) + 1,
+                                    role: {
+                                        roleName: 'admin',
+                                        PermissionStatus: {
+                                            user: userPermission,
+                                            item: itemPermission,
+                                            payment: paymentPermission,
+                                            privacy: privacyPermission,
+                                            term: termPermission,
+                                            addAdmin: adminLevel == 2 ? false : adminPermission,
+                                            feedback: feedbackPermission,
+                                            addProduct: addProduct,
+                                            pdfDetail: pdfDetailPermission
+                                        }
+                                    }
+                                });
+                            }
                         } catch (error) {
                             if (error.message.includes('Error (auth/email-already-in-use')) {
                                 notify(
@@ -110,59 +204,41 @@ export default function AddAdmin(props) {
                                     1
                                 );
                             }
+                            console.log('addAdmin error', error);
                         }
-                        const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-                        await set(refDetail, {
-                            ID: uniqueId,
-                            email: email,
-                            role: {
-                                roleName: 'admin',
-                                PermissionStatus: {
-                                    user: userPermission,
-                                    item: itemPermission,
-                                    payment: paymentPermission,
-                                    privacy: privacyPermission,
-                                    term: termPermission,
-                                    addAdmin: adminPermission,
-                                    feedback: feedbackPermission,
-                                    addProduct: addProduct,
-                                    pdfDetail: pdfDetailPermission
-                                }
-                            }
-                        });
-                        notify(`New Admin has been created!`, 1);
                     } else {
                         notify('Password required for new user', 0);
                     }
                 }
             } else {
-                if (!id) {
-                    notify('Admin Already exists!', 0);
-                } else {
-                    const refDetail = ref(database, `/ADMIN/USERS/${result}`);
-                    try {
-                        await update(refDetail, {
-                            ID: result,
-                            role: {
-                                roleName: 'admin',
-                                PermissionStatus: {
-                                    user: userPermission,
-                                    item: itemPermission,
-                                    payment: paymentPermission,
-                                    privacy: privacyPermission,
-                                    term: termPermission,
-                                    addAdmin: adminPermission,
-                                    feedback: feedbackPermission,
-                                    addProduct: addProduct,
-                                    pdfDetail: pdfDetailPermission
-                                }
-                            }
-                        });
-                        notify(`User Permission updated!`, 1);
-                    } catch (error) {
-                        console.log(error);
-                    }
-                }
+                //admin exist show message "admin already exist please try with differenet id"
+                notify('Admin already Exist!', 0);
+                // const subUserID = userAlreadyExist();
+                // const refDetail = ref(database, `/ADMIN/USERS/${result}`);
+                // try {
+                //     await update(refDetail, {
+                //         ID: result,
+                //         adminLevel: parseInt(adminLevel) + 1,
+                //         role: {
+                //             roleName: 'admin',
+                //             PermissionStatus: {
+                //                 user: userPermission,
+                //                 item: itemPermission,
+                //                 payment: paymentPermission,
+                //                 privacy: privacyPermission,
+                //                 term: termPermission,
+                //                 addAdmin: adminLevel == 2 ? false : adminPermission,
+                //                 feedback: feedbackPermission,
+                //                 addProduct: addProduct,
+                //                 pdfDetail: pdfDetailPermission
+                //             }
+                //         }
+                //     });
+                //     notify(`User Permission updated!`, 1);
+                // } catch (error) {
+                //     console.log(error);
+                // }
+                // }
             }
         } catch (error) {
             const { message } = error;
@@ -174,6 +250,7 @@ export default function AddAdmin(props) {
                         await set(refDetail, {
                             ID: uniqueId,
                             email: email,
+                            adminLevel: parseInt(adminLevel) + 1,
                             role: {
                                 roleName: 'admin',
                                 PermissionStatus: {
@@ -182,7 +259,7 @@ export default function AddAdmin(props) {
                                     payment: paymentPermission,
                                     privacy: privacyPermission,
                                     term: termPermission,
-                                    addAdmin: adminPermission,
+                                    addAdmin: adminLevel == 2 ? false : adminPermission,
                                     feedback: feedbackPermission,
                                     addProduct: addProduct,
                                     pdfDetail: pdfDetailPermission
@@ -194,6 +271,7 @@ export default function AddAdmin(props) {
                         await update(refDetail, {
                             ID: result,
                             email: email,
+                            adminLevel: parseInt(adminLevel) + 1,
                             role: {
                                 roleName: 'admin',
                                 PermissionStatus: {
@@ -202,7 +280,7 @@ export default function AddAdmin(props) {
                                     payment: paymentPermission,
                                     privacy: privacyPermission,
                                     term: termPermission,
-                                    addAdmin: adminPermission,
+                                    addAdmin: adminLevel == 2 ? false : adminPermission,
                                     feedback: feedbackPermission,
                                     addProduct: addProduct,
                                     pdfDetail: pdfDetailPermission
@@ -278,156 +356,159 @@ export default function AddAdmin(props) {
                         />
                     </>
                 )}
-                <div style={{ marginLeft: 40 }}>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={userPermission}
-                            onChange={() => setUserPermission(!userPermission)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <label style={dangerLabel}>DELETE/VIEW</label> usersDetail
-                        </label>
-                    </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={itemPermission}
-                            onChange={() => setItemPermission(!itemPermission)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <label style={dangerLabel}>ADD/DELETE</label> item
-                        </label>
-                    </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={paymentPermission}
-                            onChange={() => setPaymentPermission(!paymentPermission)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <label style={dangerLabel}>ADD/DELETE</label> payment Method
-                        </label>
-                    </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={pdfDetailPermission}
-                            onChange={() => setpdfDetailPermission(!pdfDetailPermission)}
-                        />
+                {adminLevel != 1 ? null : (
+                    <div style={{ marginLeft: 40 }}>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={userPermission}
+                                onChange={() => setUserPermission(!userPermission)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>DELETE/VIEW</label> usersDetail
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={itemPermission}
+                                onChange={() => setItemPermission(!itemPermission)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>ADD/DELETE</label> item
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={paymentPermission}
+                                onChange={() => setPaymentPermission(!paymentPermission)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>ADD/DELETE</label> payment
+                                Method
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={pdfDetailPermission}
+                                onChange={() => setpdfDetailPermission(!pdfDetailPermission)}
+                            />
 
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <label style={dangerLabel}>VIEW/UPDATE</label> pdfDetail
-                        </label>
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>VIEW/UPDATE</label> pdfDetail
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={feedbackPermission}
+                                onChange={() => setFeedBackPermission(!feedbackPermission)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>VIEW</label> the feedbacks
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={adminPermission}
+                                onChange={() => setAdminPermission(!adminPermission)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can give the <label style={dangerLabel}>PERMISSION</label> to
+                                the Another user
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={termPermission}
+                                onChange={() => setTermPermission(!termPermission)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <lable style={dangerLabel}>VIEW/UPDATE</lable> the
+                                TermAndCondition
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={privacyPermission}
+                                onChange={() => setPrivacyPermission(!privacyPermission)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>VIEW/UPDATE </label>the
+                                PrivacyPolicy
+                            </label>
+                        </div>
+                        <div className='form-check' style={formCheckStyle}>
+                            <input
+                                className='form-check-input'
+                                type='checkbox'
+                                style={checkboxStyle}
+                                checked={addProduct}
+                                onChange={() => setAddProduct(!addProduct)}
+                            />
+                            <label
+                                style={labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={dangerLabel}>ADD_PRODUCT</label>
+                            </label>
+                        </div>
                     </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={feedbackPermission}
-                            onChange={() => setFeedBackPermission(!feedbackPermission)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <label style={dangerLabel}>VIEW</label> the feedbacks
-                        </label>
-                    </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={adminPermission}
-                            onChange={() => setAdminPermission(!adminPermission)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can give the <label style={dangerLabel}>PERMISSION</label> to the
-                            Another user
-                        </label>
-                    </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={termPermission}
-                            onChange={() => setTermPermission(!termPermission)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <lable style={dangerLabel}>VIEW/UPDATE</lable> the
-                            TermAndCondition
-                        </label>
-                    </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={privacyPermission}
-                            onChange={() => setPrivacyPermission(!privacyPermission)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <label style={dangerLabel}>VIEW/UPDATE </label>the
-                            PrivacyPolicy
-                        </label>
-                    </div>
-                    <div className='form-check' style={formCheckStyle}>
-                        <input
-                            className='form-check-input'
-                            type='checkbox'
-                            style={checkboxStyle}
-                            checked={addProduct}
-                            onChange={() => setAddProduct(!addProduct)}
-                        />
-                        <label
-                            style={labelStyle}
-                            className='form-check-label'
-                            htmlFor='flexCheckChecked'
-                        >
-                            User can <label style={dangerLabel}>ADD_PRODUCT</label>
-                        </label>
-                    </div>
-                </div>
+                )}
             </div>
             <Button onClick={() => onSubmit()} style={btnStyle}>
                 <span style={{ color: 'white' }}>{id ? 'UPDATE' : 'SUBMIT'}</span>

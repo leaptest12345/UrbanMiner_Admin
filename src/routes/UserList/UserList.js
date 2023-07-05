@@ -21,17 +21,51 @@ import ImageModal from 'components/ImageModal/ImageModal';
 
 import styles from './styles';
 import { Delete } from '@material-ui/icons';
+
 export default function UserList() {
     const theme = useTheme();
     const { push } = useHistory();
 
-    const [user, setUsers] = useState([1, 2]);
-    const getUserList = () => {
+    const [user, setUsers] = useState([]);
+    const [adminLevel, setAdminLevel] = useState(0);
+
+    const getUserDetail = (id) => {
+        let userData = null;
+        const userRef = ref(database, `USERS/${id}`);
+        onValue(userRef, (snapshot) => {
+            const data = snapshot.val();
+            userData = data;
+        });
+        return userData;
+    };
+
+    const getUserList = async () => {
         try {
-            const starCountRef = ref(database, '/USERS');
-            onValue(starCountRef, (snapshot) => {
-                const data = snapshot.val();
-                setUsers(formateData(data).filter((item) => item.isDeleted == false));
+            const id = await localStorage.getItem('userID');
+            const userRef = ref(database, `/ADMIN/USERS/${id}`);
+            const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
+            onValue(userRef, (snapshot) => {
+                setAdminLevel(snapshot.val().adminLevel);
+                if (snapshot.val().adminLevel == '2') {
+                    //can only see subusers data
+                    onValue(subUserRef, (snapshot) => {
+                        const data = snapshot.val();
+                        setUsers(formateData(data));
+                    });
+                } else if (snapshot.val().adminLevel == '1') {
+                    //level 1 admin will be able to see all the user data
+                    const starCountRef = ref(database, '/USERS');
+                    onValue(starCountRef, (snapshot) => {
+                        const data = snapshot.val();
+                        setUsers(formateData(data).filter((item) => item.isDeleted == false));
+                    });
+                } else {
+                    //no need to show this for level3 user
+                    onValue(userRef, (snapshot) => {
+                        user.push(snapshot.val());
+                        console.log(user);
+                    });
+                }
             });
         } catch (error) {
             console.log(error);
@@ -102,35 +136,38 @@ export default function UserList() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {user &&
-                        user.map((item, index) => (
-                            <StyledTableRow align='left' key={item.id}>
+                    {user.map((itemDetails, index) => {
+                        const item = getUserDetail(itemDetails.ID);
+                        return (
+                            <StyledTableRow align='left' key={itemDetails.ID + '['}>
                                 <StyledTableCell component='th' scope='row'>
                                     {index + 1}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
-                                    {item.photo ? (
-                                        <ImageModal url={item.photo} imageStyle={styles.img} />
+                                    {item?.photo ? (
+                                        <ImageModal url={item?.photo} imageStyle={styles.img} />
                                     ) : (
                                         <div className={styles.img}>-</div>
                                     )}
                                 </StyledTableCell>
                                 <StyledTableCell component='th' scope='row'>
-                                    {item?.firstName + '   ' + item.lastName}
+                                    {item?.firstName == undefined
+                                        ? item?.email
+                                        : item?.firstName + '   ' + item?.lastName}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
-                                    {item.phoneNumber
-                                        ? (item.phoneNumber + '').substring(0, 3) +
+                                    {item?.phoneNumber
+                                        ? (item?.phoneNumber + '').substring(0, 3) +
                                           '   ' +
-                                          (item.phoneNumber + '').substring(3, 6) +
+                                          (item?.phoneNumber + '').substring(3, 6) +
                                           '   ' +
-                                          (item.phoneNumber + '').substring(6, 10) +
+                                          (item?.phoneNumber + '').substring(6, 10) +
                                           '   '
                                         : '-'}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
                                     <Button
-                                        onClick={() => onClick(SLUGS.UserDetail, { id: item.ID })}
+                                        onClick={() => onClick(SLUGS.UserDetail, { id: item?.ID })}
                                     >
                                         View Detail
                                     </Button>
@@ -139,7 +176,8 @@ export default function UserList() {
                                     <Delete onClick={() => onAction(item)}></Delete>
                                 </StyledTableCell>
                             </StyledTableRow>
-                        ))}
+                        );
+                    })}
                 </TableBody>
             </Table>
             <ToastContainer />

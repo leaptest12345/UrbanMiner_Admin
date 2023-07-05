@@ -86,7 +86,7 @@ export default function UserDetail(props) {
         try {
             const refDetail = ref(database, `USERS/${id}`);
             onValue(refDetail, (snapShot) => {
-                setIsApproved(snapShot.val().isApproved);
+                setIsApproved(snapShot.val()?.isApproved);
                 setUser(snapShot.val());
             });
         } catch (error) {

@@ -23,46 +23,46 @@ const Login = () => {
     const { signIn1 } = React.useContext(UserContext);
     const auth = getAuth();
 
-    useEffect(() => {
-        setValues();
-    }, []);
-    const setValues = async () => {
-        try {
-            const user = await createUserWithEmailAndPassword(
-                auth,
-                'sutharbipinn25899@gmail.com',
-                '12345678'
-            );
-            const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-            await set(refDetail, {
-                ID: uniqueId,
-                email: 'sutharbipinn25899@gmail.com',
-                role: {
-                    roleName: 'admin',
-                    PermissionStatus: {
-                        user: true,
-                        item: true,
-                        payment: true,
-                        privacy: true,
-                        term: true,
-                        addAdmin: true,
-                        feedback: true,
-                        addProduct: true
-                    }
-                }
-            });
-            const id = uuid().slice(0, 8);
-            const starCount = ref(database, `/ADMIN/PRODUCT/${id}`);
-            await set(starCount, {
-                ID: id,
-                productName: 'new product',
-                productImage: '',
-                prodductDescription: 'urbanminer product has been added'
-            });
-        } catch (error) {
-            console.log('error details', error.message);
-        }
-    };
+    // useEffect(() => {
+    //     setValues();
+    // }, []);
+    // const setValues = async () => {
+    //     try {
+    //         const user = await createUserWithEmailAndPassword(
+    //             auth,
+    //             'sutharbipinn25899@gmail.com',
+    //             '12345678'
+    //         );
+    //         const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
+    //         await set(refDetail, {
+    //             ID: uniqueId,
+    //             email: 'sutharbipinn25899@gmail.com',
+    //             role: {
+    //                 roleName: 'admin',
+    //                 PermissionStatus: {
+    //                     user: true,
+    //                     item: true,
+    //                     payment: true,
+    //                     privacy: true,
+    //                     term: true,
+    //                     addAdmin: true,
+    //                     feedback: true,
+    //                     addProduct: true
+    //                 }
+    //             }
+    //         });
+    //         const id = uuid().slice(0, 8);
+    //         const starCount = ref(database, `/ADMIN/PRODUCT/${id}`);
+    //         await set(starCount, {
+    //             ID: id,
+    //             productName: 'new product',
+    //             productImage: '',
+    //             prodductDescription: 'urbanminer product has been added'
+    //         });
+    //     } catch (error) {
+    //         console.log('error details', error.message);
+    //     }
+    // };
 
     const theme = useTheme();
     const paperStyle = {
@@ -93,6 +93,7 @@ const Login = () => {
                         users.map((item, index) => {
                             if (item.email == email) {
                                 emailResult = true;
+                                console.log('user item deatils', item);
                                 signIn1(item.ID + '', item.role.PermissionStatus);
                                 notify('Login Successfully Done!', 1);
                                 setLoading(false);

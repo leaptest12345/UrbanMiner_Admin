@@ -129,9 +129,9 @@ function HeaderComponent() {
             if (userID != null) {
                 const result = ref(database, `/ADMIN/USERS/${userID}`);
                 onValue(result, (snapshot) => {
-                    const { firstName, lastName, photo } = snapshot.val();
-                    setName(firstName + lastName);
-                    setPhoto(photo);
+                    const data = snapshot.val();
+                    setName(data?.firstName + data?.lastName);
+                    setPhoto(data?.photo);
                 });
             }
         } catch (error) {
