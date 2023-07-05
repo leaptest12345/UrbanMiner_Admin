@@ -131,7 +131,9 @@ export default function AdminList() {
                     <TableHead>
                         <TableRow>
                             <StyledTableCell align='left'>No.</StyledTableCell>
-                            <StyledTableCell align='left'>AdminList</StyledTableCell>
+                            <StyledTableCell align='left'>
+                                {adminLevel == 1 ? 'Admin List' : 'User List'}
+                            </StyledTableCell>
                             {adminLevel != 1 ? null : (
                                 <StyledTableCell align='left'>Actions</StyledTableCell>
                             )}
