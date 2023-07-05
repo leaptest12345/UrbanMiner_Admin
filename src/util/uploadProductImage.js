@@ -1,4 +1,10 @@
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
+import {
+    deleteObject,
+    getDownloadURL,
+    getStorage,
+    ref,
+    uploadBytesResumable
+} from 'firebase/storage';
 
 export const uploadProductImage = async (imgfile) => {
     return new Promise((resolve, reject) => {
@@ -26,4 +32,16 @@ export const uploadProductImage = async (imgfile) => {
             }
         );
     });
+};
+
+export const deleteProductImage = (imgfile) => {
+    const storage = getStorage();
+    const storageRef = ref(storage, `ProductImages/${imgfile}`);
+    deleteObject(storageRef)
+        .then(() => {
+            console.log('succesfully deleted');
+        })
+        .catch((error) => {
+            console.log('while uploading iamge', error);
+        });
 };

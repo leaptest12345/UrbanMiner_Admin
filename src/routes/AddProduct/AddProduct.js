@@ -270,7 +270,7 @@ function AddProduct() {
         setIsImageChange(false);
         setAddToDatabase(false);
     };
-    const deleteProduct = () => {
+    const deleteProduct = (productId) => {
         const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
         const refDetail1 = ref(database, `/ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${productSubId}`);
         try {
@@ -516,7 +516,7 @@ function AddProduct() {
                                                     onClick={() =>
                                                         setProductType(0) +
                                                         setProductId(item.ID) +
-                                                        deleteProduct()
+                                                        deleteProduct(item.ID)
                                                     }
                                                 ></Delete>
                                             </StyledTableCell>
@@ -628,7 +628,7 @@ function AddProduct() {
                     <div style={styles.rowDiv}>
                         <div>
                             <h4>Upload Sub_Product Image (Optional)</h4>
-                            <input type='file' onChange={imgFilehandler1} />
+                            <input type='file' onChange={imgFilehandler1} accept='image/*' />
                         </div>
                         <div>
                             {subImgFile != '' ? (

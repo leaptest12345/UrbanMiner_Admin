@@ -11,6 +11,7 @@ export default {
     settings: '/settings',
     PdfDetail: '/PdfDetail',
     UserList: '/UserList',
+    EditCategory: '/EditCategory',
     AddAdmin: '/AddAdmin',
     AdminList: '/AdminList',
     login: '/login',
@@ -21,5 +22,7 @@ export default {
     UserDetail: '/UserDetail',
     CustomerDetail: '/CustomerDetail',
     ViewDraft: '/ViewDraft',
-    AddProduct: '/AddProduct'
+    AddProduct: '/AddProduct',
+    PriceSheet: '/PriceSheet',
+    categoryImages: '/CategoryImages'
 };
