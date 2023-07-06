@@ -26,14 +26,6 @@ export default function AdminList() {
         getUsers();
     }, []);
 
-    const subUserExistOrNot = (id) => {
-        let result = false;
-        // subUsers[0].map((item) => {
-        //     if (item.ID == id) result = true;
-        // });
-        return result;
-    };
-
     const getUserDetail = (id) => {
         let userData = null;
         const userRef = ref(database, `USERS/${id}`);
