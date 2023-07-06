@@ -1,6 +1,6 @@
 import { Button } from '@material-ui/core';
 import { database } from 'configs/firebaseConfig';
-import { onValue, ref } from 'firebase/database';
+import { onValue, ref, set } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'react-jss';
 import { withStyles } from '@material-ui/core/styles';
@@ -15,6 +15,8 @@ import { formateData } from 'util/formateData';
 import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
 import { useHistory } from 'react-router-dom';
+import { Delete } from '@material-ui/icons';
+import { notify } from 'util/notify';
 
 export default function AdminList() {
     const [users, setUsers] = useState([]);
@@ -45,7 +47,7 @@ export default function AdminList() {
                 // subUsers.push(formateData(snapShot1.val()));
             });
             onValue(userRef, (snapShot) => {
-                setAdminLevel(snapShot.val().adminLevel);
+                setAdminLevel(snapShot.val()?.adminLevel);
             });
 
             // onValue(userRef, (snapshot) => {
@@ -104,6 +106,18 @@ export default function AdminList() {
             state: data
         });
     }
+
+    const deleteSubUser = async (id) => {
+        const userId = await localStorage.getItem('userID');
+        if (adminLevel == 1) {
+            const userRef = ref(database, `/ADMIN/USERS/${id}`);
+            set(userRef, null);
+        }
+        const subUserRef = ref(database, `/ADMIN/USERS/${userId}/SUB_USERS/${id}`);
+        set(subUserRef, null);
+        notify(`Your ${adminLevel == 1 ? 'Admin' : 'User'}  Successfully Deleted`, 0);
+    };
+
     return (
         <div>
             <label className='form-check-label' htmlFor='flexCheckChecked'>
@@ -129,6 +143,7 @@ export default function AdminList() {
                             {adminLevel != 1 ? null : (
                                 <StyledTableCell align='left'>Actions</StyledTableCell>
                             )}
+                            <StyledTableCell align='left'>Delete</StyledTableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -152,6 +167,9 @@ export default function AdminList() {
                                                 </Button>
                                             </StyledTableCell>
                                         )}
+                                        <StyledTableCell align='left'>
+                                            <Delete onClick={() => deleteSubUser(item.ID)}></Delete>
+                                        </StyledTableCell>
                                     </StyledTableRow>
                                 );
                             })}

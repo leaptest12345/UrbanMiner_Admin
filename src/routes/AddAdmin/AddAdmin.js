@@ -8,8 +8,11 @@ import { v4 as uuid } from 'uuid';
 import { onValue, ref, set, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'react-jss';
+import { useHistory } from 'react-router-dom';
 
 export default function AddAdmin(props) {
+    const history = useHistory();
+
     const uniqueId = uuid().slice(0, 8);
     const [email, setEmail] = useState('');
     const [users, setUsers] = useState([]);
@@ -143,7 +146,10 @@ export default function AddAdmin(props) {
                                 }
                             });
                         }
-                        notify(`New Admin has been created!`, 1);
+                        notify(`New ${adminLevel == 1 ? 'Admin' : 'User'} has been created!`, 1);
+                        setTimeout(() => {
+                            history.goBack();
+                        }, 1000);
                     });
                 } else {
                     if (password) {
@@ -163,8 +169,8 @@ export default function AddAdmin(props) {
                                 photoName: '',
                                 phoneNumber: '',
                                 isApproved: true,
-                                cca2: '',
-                                countryCode: ''
+                                cca2: 'US',
+                                countryCode: '1'
                             });
 
                             const id = await localStorage.getItem('userID');
@@ -176,7 +182,6 @@ export default function AddAdmin(props) {
                                 ID: userUniqueID,
                                 email: email
                             });
-                            notify(`New Admin has been created!`, 1);
 
                             if (adminLevel == 1) {
                                 const refDetail = ref(database, `/ADMIN/USERS/${userUniqueID}`);
@@ -201,6 +206,14 @@ export default function AddAdmin(props) {
                                     }
                                 });
                             }
+
+                            notify(
+                                `New ${adminLevel == 1 ? 'Admin' : 'User'} has been created!`,
+                                1
+                            );
+                            setTimeout(() => {
+                                history.goBack();
+                            }, 1000);
                         } catch (error) {
                             if (error.message.includes('Error (auth/email-already-in-use')) {
                                 notify(
@@ -236,7 +249,10 @@ export default function AddAdmin(props) {
                                 }
                             }
                         });
-                        notify(`User Permission updated!`, 1);
+                        notify(`Admin Permission updated!`, 1);
+                        setTimeout(() => {
+                            history.goBack();
+                        }, 1000);
                     } catch (error) {
                         console.log(error);
                     }

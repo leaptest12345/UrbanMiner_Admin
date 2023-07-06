@@ -66,15 +66,19 @@ function DashboardComponent() {
                 const newArr = snapshot.val();
                 snapshot.forEach((child) => {
                     if (child.val()) {
-                        subUserIds.push(child.val().ID);
+                        if (child.val().isDeleted != true) {
+                            subUserIds.push(child.val().ID);
+                        }
                     }
                 });
-                setTotalSubUser(formateData(newArr).length);
+                setTotalSubUser(
+                    formateData(newArr).filter((item) => item.isDeleted != true).length
+                );
             });
             const starCountRef = ref(database, '/USERS');
             onValue(starCountRef, (snapshot) => {
                 const newArr = snapshot.val();
-                setTotalUser(formateData(newArr).length);
+                setTotalUser(formateData(newArr).filter((item) => item.isDeleted != true).length);
             });
             const starCountRef1 = ref(database, '/INVOICE_LIST');
             onValue(starCountRef1, (snapshot) => {

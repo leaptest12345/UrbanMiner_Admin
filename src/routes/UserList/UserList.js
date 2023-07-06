@@ -57,7 +57,7 @@ export default function UserList() {
                     const starCountRef = ref(database, '/USERS');
                     onValue(starCountRef, (snapshot) => {
                         const data = snapshot.val();
-                        setUsers(formateData(data).filter((item) => item.isDeleted == false));
+                        setUsers(formateData(data).filter((item) => item.isDeleted != true));
                     });
                 } else {
                     //no need to show this for level3 user
