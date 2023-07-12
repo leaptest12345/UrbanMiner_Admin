@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "07a5160d2de7e56919a46d0fda7dc787",
+    "revision": "3593b735cf95dd0ee04fd068ce785949",
     "url": "/UrbanMiner_Admin/index.html"
   },
   {
@@ -8,7 +8,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/UrbanMiner_Admin/static/css/2.12770553.chunk.css"
   },
   {
-    "revision": "b3ac0a0ce75024761dc5",
+    "revision": "1addbff1b5eb25ca1a5e",
     "url": "/UrbanMiner_Admin/static/css/main.7deb2159.chunk.css"
   },
   {
@@ -28,12 +28,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/UrbanMiner_Admin/static/js/3.19ada9f7.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "b3ac0a0ce75024761dc5",
-    "url": "/UrbanMiner_Admin/static/js/main.33c4d514.chunk.js"
+    "revision": "1addbff1b5eb25ca1a5e",
+    "url": "/UrbanMiner_Admin/static/js/main.0721e502.chunk.js"
   },
   {
     "revision": "4e0e34f265fae8f33b01b27ae29d9d6f",
-    "url": "/UrbanMiner_Admin/static/js/main.33c4d514.chunk.js.LICENSE.txt"
+    "url": "/UrbanMiner_Admin/static/js/main.0721e502.chunk.js.LICENSE.txt"
   },
   {
     "revision": "00e6e731a89869c657c5",
