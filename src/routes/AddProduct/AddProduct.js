@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { database } from 'configs/firebaseConfig';
-import { set, onValue, ref, update } from 'firebase/database';
-import { v4 as uuid } from 'uuid';
-import { notify } from 'util/notify';
-import { ToastContainer } from 'react-toastify';
-import { Button } from '@material-ui/core';
-import LoadingSpinner from 'components/Spinner/LoadingSpinner';
-import { useTheme } from 'react-jss';
+
 import Modal from '@material-ui/core/Modal';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+
+import { set, onValue, ref, update } from 'firebase/database';
+import { v4 as uuid } from 'uuid';
+import { database } from 'configs/firebaseConfig';
+import { notify } from 'util/notify';
+import { ToastContainer } from 'react-toastify';
+import { Button } from '@material-ui/core';
+import { useTheme } from 'react-jss';
 import { withStyles } from '@material-ui/core/styles';
 import { Delete } from '@material-ui/icons';
 import { uploadProductImage } from 'util/uploadProductImage';
-import productStyle from './styles';
 import { formateData } from 'util/formateData';
+
+import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 import ImageModal from 'components/ImageModal/ImageModal';
+
+import productStyle from './styles';
+
 function AddProduct() {
     const [imgfile, setImageFile] = useState('');
     const [productName, setProductName] = useState('');
@@ -37,20 +42,25 @@ function AddProduct() {
     const [isImageChange, setIsImageChange] = useState(false);
     const [addToDatabase, setAddToDatabase] = useState(false);
     const [item, setItem] = useState('');
+
     const { styles } = productStyle;
     const uniqueId = uuid().slice(0, 8);
+
     const imgFilehandler = (e) => {
         setImageFile(e.target.files[0]);
     };
+
     const imgFilehandler1 = (e) => {
         if (isEditable) {
             setIsImageChange(true);
             setSubImageFile(e.target.files[0]);
         } else setSubImageFile(e.target.files[0]);
     };
+
     useEffect(() => {
         getProduct();
     }, []);
+
     const setProductDetail = async () => {
         try {
             setLoading(true);
@@ -270,21 +280,24 @@ function AddProduct() {
         setIsImageChange(false);
         setAddToDatabase(false);
     };
-    const deleteProduct = (productId) => {
-        const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
-        const refDetail1 = ref(database, `/ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${productSubId}`);
-        try {
-            if (productType == 0) {
-                set(refDetail, null);
-                notify('Product Successfully Deleted!', 0);
-            } else {
-                set(refDetail1, null);
-                notify('Sub_Product Successfully Deleted!', 0);
-            }
-        } catch (error) {
-            console.log(error);
+
+    const deleteProduct = (productId, subProductId, type) => {
+        if (type == 'product') {
+            console.log('please delete produc here', productId);
+            const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
+            set(refDetail, null);
+            notify('Product Successfully Deleted!', 0);
+        } else {
+            console.log('inside subproduct');
+            const refDetail1 = ref(
+                database,
+                `/ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${subProductId}`
+            );
+            set(refDetail1, null);
+            notify('Sub_Product Successfully Deleted!', 0);
         }
     };
+
     const addSubProductInDatabase = async () => {
         try {
             if (subImgFile) {
@@ -318,10 +331,13 @@ function AddProduct() {
                 setLoading(false);
             }
         } catch (error) {
-            setLoading(false);
             console.log(error);
+        } finally {
+            onModalClose();
+            setLoading(false);
         }
     };
+
     const onEdit = () => {
         addToDatabase
             ? addSubProductInDatabase()
@@ -354,7 +370,12 @@ function AddProduct() {
                 />
             </div>
             <h2>Upload</h2>
-            <input style={styles.marginTopView} type='file' onChange={imgFilehandler} />
+            <input
+                style={styles.marginTopView}
+                type='file'
+                accept='image/*'
+                onChange={imgFilehandler}
+            />
 
             {imgfile != '' ? (
                 <>
@@ -513,11 +534,15 @@ function AddProduct() {
                                             </StyledTableCell>
                                             <StyledTableCell align='left' style={styles.width10}>
                                                 <Delete
-                                                    onClick={() =>
-                                                        setProductType(0) +
-                                                        setProductId(item.ID) +
-                                                        deleteProduct(item.ID)
-                                                    }
+                                                    onClick={() => {
+                                                        console.log(
+                                                            'before deleting product',
+                                                            item
+                                                        );
+                                                        setProductType(0);
+                                                        setProductId(item.ID);
+                                                        deleteProduct(item.ID, null, 'product');
+                                                    }}
                                                 ></Delete>
                                             </StyledTableCell>
                                         </StyledTableRow>
@@ -581,12 +606,18 @@ function AddProduct() {
                                                               style={styles.width10}
                                                           >
                                                               <Delete
-                                                                  onClick={() =>
-                                                                      setProductType(1) +
-                                                                      setProductId(item.ID) +
-                                                                      setProductSubId(item1.id) +
-                                                                      deleteProduct()
-                                                                  }
+                                                                  onClick={() => {
+                                                                      console.log(
+                                                                          'before deleting sub product',
+                                                                          item
+                                                                      );
+                                                                      setProductType(1);
+                                                                      deleteProduct(
+                                                                          item.ID,
+                                                                          item1.id,
+                                                                          1
+                                                                      );
+                                                                  }}
                                                               ></Delete>
                                                           </StyledTableCell1>
                                                       </StyledTableRow>
