@@ -85,7 +85,8 @@ function AddProduct() {
                         id: index + 1,
                         productName: item.name,
                         productImage: url,
-                        prodductDescription: item.description
+                        prodductDescription: item.description,
+                        updatedAt: new Date().toString()
                     });
                     onModalClose();
                 } else {
@@ -97,7 +98,8 @@ function AddProduct() {
                         id: index + 1,
                         productName: item.name,
                         productImage: '',
-                        prodductDescription: item.description
+                        prodductDescription: item.description,
+                        updatedAt: new Date().toString()
                     });
                     onModalClose();
                 }
@@ -126,7 +128,8 @@ function AddProduct() {
                     ID: id,
                     productName: productName,
                     productImage: downloadURL,
-                    prodductDescription: productDesc
+                    prodductDescription: productDesc,
+                    updatedAt: new Date().toString()
                 });
                 notify('Product has been successfully created!', 1);
                 addSubProductDatabase(id);
@@ -192,12 +195,14 @@ function AddProduct() {
             setOpen(false);
         }
     };
+
     const deleteSubProduct = (data) => {
         const result = subProduct.filter((item) => {
             return item.id != data.id;
         });
         setSubProduct(result);
     };
+
     const editProduct = (item) => {
         try {
             setIsEditable(true);
@@ -209,6 +214,7 @@ function AddProduct() {
             console.log(error);
         }
     };
+
     const editProductDetail = async () => {
         try {
             setLoading(true);
@@ -218,14 +224,16 @@ function AddProduct() {
                 update(refDetail, {
                     productName: subProductName,
                     prodductDescription: subProductDesc,
-                    productImage: url
+                    productImage: url,
+                    updatedAt: new Date().toString()
                 });
                 notify('Product detail has been updated!', 2);
             } else {
                 const refDetail = ref(database, `ADMIN/PRODUCT/${productId}`);
                 update(refDetail, {
                     productName: subProductName,
-                    prodductDescription: subProductDesc
+                    prodductDescription: subProductDesc,
+                    updatedAt: new Date().toString()
                 });
                 notify('Product detail has been updated!', 2);
             }
@@ -237,6 +245,7 @@ function AddProduct() {
             setLoading(false);
         }
     };
+
     const editSubProductDetail = async () => {
         try {
             setLoading(true);
@@ -249,7 +258,8 @@ function AddProduct() {
                 update(refDetail, {
                     productName: subProductName,
                     prodductDescription: subProductDesc,
-                    productImage: url
+                    productImage: url,
+                    updatedAt: new Date().toString()
                 });
                 notify('Sub_Product detail has been updated!', 2);
             } else {
@@ -259,7 +269,8 @@ function AddProduct() {
                 );
                 update(refDetail, {
                     productName: subProductName,
-                    prodductDescription: subProductDesc
+                    prodductDescription: subProductDesc,
+                    updatedAt: new Date().toString()
                 });
                 notify('Sub_Product detail has been updated!', 2);
             }
@@ -271,6 +282,7 @@ function AddProduct() {
             setLoading(false);
         }
     };
+
     const onModalClose = () => {
         setOpen(false);
         setIsEditable(false);
@@ -309,7 +321,8 @@ function AddProduct() {
                     id: id,
                     productName: subProductName,
                     productImage: url,
-                    prodductDescription: subProductDesc
+                    prodductDescription: subProductDesc,
+                    updatedAt: new Date().toString()
                 });
                 setOpen(false);
                 setAddToDatabase(false);
@@ -323,7 +336,8 @@ function AddProduct() {
                     id: id,
                     productName: subProductName,
                     productImage: '',
-                    prodductDescription: subProductDesc
+                    prodductDescription: subProductDesc,
+                    updatedAt: new Date().toString()
                 });
                 setOpen(false);
                 setAddToDatabase(false);
@@ -347,6 +361,7 @@ function AddProduct() {
                 : editSubProductDetail()
             : addSubProduct();
     };
+
     const imageFileUrl = imgfile != '' ? window.URL.createObjectURL(imgfile) : '';
 
     return (
@@ -703,4 +718,5 @@ function AddProduct() {
         </div>
     );
 }
+
 export default AddProduct;

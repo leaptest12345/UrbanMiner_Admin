@@ -17,6 +17,7 @@ export default function AddAdmin(props) {
     const [email, setEmail] = useState('');
     const [users, setUsers] = useState([]);
     const [password, setPassword] = useState('');
+
     const [itemPermission, setItemPermission] = useState(false);
     const [userPermission, setUserPermission] = useState(false);
     const [paymentPermission, setPaymentPermission] = useState(false);
@@ -26,6 +27,7 @@ export default function AddAdmin(props) {
     const [adminPermission, setAdminPermission] = useState(false);
     const [pdfDetailPermission, setpdfDetailPermission] = useState(false);
     const [priceSheetPermission, setPriceSheetPermission] = useState(false);
+
     const [addProduct, setAddProduct] = useState(false);
     const [userList, setUserList] = useState([]);
     const [adminLevel, setAdminLevel] = useState('');
