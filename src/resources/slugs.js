@@ -21,6 +21,7 @@ export default {
     items: '/items',
     UserDetail: '/UserDetail',
     CustomerDetail: '/CustomerDetail',
+    UserPermission: '/UserPermission',
     ViewDraft: '/ViewDraft',
     AddProduct: '/AddProduct',
     PriceSheet: '/PriceSheet',

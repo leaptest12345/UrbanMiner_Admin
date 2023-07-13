@@ -18,6 +18,7 @@ import PdfDetail from './PdfDetail/PdfDetail';
 import PriceSheet from './PriceSheet/PriceSheet';
 import CategoryImages from './CategoryImages/CategoryImages';
 import EditCategory, { editCategory } from './editCategory/editCategory';
+import { UserPermission } from './UserPermission/UserPermission';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -49,6 +50,12 @@ function PrivateRoutes() {
                     path={SLUGS.UserList}
                     component={UserList}
                     render={() => <div>UserList</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.UserPermission}
+                    component={UserPermission}
+                    render={() => <div>User Permission</div>}
                 />
                 <Route
                     exact
