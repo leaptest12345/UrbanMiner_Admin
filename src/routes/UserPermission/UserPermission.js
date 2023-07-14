@@ -10,11 +10,11 @@ export const UserPermission = (props) => {
     const { userId } = props.location.state;
     const history = useHistory();
 
+    const [isViewInvoices, setIsViewInvoices] = useState(true);
     const [isCreateInvoice, setIsCreateInvoice] = useState(true);
     const [isProduct, setIsProduct] = useState(true);
     const [isPriceSheet, setIsPriceSheet] = useState(true);
     const [isCalculator, setIsCalculator] = useState(true);
-    const [isProfileAndSettings, setIsProfileAndSettings] = useState(true);
 
     useEffect(() => {
         getUserPermissionDetails();
@@ -26,11 +26,11 @@ export const UserPermission = (props) => {
             const data = snapshot?.val()?.permissionStatus;
 
             if (data) {
+                setIsViewInvoices(data?.viewInvoices);
                 setIsCreateInvoice(data?.createInvoice);
                 setIsProduct(data?.product);
                 setIsPriceSheet(data?.priceSheet);
                 setIsCalculator(data?.calculator);
-                setIsProfileAndSettings(data?.profileAndSettings);
             }
         });
     };
@@ -40,11 +40,11 @@ export const UserPermission = (props) => {
             const userRef = ref(database, `USERS/${userId}`);
             await update(userRef, {
                 permissionStatus: {
+                    viewInvoices: isViewInvoices,
                     createInvoice: isCreateInvoice,
                     product: isProduct,
                     priceSheet: isPriceSheet,
-                    calculator: isCalculator,
-                    profileAndSettings: isProfileAndSettings
+                    calculator: isCalculator
                 }
             });
             notify('Pemission Successfully Updated!', 1);
@@ -55,6 +55,22 @@ export const UserPermission = (props) => {
     return (
         <div>
             <div style={{ marginLeft: 40 }}>
+                <div className='form-check' style={styles.formCheckStyle}>
+                    <input
+                        className='form-check-input'
+                        type='checkbox'
+                        style={styles.checkboxStyle}
+                        checked={isViewInvoices}
+                        onChange={() => setIsViewInvoices(!isViewInvoices)}
+                    />
+                    <label
+                        style={styles.labelStyle}
+                        className='form-check-label'
+                        htmlFor='flexCheckChecked'
+                    >
+                        User can <label style={styles.dangerLabel}>VIEW/EDIT</label> Invoices
+                    </label>
+                </div>
                 <div className='form-check' style={styles.formCheckStyle}>
                     <input
                         className='form-check-input'
@@ -121,23 +137,6 @@ export const UserPermission = (props) => {
                     >
                         User will be able to<label style={styles.dangerLabel}> USE</label>{' '}
                         calculator
-                    </label>
-                </div>
-                <div className='form-check' style={styles.formCheckStyle}>
-                    <input
-                        className='form-check-input'
-                        type='checkbox'
-                        style={styles.checkboxStyle}
-                        checked={isProfileAndSettings}
-                        onChange={() => setIsProfileAndSettings(!isProfileAndSettings)}
-                    />
-                    <label
-                        style={styles.labelStyle}
-                        className='form-check-label'
-                        htmlFor='flexCheckChecked'
-                    >
-                        User can<label style={styles.dangerLabel}>VIEW/UPDATE</label> Profile and
-                        Settings
                     </label>
                 </div>
             </div>
