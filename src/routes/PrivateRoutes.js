@@ -17,7 +17,7 @@ import AddAdmin from './AddAdmin/AddAdmin';
 import PdfDetail from './PdfDetail/PdfDetail';
 import PriceSheet from './PriceSheet/PriceSheet';
 import CategoryImages from './CategoryImages/CategoryImages';
-import EditCategory, { editCategory } from './editCategory/editCategory';
+import EditCategory from './editCategory/editCategory';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 

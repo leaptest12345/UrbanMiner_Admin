@@ -121,7 +121,7 @@ export default function AdminList() {
     return (
         <div>
             <label className='form-check-label' htmlFor='flexCheckChecked'>
-                AdminLevel:{adminLevel}
+                AdminLevel:{parseInt(adminLevel) + 1}
             </label>
             <Button type='submit' style={btn} onClick={() => onClick(SLUGS.AddAdmin, { id: null })}>
                 {adminLevel == 1 ? 'Create New Admin' : 'Add New User'}

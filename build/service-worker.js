@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/UrbanMiner_Admin/precache-manifest.4104bc913e53af18fe557b41848128e1.js"
+  "/UrbanMiner_Admin/precache-manifest.879d85c1bb7c0b169542764bf57879d3.js"
 );
 
 self.addEventListener('message', (event) => {
