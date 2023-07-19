@@ -89,7 +89,7 @@ const styles = {
         color: 'white',
         position: 'absolute',
         right: '15%',
-        top: '14%',
+        top: '10%',
         paddingInline: '1em'
     },
     btnStyle1: {

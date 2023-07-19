@@ -26,7 +26,7 @@ import SLUGS from 'resources/slugs';
 function PriceSheet() {
     const dragItem = useRef();
     const dragOverItem = useRef();
-
+    const containerRef = useRef(null);
     const dragItem1 = useRef();
     const dragOverItem1 = useRef();
 
@@ -287,8 +287,33 @@ function PriceSheet() {
         dragItem1.current = null;
         dragOverItem1.current = null;
     };
+
+    function handleDrag(e) {
+        const container = containerRef.current; // Get the scrollable container
+        const scrollPosition = container.scrollTop;
+        const containerHeight = container.clientHeight;
+        const scrollThreshold = 50; // Set a threshold for scrolling
+
+        const scrollUpAmount = Math.max(1, Math.ceil((scrollThreshold - e.clientY) / 10));
+        const scrollDownAmount = Math.max(
+            1,
+            Math.ceil((e.clientY - (containerHeight - scrollThreshold)) / 10)
+        );
+
+        if (e.clientY < scrollThreshold && scrollPosition > 0) {
+            // Scroll up if the drag position is near the top and there is room to scroll
+            container.scrollTop -= scrollUpAmount;
+        } else if (
+            e.clientY > containerHeight - scrollThreshold &&
+            scrollPosition + containerHeight < container.scrollHeight
+        ) {
+            // Scroll down if the drag position is near the bottom and there is room to scroll
+            container.scrollTop += scrollDownAmount;
+        }
+    }
+
     return (
-        <div>
+        <div ref={containerRef} style={{ height: '700px', overflow: 'auto' }}>
             {loading ? <LoadingSpinner /> : null}
             <text>Enter Category Name: </text>
             <br />
@@ -380,190 +405,207 @@ function PriceSheet() {
                     </Table>
                 ) : null}
                 <br />
-                {categoryList.length != 0 ? <text style={styles.title}>CATEGORY_LIST</text> : null}
-                {categoryList.length != 0 ? (
-                    <Table aria-label='customized table' style={{ marginTop: '20px' }}>
-                        <TableHead>
-                            <TableRow>
-                                <StyledTableCell align='left' style={styles.width10}>
-                                    No.
-                                </StyledTableCell>
-                                <StyledTableCell align='left' style={{ width: '20%' }}>
-                                    categoryName
-                                </StyledTableCell>
-                                <StyledTableCell align='left' style={styles.width10}>
-                                    ProductPrice
-                                </StyledTableCell>
-                                <StyledTableCell align='left' style={styles.width10}>
-                                    Actions
-                                </StyledTableCell>
-                                <StyledTableCell align='left' style={styles.width10}>
-                                    Delete
-                                </StyledTableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {categoryList &&
-                                categoryList.map((item, index) => (
-                                    <>
-                                        <StyledTableRow
-                                            draggable
-                                            onDragStart={(e) => dragStart(e, index)}
-                                            onDragEnter={(e) => dragEnter(e, index)}
-                                            onDragEnd={drop}
-                                            align='left'
-                                            key={item.id}
-                                        >
-                                            <StyledTableCell
-                                                component='th'
-                                                scope='row'
-                                                style={styles.width10}
-                                            >
-                                                {index + 1}
-                                            </StyledTableCell>
-                                            <StyledTableCell
-                                                component='th'
-                                                scope='row'
-                                                style={styles.width10}
-                                            >
-                                                {item.categoryName}
-                                            </StyledTableCell>
-                                            <StyledTableCell
+                <div>
+                    {categoryList.length != 0 ? (
+                        <text style={styles.title}>CATEGORY_LIST</text>
+                    ) : null}
+                    {categoryList.length != 0 ? (
+                        <Table aria-label='customized table' style={{ marginTop: '20px' }}>
+                            <TableHead>
+                                <TableRow>
+                                    <StyledTableCell align='left' style={styles.width10}>
+                                        No.
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left' style={{ width: '20%' }}>
+                                        categoryName
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left' style={styles.width10}>
+                                        ProductPrice
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left' style={styles.width10}>
+                                        Actions
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left' style={styles.width10}>
+                                        Delete
+                                    </StyledTableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {categoryList &&
+                                    categoryList.map((item, index) => (
+                                        <>
+                                            <StyledTableRow
+                                                draggable
+                                                onDragStart={(e) => dragStart(e, index)}
+                                                onDragEnter={(e) => dragEnter(e, index)}
+                                                onDragEnd={drop}
                                                 align='left'
-                                                style={styles.width10}
-                                            ></StyledTableCell>
-                                            <StyledTableCell style={{ ...styles.width10 }}>
-                                                <Button
-                                                    style={styles.dangerBtn1}
-                                                    onClick={() => {
-                                                        push({
-                                                            pathname: convertSlugToUrl(
-                                                                SLUGS.categoryImages,
-                                                                {}
-                                                            ),
-                                                            state: { categoryId: item.ID }
-                                                        });
-                                                    }}
+                                                onDrag={(e) => handleDrag(e)}
+                                                key={item.id}
+                                            >
+                                                <StyledTableCell
+                                                    component='th'
+                                                    scope='row'
+                                                    style={styles.width10}
                                                 >
-                                                    SEE IMAGES
-                                                </Button>
-                                                <Button
-                                                    style={styles.dangerBtn}
-                                                    onClick={() => {
-                                                        // setEditCategoryName(item.categoryName);
-                                                        // setOpenEditCategory(true);
-                                                        // setCategoryId(item.ID);
-                                                        push({
-                                                            pathname: convertSlugToUrl(
-                                                                SLUGS.EditCategory,
-                                                                {}
-                                                            ),
-                                                            state: { categoryId: item.ID }
-                                                        });
-                                                    }}
+                                                    {index + 1}
+                                                </StyledTableCell>
+                                                <StyledTableCell
+                                                    component='th'
+                                                    scope='row'
+                                                    style={styles.width10}
                                                 >
-                                                    EDIT
-                                                </Button>
-                                            </StyledTableCell>
-                                            <StyledTableCell align='left' style={styles.width10}>
-                                                <Delete
-                                                    onClick={() => deleteCategory(item.ID, null, 0)}
-                                                ></Delete>
-                                            </StyledTableCell>
-                                        </StyledTableRow>
-                                        {item.PRODUCT
-                                            ? formateData(item.PRODUCT)
-                                                  .sort((a, b) => a.order - b.order)
-                                                  .map((item1, index1) => {
-                                                      return (
-                                                          <StyledTableRow
-                                                              draggable
-                                                              onDragStart={(e) => {
-                                                                  dragStart1(e, index1);
-                                                                  dragStart(e, index);
-                                                              }}
-                                                              onDragEnter={(e) => {
-                                                                  dragEnter1(e, index1);
-                                                                  dragEnter(e, index);
-                                                              }}
-                                                              onDragEnd={(e) =>
-                                                                  drop1(e, item.ID, item.order)
-                                                              }
-                                                              align='left'
-                                                              key={item1.id}
-                                                          >
-                                                              <StyledTableCell1
-                                                                  component='th'
-                                                                  scope='row'
-                                                                  style={styles.width10}
-                                                              >
-                                                                  {index + 1 + '.' + (index1 + 1)}
-                                                              </StyledTableCell1>
-
-                                                              <StyledTableCell1
-                                                                  component='th'
-                                                                  scope='row'
-                                                                  style={styles.width10}
-                                                              >
-                                                                  {item1.productName}
-                                                              </StyledTableCell1>
-                                                              <StyledTableCell1
+                                                    {item.categoryName}
+                                                </StyledTableCell>
+                                                <StyledTableCell
+                                                    align='left'
+                                                    style={styles.width10}
+                                                ></StyledTableCell>
+                                                <StyledTableCell style={{ ...styles.width10 }}>
+                                                    <Button
+                                                        style={styles.dangerBtn1}
+                                                        onClick={() => {
+                                                            push({
+                                                                pathname: convertSlugToUrl(
+                                                                    SLUGS.categoryImages,
+                                                                    {}
+                                                                ),
+                                                                state: { categoryId: item.ID }
+                                                            });
+                                                        }}
+                                                    >
+                                                        SEE IMAGES
+                                                    </Button>
+                                                    <Button
+                                                        style={styles.dangerBtn}
+                                                        onClick={() => {
+                                                            // setEditCategoryName(item.categoryName);
+                                                            // setOpenEditCategory(true);
+                                                            // setCategoryId(item.ID);
+                                                            push({
+                                                                pathname: convertSlugToUrl(
+                                                                    SLUGS.EditCategory,
+                                                                    {}
+                                                                ),
+                                                                state: { categoryId: item.ID }
+                                                            });
+                                                        }}
+                                                    >
+                                                        EDIT
+                                                    </Button>
+                                                </StyledTableCell>
+                                                <StyledTableCell
+                                                    align='left'
+                                                    style={styles.width10}
+                                                >
+                                                    <Delete
+                                                        onClick={() =>
+                                                            deleteCategory(item.ID, null, 0)
+                                                        }
+                                                    ></Delete>
+                                                </StyledTableCell>
+                                            </StyledTableRow>
+                                            {item.PRODUCT
+                                                ? formateData(item.PRODUCT)
+                                                      .sort((a, b) => a.order - b.order)
+                                                      .map((item1, index1) => {
+                                                          return (
+                                                              <StyledTableRow
+                                                                  draggable
+                                                                  onDragStart={(e) => {
+                                                                      dragStart1(e, index1);
+                                                                      dragStart(e, index);
+                                                                  }}
+                                                                  onDragEnter={(e) => {
+                                                                      dragEnter1(e, index1);
+                                                                      dragEnter(e, index);
+                                                                  }}
+                                                                  onDragEnd={(e) =>
+                                                                      drop1(e, item.ID, item.order)
+                                                                  }
                                                                   align='left'
-                                                                  style={{ width: '35%' }}
+                                                                  key={item1.id}
                                                               >
-                                                                  $ {item1.productPrice}
-                                                              </StyledTableCell1>
-                                                              <StyledTableCell1
-                                                                  align='left'
-                                                                  style={styles.width10}
-                                                              >
-                                                                  <Button
-                                                                      style={styles.dangerBtn}
-                                                                      onClick={() => {
-                                                                          setOpen(true);
-                                                                          setIsEditable(true);
-                                                                          setProductName(
-                                                                              item1.productName
-                                                                          );
-                                                                          setProductPrice(
-                                                                              item1.productPrice
-                                                                          );
-                                                                          setProductId(item1.id);
-                                                                          setCategoryId(item.ID);
-                                                                      }}
-                                                                      //   onClick={() => {
-                                                                      //       setProductId(item.ID);
-                                                                      //       setProductSubId(item1.id);
-                                                                      //       editProduct(item1);
-                                                                      //       setProductType(1);
-                                                                      //   }}
+                                                                  <StyledTableCell1
+                                                                      component='th'
+                                                                      scope='row'
+                                                                      style={styles.width10}
                                                                   >
-                                                                      EDIT
-                                                                  </Button>
-                                                              </StyledTableCell1>
-                                                              <StyledTableCell1
-                                                                  align='left'
-                                                                  style={styles.width10}
-                                                              >
-                                                                  <Delete
-                                                                      onClick={() =>
-                                                                          deleteCategory(
-                                                                              item.ID,
-                                                                              item1.id,
-                                                                              1
-                                                                          )
-                                                                      }
-                                                                  ></Delete>
-                                                              </StyledTableCell1>
-                                                          </StyledTableRow>
-                                                      );
-                                                  })
-                                            : null}
-                                    </>
-                                ))}
-                        </TableBody>
-                    </Table>
-                ) : null}
+                                                                      {index +
+                                                                          1 +
+                                                                          '.' +
+                                                                          (index1 + 1)}
+                                                                  </StyledTableCell1>
+
+                                                                  <StyledTableCell1
+                                                                      component='th'
+                                                                      scope='row'
+                                                                      style={styles.width10}
+                                                                  >
+                                                                      {item1.productName}
+                                                                  </StyledTableCell1>
+                                                                  <StyledTableCell1
+                                                                      align='left'
+                                                                      style={{ width: '35%' }}
+                                                                  >
+                                                                      $ {item1.productPrice}
+                                                                  </StyledTableCell1>
+                                                                  <StyledTableCell1
+                                                                      align='left'
+                                                                      style={styles.width10}
+                                                                  >
+                                                                      <Button
+                                                                          style={styles.dangerBtn}
+                                                                          onClick={() => {
+                                                                              setOpen(true);
+                                                                              setIsEditable(true);
+                                                                              setProductName(
+                                                                                  item1.productName
+                                                                              );
+                                                                              setProductPrice(
+                                                                                  item1.productPrice
+                                                                              );
+                                                                              setProductId(
+                                                                                  item1.id
+                                                                              );
+                                                                              setCategoryId(
+                                                                                  item.ID
+                                                                              );
+                                                                          }}
+                                                                          //   onClick={() => {
+                                                                          //       setProductId(item.ID);
+                                                                          //       setProductSubId(item1.id);
+                                                                          //       editProduct(item1);
+                                                                          //       setProductType(1);
+                                                                          //   }}
+                                                                      >
+                                                                          EDIT
+                                                                      </Button>
+                                                                  </StyledTableCell1>
+                                                                  <StyledTableCell1
+                                                                      align='left'
+                                                                      style={styles.width10}
+                                                                  >
+                                                                      <Delete
+                                                                          onClick={() =>
+                                                                              deleteCategory(
+                                                                                  item.ID,
+                                                                                  item1.id,
+                                                                                  1
+                                                                              )
+                                                                          }
+                                                                      ></Delete>
+                                                                  </StyledTableCell1>
+                                                              </StyledTableRow>
+                                                          );
+                                                      })
+                                                : null}
+                                        </>
+                                    ))}
+                            </TableBody>
+                        </Table>
+                    ) : null}
+                </div>
             </div>
             <ToastContainer />
             <Modal onClose={() => setOpen(false)} open={open} style={styles.modal}>
