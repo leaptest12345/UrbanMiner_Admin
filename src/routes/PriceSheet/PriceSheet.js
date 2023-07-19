@@ -69,9 +69,7 @@ function PriceSheet() {
                 setCategoryList(arr);
                 setTotalCategory(arr.length);
             });
-        } catch (error) {
-            console.log(error);
-        }
+        } catch (error) {}
     };
 
     const imgFilehandler = (e) => {
@@ -122,9 +120,7 @@ function PriceSheet() {
                     order: index + 1
                 });
             });
-        } catch (error) {
-            console.log(error);
-        }
+        } catch (error) {}
     };
     const createCategory = async () => {
         try {
@@ -134,7 +130,6 @@ function PriceSheet() {
                 imagesFile.map(async (item, index) => {
                     const uniqueId = uuid().slice(0, 8);
                     const url = await uploadProductImage(item);
-                    console.log('uplaodded url', url);
                     const starCount = ref(database, `/ADMIN/CATEGORY_PHOTOS/${id}/${uniqueId}`);
                     await set(starCount, {
                         ID: uniqueId,
@@ -161,8 +156,6 @@ function PriceSheet() {
             setLoading(false);
         } catch (error) {
             setLoading(false);
-
-            console.log(error);
         }
     };
 
@@ -186,9 +179,7 @@ function PriceSheet() {
                 set(refDetail1, null);
                 notify('Category Product Successfully Deleted!', 0);
             }
-        } catch (error) {
-            console.log(error);
-        }
+        } catch (error) {}
     };
 
     const onModalClose = () => {
@@ -224,7 +215,6 @@ function PriceSheet() {
             onModalClose();
         } catch (error) {
             setLoading(false);
-            console.log(error);
         }
     };
 
@@ -237,8 +227,6 @@ function PriceSheet() {
     };
 
     const drop = (e) => {
-        console.log(categoryList[dragItem.current], categoryList[dragOverItem.current]);
-
         const FirstItemRef = ref(database, `/ADMIN/CATEGORY/${categoryList[dragItem.current].ID}`);
         update(FirstItemRef, {
             order: categoryList[dragOverItem.current].order
@@ -262,38 +250,41 @@ function PriceSheet() {
     };
 
     const dragStart1 = (e, position) => {
-        console.log('dragStart', position);
         dragItem1.current = position;
     };
 
     const dragEnter1 = (e, position) => {
-        console.log('dragEnter', position);
         dragOverItem1.current = position;
     };
 
-    const drop1 = (e, categoryItemId, categoryIndex) => {
-        const parentNode = formateData(categoryList[categoryIndex - 1].PRODUCT).sort(
+    const drop1 = async (e, categoryItemId, categoryIndex) => {
+        const parentNode = formateData(categoryList[dragItem.current]?.PRODUCT).sort(
             (a, b) => a.order - b.order
         );
+
         const FirstItem = parentNode[dragItem1.current];
         const secondItem = parentNode[dragOverItem1.current];
 
-        const FirstItemRef = ref(
-            database,
-            `/ADMIN/CATEGORY/${categoryItemId}/PRODUCT/${FirstItem.id}`
-        );
-        update(FirstItemRef, {
-            order: secondItem.order
-        });
+        if (FirstItem?.id != undefined && secondItem?.id != undefined) {
+            const FirstItemRef = ref(
+                database,
+                `/ADMIN/CATEGORY/${categoryItemId}/PRODUCT/${FirstItem?.id}`
+            );
+            await update(FirstItemRef, {
+                order: secondItem?.order
+            });
 
-        const SecondItemRef = ref(
-            database,
-            `/ADMIN/CATEGORY/${categoryItemId}/PRODUCT/${secondItem.id}`
-        );
-        update(SecondItemRef, {
-            order: FirstItem.order
-        });
-        dragOverItem1.current = null;
+            const SecondItemRef = ref(
+                database,
+                `/ADMIN/CATEGORY/${categoryItemId}/PRODUCT/${secondItem?.id}`
+            );
+            await update(SecondItemRef, {
+                order: FirstItem?.order
+            });
+        }
+        dragItem.current = null;
+        dragOverItem.current = null;
+        dragItem1.current = null;
         dragOverItem1.current = null;
     };
     return (
@@ -487,12 +478,14 @@ function PriceSheet() {
                                                       return (
                                                           <StyledTableRow
                                                               draggable
-                                                              onDragStart={(e) =>
-                                                                  dragStart1(e, index1)
-                                                              }
-                                                              onDragEnter={(e) =>
-                                                                  dragEnter1(e, index1)
-                                                              }
+                                                              onDragStart={(e) => {
+                                                                  dragStart1(e, index1);
+                                                                  dragStart(e, index);
+                                                              }}
+                                                              onDragEnter={(e) => {
+                                                                  dragEnter1(e, index1);
+                                                                  dragEnter(e, index);
+                                                              }}
                                                               onDragEnd={(e) =>
                                                                   drop1(e, item.ID, item.order)
                                                               }
