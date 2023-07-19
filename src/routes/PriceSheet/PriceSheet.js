@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 import { ToastContainer } from 'react-toastify';
 import { Button } from '@material-ui/core';
@@ -24,6 +24,12 @@ import { convertSlugToUrl } from 'resources/utilities';
 import SLUGS from 'resources/slugs';
 
 function PriceSheet() {
+    const dragItem = useRef();
+    const dragOverItem = useRef();
+
+    const dragItem1 = useRef();
+    const dragOverItem1 = useRef();
+
     const [imgfile, setImageFile] = useState('');
     const [categoryName, setCategoryName] = useState('');
     const [editCategoryName, setEditCategoryName] = useState('');
@@ -43,7 +49,7 @@ function PriceSheet() {
 
     const [categoryId, setCategoryId] = useState(null);
     const [productId, setProductId] = useState(null);
-
+    const [totalCategory, setTotalCategory] = useState(0);
     const [ModalType, setModalType] = useState(0);
     const { styles } = productStyle;
     const uniqueId = uuid().slice(0, 8);
@@ -59,7 +65,9 @@ function PriceSheet() {
             const refDetail = ref(database, `/ADMIN/CATEGORY`);
             onValue(refDetail, (snapShot) => {
                 const arr = formateData(snapShot.val());
+                arr.sort((a, b) => a.order - b.order);
                 setCategoryList(arr);
+                setTotalCategory(arr.length);
             });
         } catch (error) {
             console.log(error);
@@ -110,7 +118,8 @@ function PriceSheet() {
                 await set(starCount, {
                     id: uniqueId,
                     productName: item.name,
-                    productPrice: item.price
+                    productPrice: item.price,
+                    order: index + 1
                 });
             });
         } catch (error) {
@@ -138,7 +147,8 @@ function PriceSheet() {
                 const starCount = ref(database, `/ADMIN/CATEGORY/${id}`);
                 await set(starCount, {
                     ID: id,
-                    categoryName: categoryName
+                    categoryName: categoryName,
+                    order: totalCategory + 1
                 });
                 notify('Category has been successfully created!', 1);
                 addProductInDatabase(id);
@@ -216,6 +226,103 @@ function PriceSheet() {
             setLoading(false);
             console.log(error);
         }
+    };
+
+    const dragStart = (e, position) => {
+        dragItem.current = position;
+    };
+
+    const dragEnter = (e, position) => {
+        dragOverItem.current = position;
+    };
+
+    const drop = (e) => {
+        console.log(categoryList[dragItem.current], categoryList[dragOverItem.current]);
+
+        const FirstItemRef = ref(database, `/ADMIN/CATEGORY/${categoryList[dragItem.current].ID}`);
+        update(FirstItemRef, {
+            order: categoryList[dragOverItem.current].order
+        });
+        const SecondItemRef = ref(
+            database,
+            `/ADMIN/CATEGORY/${categoryList[dragOverItem.current].ID}`
+        );
+        update(SecondItemRef, {
+            order: categoryList[dragItem.current].order
+        });
+
+        const copyListItems = [...categoryList];
+        const dragItemContent = copyListItems[dragItem.current];
+        copyListItems.splice(dragItem.current, 1);
+        copyListItems.splice(dragOverItem.current, 0, dragItemContent);
+
+        dragItem.current = null;
+        dragOverItem.current = null;
+        setCategoryList(copyListItems);
+    };
+
+    const dragStart1 = (e, position) => {
+        console.log('dragStart', position);
+        dragItem1.current = position;
+    };
+
+    const dragEnter1 = (e, position) => {
+        console.log('dragEnter', position);
+        dragOverItem1.current = position;
+    };
+
+    const drop1 = (e, categoryItemId, categoryIndex) => {
+        const parentNode = formateData(categoryList[categoryIndex - 1].PRODUCT).sort(
+            (a, b) => a.order - b.order
+        );
+        const FirstItem = parentNode[dragItem1.current];
+        const secondItem = parentNode[dragOverItem1.current];
+
+        const FirstItemRef = ref(
+            database,
+            `/ADMIN/CATEGORY/${categoryItemId}/PRODUCT/${FirstItem.id}`
+        );
+        update(FirstItemRef, {
+            order: secondItem.order
+        });
+
+        const SecondItemRef = ref(
+            database,
+            `/ADMIN/CATEGORY/${categoryItemId}/PRODUCT/${secondItem.id}`
+        );
+        update(SecondItemRef, {
+            order: FirstItem.order
+        });
+        dragOverItem1.current = null;
+        dragOverItem1.current = null;
+        // console.log('parent Node', parentNode);
+
+        // console.log(ParestNode[dragItem1.current + 1]);
+        // console.log(ParestNode[dragOverItem1.current + 1]);
+
+        // const FirstItemRef = ref(database, `/ADMIN/CATEGORY/${ParestNode.ID}/PRODUCT`);
+
+        // const FirstItemRef = ref(
+        //     database,
+        //     `/ADMIN/CATEGORY/${categoryList[dragOverItem1.current].ID}`
+        // );
+        // update(FirstItemRef, {
+        //     order: categoryList[dragOverItem1.current].order
+        // });
+        // const SecondItemRef = ref(
+        //     database,
+        //     `/ADMIN/CATEGORY/${categoryList[dragOverItem1.current].ID}`
+        // );
+        // update(SecondItemRef, {
+        //     order: categoryList[dragOverItem1.current].order
+        // });
+
+        // const copyListItems = [...categoryList];
+        // const dragOverItem1Content = copyListItems[dragOverItem1.current];
+        // copyListItems.splice(dragOverItem1.current, 1);
+        // copyListItems.splice(dragOverItem1.current, 0, dragOverItem1Content);
+
+        // setCategoryList(copyListItems);
     };
     return (
         <div>
@@ -336,7 +443,14 @@ function PriceSheet() {
                             {categoryList &&
                                 categoryList.map((item, index) => (
                                     <>
-                                        <StyledTableRow align='left' key={item.id}>
+                                        <StyledTableRow
+                                            draggable
+                                            onDragStart={(e) => dragStart(e, index)}
+                                            onDragEnter={(e) => dragEnter(e, index)}
+                                            onDragEnd={drop}
+                                            align='left'
+                                            key={item.id}
+                                        >
                                             <StyledTableCell
                                                 component='th'
                                                 scope='row'
@@ -395,75 +509,90 @@ function PriceSheet() {
                                             </StyledTableCell>
                                         </StyledTableRow>
                                         {item.PRODUCT
-                                            ? formateData(item.PRODUCT).map((item1, index1) => {
-                                                  return (
-                                                      <StyledTableRow align='left' key={item1.id}>
-                                                          <StyledTableCell1
-                                                              component='th'
-                                                              scope='row'
-                                                              style={styles.width10}
-                                                          >
-                                                              {index + 1 + '.' + (index1 + 1)}
-                                                          </StyledTableCell1>
-
-                                                          <StyledTableCell1
-                                                              component='th'
-                                                              scope='row'
-                                                              style={styles.width10}
-                                                          >
-                                                              {item1.productName}
-                                                          </StyledTableCell1>
-                                                          <StyledTableCell1
+                                            ? formateData(item.PRODUCT)
+                                                  .sort((a, b) => a.order - b.order)
+                                                  .map((item1, index1) => {
+                                                      return (
+                                                          <StyledTableRow
+                                                              draggable
+                                                              onDragStart={(e) =>
+                                                                  dragStart1(e, index1)
+                                                              }
+                                                              onDragEnter={(e) =>
+                                                                  dragEnter1(e, index1)
+                                                              }
+                                                              onDragEnd={(e) =>
+                                                                  drop1(e, item.ID, item.order)
+                                                              }
                                                               align='left'
-                                                              style={{ width: '35%' }}
+                                                              key={item1.id}
                                                           >
-                                                              $ {item1.productPrice}
-                                                          </StyledTableCell1>
-                                                          <StyledTableCell1
-                                                              align='left'
-                                                              style={styles.width10}
-                                                          >
-                                                              <Button
-                                                                  style={styles.dangerBtn}
-                                                                  onClick={() => {
-                                                                      setOpen(true);
-                                                                      setIsEditable(true);
-                                                                      setProductName(
-                                                                          item1.productName
-                                                                      );
-                                                                      setProductPrice(
-                                                                          item1.productPrice
-                                                                      );
-                                                                      setProductId(item1.id);
-                                                                      setCategoryId(item.ID);
-                                                                  }}
-                                                                  //   onClick={() => {
-                                                                  //       setProductId(item.ID);
-                                                                  //       setProductSubId(item1.id);
-                                                                  //       editProduct(item1);
-                                                                  //       setProductType(1);
-                                                                  //   }}
+                                                              <StyledTableCell1
+                                                                  component='th'
+                                                                  scope='row'
+                                                                  style={styles.width10}
                                                               >
-                                                                  EDIT
-                                                              </Button>
-                                                          </StyledTableCell1>
-                                                          <StyledTableCell1
-                                                              align='left'
-                                                              style={styles.width10}
-                                                          >
-                                                              <Delete
-                                                                  onClick={() =>
-                                                                      deleteCategory(
-                                                                          item.ID,
-                                                                          item1.id,
-                                                                          1
-                                                                      )
-                                                                  }
-                                                              ></Delete>
-                                                          </StyledTableCell1>
-                                                      </StyledTableRow>
-                                                  );
-                                              })
+                                                                  {index + 1 + '.' + (index1 + 1)}
+                                                              </StyledTableCell1>
+
+                                                              <StyledTableCell1
+                                                                  component='th'
+                                                                  scope='row'
+                                                                  style={styles.width10}
+                                                              >
+                                                                  {item1.productName}
+                                                              </StyledTableCell1>
+                                                              <StyledTableCell1
+                                                                  align='left'
+                                                                  style={{ width: '35%' }}
+                                                              >
+                                                                  $ {item1.productPrice}
+                                                              </StyledTableCell1>
+                                                              <StyledTableCell1
+                                                                  align='left'
+                                                                  style={styles.width10}
+                                                              >
+                                                                  <Button
+                                                                      style={styles.dangerBtn}
+                                                                      onClick={() => {
+                                                                          setOpen(true);
+                                                                          setIsEditable(true);
+                                                                          setProductName(
+                                                                              item1.productName
+                                                                          );
+                                                                          setProductPrice(
+                                                                              item1.productPrice
+                                                                          );
+                                                                          setProductId(item1.id);
+                                                                          setCategoryId(item.ID);
+                                                                      }}
+                                                                      //   onClick={() => {
+                                                                      //       setProductId(item.ID);
+                                                                      //       setProductSubId(item1.id);
+                                                                      //       editProduct(item1);
+                                                                      //       setProductType(1);
+                                                                      //   }}
+                                                                  >
+                                                                      EDIT
+                                                                  </Button>
+                                                              </StyledTableCell1>
+                                                              <StyledTableCell1
+                                                                  align='left'
+                                                                  style={styles.width10}
+                                                              >
+                                                                  <Delete
+                                                                      onClick={() =>
+                                                                          deleteCategory(
+                                                                              item.ID,
+                                                                              item1.id,
+                                                                              1
+                                                                          )
+                                                                      }
+                                                                  ></Delete>
+                                                              </StyledTableCell1>
+                                                          </StyledTableRow>
+                                                      );
+                                                  })
                                             : null}
                                     </>
                                 ))}
