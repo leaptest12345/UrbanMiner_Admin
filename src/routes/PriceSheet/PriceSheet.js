@@ -295,34 +295,6 @@ function PriceSheet() {
         });
         dragOverItem1.current = null;
         dragOverItem1.current = null;
-        // console.log('parent Node', parentNode);
-
-        // console.log(ParestNode[dragItem1.current + 1]);
-        // console.log(ParestNode[dragOverItem1.current + 1]);
-
-        // const FirstItemRef = ref(database, `/ADMIN/CATEGORY/${ParestNode.ID}/PRODUCT`);
-
-        // const FirstItemRef = ref(
-        //     database,
-        //     `/ADMIN/CATEGORY/${categoryList[dragOverItem1.current].ID}`
-        // );
-        // update(FirstItemRef, {
-        //     order: categoryList[dragOverItem1.current].order
-        // });
-        // const SecondItemRef = ref(
-        //     database,
-        //     `/ADMIN/CATEGORY/${categoryList[dragOverItem1.current].ID}`
-        // );
-        // update(SecondItemRef, {
-        //     order: categoryList[dragOverItem1.current].order
-        // });
-
-        // const copyListItems = [...categoryList];
-        // const dragOverItem1Content = copyListItems[dragOverItem1.current];
-        // copyListItems.splice(dragOverItem1.current, 1);
-        // copyListItems.splice(dragOverItem1.current, 0, dragOverItem1Content);
-
-        // setCategoryList(copyListItems);
     };
     return (
         <div>
