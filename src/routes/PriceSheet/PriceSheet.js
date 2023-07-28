@@ -65,7 +65,7 @@ function PriceSheet() {
             const refDetail = ref(database, `/ADMIN/CATEGORY`);
             onValue(refDetail, (snapShot) => {
                 const arr = formateData(snapShot.val());
-                arr.sort((a, b) => a.order - b.order);
+                arr.sort((a, b) => a?.order - b?.order);
                 setCategoryList(arr);
                 setTotalCategory(arr.length);
             });
@@ -229,14 +229,14 @@ function PriceSheet() {
     const drop = (e) => {
         const FirstItemRef = ref(database, `/ADMIN/CATEGORY/${categoryList[dragItem.current].ID}`);
         update(FirstItemRef, {
-            order: categoryList[dragOverItem.current].order
+            order: categoryList[dragOverItem.current]?.order
         });
         const SecondItemRef = ref(
             database,
             `/ADMIN/CATEGORY/${categoryList[dragOverItem.current].ID}`
         );
         update(SecondItemRef, {
-            order: categoryList[dragItem.current].order
+            order: categoryList[dragItem.current]?.order
         });
 
         const copyListItems = [...categoryList];
@@ -259,7 +259,7 @@ function PriceSheet() {
 
     const drop1 = async (e, categoryItemId, categoryIndex) => {
         const parentNode = formateData(categoryList[dragItem.current]?.PRODUCT).sort(
-            (a, b) => a.order - b.order
+            (a, b) => a?.order - b?.order
         );
 
         const FirstItem = parentNode[dragItem1.current];
@@ -507,7 +507,7 @@ function PriceSheet() {
                                             </StyledTableRow>
                                             {item.PRODUCT
                                                 ? formateData(item.PRODUCT)
-                                                      .sort((a, b) => a.order - b.order)
+                                                      .sort((a, b) => a?.order - b?.order)
                                                       .map((item1, index1) => {
                                                           return (
                                                               <StyledTableRow
