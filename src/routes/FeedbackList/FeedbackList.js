@@ -23,7 +23,7 @@ export default function FeedBackList() {
         };
         return (
             <p className='text'>
-                {isReadMore ? text.slice(0, 150) : text}
+                {isReadMore ? text?.slice(0, 150) : text}
                 {
                     <span
                         style={{
