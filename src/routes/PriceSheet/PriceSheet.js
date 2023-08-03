@@ -265,6 +265,9 @@ function PriceSheet() {
         const FirstItem = parentNode[dragItem1.current];
         const secondItem = parentNode[dragOverItem1.current];
 
+        console.log("firstItem details",FirstItem)
+        console.log("second item details",secondItem)
+
         if (FirstItem?.id != undefined && secondItem?.id != undefined) {
             const FirstItemRef = ref(
                 database,
