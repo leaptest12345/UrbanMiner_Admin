@@ -28,7 +28,7 @@ export default function UserDetail(props) {
     const [user, setUser] = useState('');
     const { styles } = userDetailStyle;
     const [isApproved, setIsApproved] = useState(false);
-    
+
     function onClick(slug, data, parameters = {}) {
         push({
             pathname: convertSlugToUrl(slug, parameters),
@@ -141,11 +141,32 @@ export default function UserDetail(props) {
                     <br />
                 </div>
             </div>
-            {!isApproved ? (
-                <Button type='Approve' style={btn} onClick={() => onApproved()}>
+            {isApproved ? (
+                <Button
+                    type='Approve'
+                    style={{
+                        ...btn,
+                        top: '18%'
+                    }}
+                    onClick={() => onApproved()}
+                >
                     Approved
                 </Button>
             ) : null}
+            <Button
+                type='Approve'
+                style={{
+                    ...btn,
+                    top: '30%'
+                }}
+                onClick={() => {
+                    onClick(SLUGS.UserPermission, {
+                        userId: id
+                    });
+                }}
+            >
+                Edit Permission
+            </Button>
             {data.length != 0 && <h1 style={styles.title}>CustomerList</h1>}
             <TableContainer component={Paper}>
                 <Table aria-label='customized table'>
