@@ -32,7 +32,7 @@ function EditCategory(props) {
     const [productPrice, setProductPrice] = useState('');
 
     const [productList, setProductList] = useState([]);
-
+    const [totalProduct, setTotalProduct] = useState(0);
     const { styles } = productStyle;
     const uniqueId = uuid().slice(0, 8);
 
@@ -51,8 +51,9 @@ function EditCategory(props) {
             const refDetail = ref(database, `/ADMIN/CATEGORY/${categoryId}/PRODUCT`);
             onValue(refDetail, (snapShot) => {
                 const arr = formateData(snapShot.val());
-                console.log(arr);
+                arr.sort((a, b) => a.order - b.order);
                 setProductList(arr);
+                setTotalProduct(arr.length);
             });
         } catch (error) {
             console.log(error);
@@ -91,7 +92,8 @@ function EditCategory(props) {
                 await set(starCount, {
                     id: uniqueId,
                     productName: item.name,
-                    productPrice: item.price
+                    productPrice: item.price,
+                    order: totalProduct + index + 1
                 });
             });
         } catch (error) {
