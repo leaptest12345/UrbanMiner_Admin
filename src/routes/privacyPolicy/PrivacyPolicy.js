@@ -1,15 +1,24 @@
-import { database } from 'configs/firebaseConfig';
 import React, { useEffect, useState } from 'react';
+
 import { ref, onValue, set } from 'firebase/database';
 import { createUseStyles, useTheme } from 'react-jss';
-import { Button } from '@material-ui/core';
-import { notify } from 'util/notify';
 import { ToastContainer } from 'react-toastify';
+
+import { Button } from '@material-ui/core';
+
+import { database } from 'configs/firebaseConfig';
+
+import { notify } from 'util/notify';
 
 export default function PrivacyPolicy() {
     const theme = useTheme();
     const classes = useStyles(theme);
+
     const [description, setDescription] = useState('');
+
+    useEffect(() => {
+        getDetail();
+    }, []);
 
     const getDetail = () => {
         try {
@@ -24,12 +33,10 @@ export default function PrivacyPolicy() {
         }
     };
 
-    useEffect(() => {
-        getDetail();
-    }, []);
     const handleMessageChange = (event) => {
         setDescription(event.target.value);
     };
+
     function handleSubmit(e) {
         e.preventDefault();
         try {
@@ -43,11 +50,13 @@ export default function PrivacyPolicy() {
             console.log(error);
         }
     }
+
     const btnstyle = {
         backgroundColor: theme.color.veryDarkGrayishBlue,
         color: 'white',
         margin: 30
     };
+
     return (
         <div>
             <form onSubmit={handleSubmit}>

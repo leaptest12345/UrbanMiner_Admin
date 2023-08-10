@@ -1,23 +1,27 @@
+import React, { useEffect, useState } from 'react';
+
 import { Button } from '@material-ui/core';
-import { database } from 'configs/firebaseConfig';
 import { ToastContainer } from 'react-toastify';
+import { v4 as uuid } from 'uuid';
+import { useHistory } from 'react-router-dom';
+
+import { database } from 'configs/firebaseConfig';
+
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { onValue, ref, set, update } from 'firebase/database';
+
 import { formateData } from 'util/formateData';
 import { notify } from 'util/notify';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { v4 as uuid } from 'uuid';
-import { onValue, ref, set, update } from 'firebase/database';
-import React, { useEffect, useState } from 'react';
-import { useTheme } from 'react-jss';
-import { useHistory } from 'react-router-dom';
+import { styles } from './styles';
 
 export default function AddAdmin(props) {
     const history = useHistory();
 
-    const uniqueId = uuid().slice(0, 8);
+    const { id } = props.location.state;
+
     const [email, setEmail] = useState('');
     const [users, setUsers] = useState([]);
     const [password, setPassword] = useState('');
-
     const [itemPermission, setItemPermission] = useState(false);
     const [userPermission, setUserPermission] = useState(false);
     const [paymentPermission, setPaymentPermission] = useState(false);
@@ -27,14 +31,10 @@ export default function AddAdmin(props) {
     const [adminPermission, setAdminPermission] = useState(false);
     const [pdfDetailPermission, setpdfDetailPermission] = useState(false);
     const [priceSheetPermission, setPriceSheetPermission] = useState(false);
-
     const [addProduct, setAddProduct] = useState(false);
     const [userList, setUserList] = useState([]);
     const [adminLevel, setAdminLevel] = useState('');
     const [adminUsers, setAdminUsers] = useState('');
-    const theme = useTheme();
-
-    const { id } = props.location.state;
 
     useEffect(() => {
         getUsers();
@@ -83,10 +83,9 @@ export default function AddAdmin(props) {
                 const data = snapshot.val();
                 setUserList(data);
             });
-        } catch (error) {
-            console.log(error);
-        }
+        } catch (error) {}
     };
+
     const getUserId = () => {
         let result = 0;
         users &&
@@ -97,6 +96,7 @@ export default function AddAdmin(props) {
             });
         return result;
     };
+
     const userAlreadyExist = () => {
         let result = null;
         formateData(userList).map((item) => {
@@ -118,7 +118,6 @@ export default function AddAdmin(props) {
                     const id = await localStorage.getItem('userID');
                     const userDetailRef = ref(database, `/USERS/${subUserID}`);
                     onValue(userDetailRef, async (snapShot) => {
-                        console.log('snapShot of the users ', snapShot.val());
                         const userRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS/${subUserID}`);
                         set(userRef, {
                             ID: subUserID,
@@ -223,7 +222,6 @@ export default function AddAdmin(props) {
                                     1
                                 );
                             }
-                            console.log('addAdmin error', error);
                         }
                     } else {
                         notify('Password required for new user', 0);
@@ -259,129 +257,19 @@ export default function AddAdmin(props) {
                         console.log(error);
                     }
                 }
-                //admin exist show message "admin already exist please try with differenet id"
-                // const subUserID = userAlreadyExist();
-                // const refDetail = ref(database, `/ADMIN/USERS/${result}`);
-                // try {
-                //     await update(refDetail, {
-                //         ID: result,
-                //         adminLevel: parseInt(adminLevel) + 1,
-                //         role: {
-                //             roleName: 'admin',
-                //             PermissionStatus: {
-                //                 user: userPermission,
-                //                 item: itemPermission,
-                //                 payment: paymentPermission,
-                //                 privacy: privacyPermission,
-                //                 term: termPermission,
-                //                 addAdmin: adminLevel == 2 ? false : adminPermission,
-                //                 feedback: feedbackPermission,
-                //                 addProduct: addProduct,
-                //                 pdfDetail: pdfDetailPermission
-                //             }
-                //         }
-                //     });
-                //     notify(`User Permission updated!`, 1);
-                // } catch (error) {
-                //     console.log(error);
-                // }
-                // }
             }
         } catch (error) {
             const { message } = error;
             notify('somehting Went Wrong!, please try with diffrent email', 0);
-            // if (message == 'Firebase: Error (auth/email-already-in-use).') {
-            //     const result = await getUserId();
-            //     try {
-            //         if (result == 0) {
-            //             const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-            //             await set(refDetail, {
-            //                 ID: uniqueId,
-            //                 email: email,
-            //                 adminLevel: parseInt(adminLevel) + 1,
-            //                 role: {
-            //                     roleName: 'admin',
-            //                     PermissionStatus: {
-            //                         user: userPermission,
-            //                         item: itemPermission,
-            //                         payment: paymentPermission,
-            //                         privacy: privacyPermission,
-            //                         term: termPermission,
-            //                         addAdmin: adminLevel == 2 ? false : adminPermission,
-            //                         feedback: feedbackPermission,
-            //                         addProduct: addProduct,
-            //                         pdfDetail: pdfDetailPermission,
-            //                         priceSheet: priceSheetPermission
-            //                     }
-            //                 }
-            //             });
-            //         } else {
-            //             const refDetail = ref(database, `/ADMIN/USERS/${result}`);
-            //             await update(refDetail, {
-            //                 ID: result,
-            //                 email: email,
-            //                 adminLevel: parseInt(adminLevel) + 1,
-            //                 role: {
-            //                     roleName: 'admin',
-            //                     PermissionStatus: {
-            //                         user: userPermission,
-            //                         item: itemPermission,
-            //                         payment: paymentPermission,
-            //                         privacy: privacyPermission,
-            //                         term: termPermission,
-            //                         addAdmin: adminLevel == 2 ? false : adminPermission,
-            //                         feedback: feedbackPermission,
-            //                         addProduct: addProduct,
-            //                         pdfDetail: pdfDetailPermission,
-            //                         priceSheet: priceSheetPermission
-            //                     }
-            //                 }
-            //             });
-            //         }
-            //         notify(`New Admin has been created!`, 1);
-            //     } catch (error) {
-            //         console.log(error);
-            //     }
-            // }
         }
     };
+
     const onSubmit = () => {
         if (!email) {
             notify('Please Enter Email Value!', 0);
         } else {
             createAdmin();
         }
-    };
-
-    const checkboxStyle = {
-        width: 25,
-        height: 25,
-        borderRadius: 100
-    };
-    const labelStyle = {
-        marginLeft: '20px'
-    };
-    const inputStyle = {
-        width: '45%',
-        height: 45,
-        borderRadius: 4,
-        padding: 20,
-        marginInline: 10,
-        margin: 20
-    };
-    const formCheckStyle = {
-        alignItems: 'center',
-        display: 'flex'
-    };
-
-    const btnStyle = {
-        backgroundColor: theme.color.veryDarkGrayishBlue,
-        margin: 30,
-        width: '30%',
-        height: 50
-    };
-    const dangerLabel = {
-        color: 'red'
     };
 
     return (
@@ -392,7 +280,7 @@ export default function AddAdmin(props) {
                         <input
                             className='form-check-input'
                             placeholder='Enter Email Address'
-                            style={inputStyle}
+                            style={styles.inputStyle}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
@@ -400,7 +288,7 @@ export default function AddAdmin(props) {
                             type='password'
                             className='form-check-input'
                             placeholder='Enter Password'
-                            style={inputStyle}
+                            style={styles.inputStyle}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -408,177 +296,181 @@ export default function AddAdmin(props) {
                 )}
                 {adminLevel != 1 ? null : (
                     <div style={{ marginLeft: 40 }}>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={userPermission}
                                 onChange={() => setUserPermission(!userPermission)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>DELETE/VIEW</label> usersDetail
+                                User can <label style={styles.dangerLabel}>DELETE/VIEW</label>{' '}
+                                usersDetail
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={itemPermission}
                                 onChange={() => setItemPermission(!itemPermission)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>ADD/DELETE</label> item
+                                User can <label style={styles.dangerLabel}>ADD/DELETE</label> item
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={paymentPermission}
                                 onChange={() => setPaymentPermission(!paymentPermission)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>ADD/DELETE</label> payment
-                                Method
+                                User can <label style={styles.dangerLabel}>ADD/DELETE</label>{' '}
+                                payment Method
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={pdfDetailPermission}
                                 onChange={() => setpdfDetailPermission(!pdfDetailPermission)}
                             />
 
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>VIEW/UPDATE</label> pdfDetail
+                                User can <label style={styles.dangerLabel}>VIEW/UPDATE</label>{' '}
+                                pdfDetail
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={priceSheetPermission}
                                 onChange={() => setPriceSheetPermission(!priceSheetPermission)}
                             />
 
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>VIEW/UPDATE</label> Category
-                                Price
+                                User can <label style={styles.dangerLabel}>VIEW/UPDATE</label>{' '}
+                                Category Price
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={feedbackPermission}
                                 onChange={() => setFeedBackPermission(!feedbackPermission)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>VIEW</label> the feedbacks
+                                User can <label style={styles.dangerLabel}>VIEW</label> the
+                                feedbacks
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={adminPermission}
                                 onChange={() => setAdminPermission(!adminPermission)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can give the <label style={dangerLabel}>PERMISSION</label> to
-                                the Another user
+                                User can give the{' '}
+                                <label style={styles.dangerLabel}>PERMISSION</label> to the Another
+                                user
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={termPermission}
                                 onChange={() => setTermPermission(!termPermission)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <lable style={dangerLabel}>VIEW/UPDATE</lable> the
+                                User can <lable style={styles.dangerLabel}>VIEW/UPDATE</lable> the
                                 TermAndCondition
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={privacyPermission}
                                 onChange={() => setPrivacyPermission(!privacyPermission)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>VIEW/UPDATE </label>the
+                                User can <label style={styles.dangerLabel}>VIEW/UPDATE </label>the
                                 PrivacyPolicy
                             </label>
                         </div>
-                        <div className='form-check' style={formCheckStyle}>
+                        <div className='form-check' style={styles.formCheckStyle}>
                             <input
                                 className='form-check-input'
                                 type='checkbox'
-                                style={checkboxStyle}
+                                style={styles.checkboxStyle}
                                 checked={addProduct}
                                 onChange={() => setAddProduct(!addProduct)}
                             />
                             <label
-                                style={labelStyle}
+                                style={styles.labelStyle}
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <label style={dangerLabel}>ADD_PRODUCT</label>
+                                User can <label style={styles.dangerLabel}>ADD_PRODUCT</label>
                             </label>
                         </div>
                     </div>
                 )}
             </div>
-            <Button onClick={() => onSubmit()} style={btnStyle}>
+            <Button onClick={() => onSubmit()} style={styles.btnStyle}>
                 <span style={{ color: 'white' }}>{id ? 'UPDATE' : 'SUBMIT'}</span>
             </Button>
 

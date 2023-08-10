@@ -1,8 +1,11 @@
-import { Button } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
+
+import { useTheme } from 'react-jss';
+import { useHistory } from 'react-router-dom';
+
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set } from 'firebase/database';
-import React, { useEffect, useState } from 'react';
-import { useTheme } from 'react-jss';
+
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,18 +14,21 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { formateData } from 'util/formateData';
+import { Delete } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+
 import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
-import { useHistory } from 'react-router-dom';
-import { Delete } from '@material-ui/icons';
+
 import { notify } from 'util/notify';
+import { formateData } from 'util/formateData';
 
 export default function AdminList() {
-    const [users, setUsers] = useState([]);
-    const [adminLevel, setAdminLevel] = useState('');
     const theme = useTheme();
     const { push } = useHistory();
+
+    const [users, setUsers] = useState([]);
+    const [adminLevel, setAdminLevel] = useState('');
 
     useEffect(() => {
         getUsers();
@@ -37,6 +43,7 @@ export default function AdminList() {
         });
         return userData;
     };
+
     const getUsers = async () => {
         try {
             const id = await localStorage.getItem('userID');
@@ -44,28 +51,10 @@ export default function AdminList() {
             const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
             onValue(subUserRef, (snapShot1) => {
                 setUsers(formateData(snapShot1.val()));
-                // subUsers.push(formateData(snapShot1.val()));
             });
             onValue(userRef, (snapShot) => {
                 setAdminLevel(snapShot.val()?.adminLevel);
             });
-
-            // onValue(userRef, (snapshot) => {
-            //     setAdminLevel(snapshot.val().adminLevel);
-            //     const refDetail = ref(database, '/ADMIN/USERS');
-            //     onValue(refDetail, (snapshOT) => {
-            //         const data = snapshOT.val();
-
-            //         console.log(formateData(data), snapshot.val().email);
-            //         setUsers(
-            //             formateData(data)
-            //             // .filter(
-            //             //     (item) =>
-            //             //         item.email != snapshot.val().email && subUserExistOrNot(item.ID)
-            //             // )
-            //         );
-            //     });
-            // });
         } catch (error) {
             console.log(error);
         }

@@ -1,10 +1,9 @@
-import ImageModal from 'components/ImageModal/ImageModal';
-import { database } from 'configs/firebaseConfig';
-import { onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { convertIntoDoller } from 'util/convertIntoDoller';
-import { formateData } from 'util/formateData';
-import styles from './styles';
+
+import { ToastContainer } from 'react-toastify';
+import { useTheme } from 'react-jss';
+import { onValue, ref } from 'firebase/database';
+
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -13,18 +12,28 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { ToastContainer } from 'react-toastify';
-import { useTheme } from 'react-jss';
+
+import ImageModal from 'components/ImageModal/ImageModal';
+
+import { database } from 'configs/firebaseConfig';
+
+import { convertIntoDoller } from 'util/convertIntoDoller';
+import { formateData } from 'util/formateData';
+
+import styles from './styles';
 
 export default function ViewDraft(props) {
     const theme = useTheme();
+    const { invoiceId, userId, customerId } = props.location.state;
+
     const [invoices, setInvoices] = useState([]);
     const [invoiceImg, setInvoiceImg] = useState([]);
     const [note, setNote] = useState('');
-    const { invoiceId, userId, customerId } = props.location.state;
+
     useEffect(() => {
         getDraftDetail();
     }, []);
+
     const getDraftDetail = () => {
         try {
             const details = ref(database, `/INVOICE_LIST/${invoiceId}`);
@@ -52,6 +61,7 @@ export default function ViewDraft(props) {
             console.log(error);
         }
     };
+
     const StyledTableCell = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,

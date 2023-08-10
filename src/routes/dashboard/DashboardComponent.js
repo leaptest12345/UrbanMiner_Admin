@@ -83,9 +83,7 @@ function DashboardComponent() {
             const starCountRef1 = ref(database, '/INVOICE_LIST');
             onValue(starCountRef1, (snapshot) => {
                 const newArr = snapshot.val();
-                formateData(newArr).map((item) => {
-                    console.log('total invoices', item.userId);
-                });
+
                 setSubUserInvoice(
                     formateData(newArr).filter((item) => subUserIds.includes(item.userId)).length
                 );

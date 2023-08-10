@@ -1,70 +1,38 @@
 import React, { useEffect, useState } from 'react';
+
+import { useTheme } from 'react-jss';
+import { ToastContainer } from 'react-toastify';
+import { v4 as uuid } from 'uuid';
+
 import { Grid, Paper, Avatar, TextField, Button } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-import { useTheme } from 'react-jss';
-import { UserContext } from 'util/userContext';
-import { notify } from 'util/notify';
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { onValue, ref, set, update } from 'firebase/database';
+
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { onValue, ref } from 'firebase/database';
 
 import { database } from 'configs/firebaseConfig';
-import { formateData } from 'util/formateData';
-import { ToastContainer } from 'react-toastify';
+
 import LoadingSpinner from 'components/Spinner/LoadingSpinner';
-import { v4 as uuid } from 'uuid';
+
+import { UserContext } from 'util/userContext';
+import { notify } from 'util/notify';
+import { formateData } from 'util/formateData';
+
 const Login = () => {
-    const uniqueId = uuid().slice(0, 8);
+    const auth = getAuth();
+    const theme = useTheme();
+
+    const { signIn1 } = React.useContext(UserContext);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState('');
-    const { signIn1 } = React.useContext(UserContext);
-    const auth = getAuth();
 
-    // useEffect(() => {
-    //     setValues();
-    // }, []);
-    // const setValues = async () => {
-    //     try {
-    //         const user = await createUserWithEmailAndPassword(
-    //             auth,
-    //             'sutharbipinn25899@gmail.com',
-    //             '12345678'
-    //         );
-    //         const refDetail = ref(database, `/ADMIN/USERS/${uniqueId}`);
-    //         await set(refDetail, {
-    //             ID: uniqueId,
-    //             email: 'sutharbipinn25899@gmail.com',
-    //             role: {
-    //                 roleName: 'admin',
-    //                 PermissionStatus: {
-    //                     user: true,
-    //                     item: true,
-    //                     payment: true,
-    //                     privacy: true,
-    //                     term: true,
-    //                     addAdmin: true,
-    //                     feedback: true,
-    //                     addProduct: true
-    //                 }
-    //             }
-    //         });
-    //         const id = uuid().slice(0, 8);
-    //         const starCount = ref(database, `/ADMIN/PRODUCT/${id}`);
-    //         await set(starCount, {
-    //             ID: id,
-    //             productName: 'new product',
-    //             productImage: '',
-    //             prodductDescription: 'urbanminer product has been added'
-    //         });
-    //     } catch (error) {
-    //         console.log('error details', error.message);
-    //     }
-    // };
+    useEffect(() => {
+        getDetail();
+    }, []);
 
-    const theme = useTheme();
     const paperStyle = {
         padding: 20,
         height: '90vh',
@@ -78,6 +46,15 @@ const Login = () => {
         marginTop: 70,
         backgroundColor: theme.color.veryDarkGrayishBlue,
         color: theme.color.white
+    };
+    const containerStyle = {
+        display: 'flex',
+        flex: 1,
+        height: '100vh',
+        backgroundColor: theme.color.BG,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundImage: `url(${imageUrl})`
     };
 
     const onSubmit = async () => {
@@ -93,7 +70,6 @@ const Login = () => {
                         users.map((item, index) => {
                             if (item.email == email) {
                                 emailResult = true;
-                                console.log('user item deatils', item);
                                 signIn1(item.ID + '', item.role.PermissionStatus);
                                 notify('Login Successfully Done!', 1);
                                 setLoading(false);
@@ -130,15 +106,14 @@ const Login = () => {
             }
         }
     };
+
     const onchangeEmail = (e) => {
         setEmail(e.target.value);
     };
+
     const onchangePassword = (e) => {
         setPassword(e.target.value);
     };
-    useEffect(() => {
-        getDetail();
-    }, []);
 
     const getDetail = () => {
         try {
@@ -151,17 +126,10 @@ const Login = () => {
             console.log(error);
         }
     };
+
     const imageUrl =
         'https://c4.wallpaperflare.com/wallpaper/644/305/118/pattern-black-gradient-texture-wallpaper-preview.jpg';
-    const containerStyle = {
-        display: 'flex',
-        flex: 1,
-        height: '100vh',
-        backgroundColor: theme.color.BG,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundImage: `url(${imageUrl})`
-    };
+
     return (
         <div style={containerStyle}>
             {loading ? <LoadingSpinner /> : null}

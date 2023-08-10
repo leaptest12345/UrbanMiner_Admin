@@ -1,8 +1,9 @@
-import { database } from 'configs/firebaseConfig';
-import { onValue, ref, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
+
 import { useTheme } from 'react-jss';
 import { useHistory } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,15 +13,20 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button } from '@material-ui/core';
-import { notify } from 'util/notify';
-import { ToastContainer } from 'react-toastify';
-import { formateData } from 'util/formateData';
-import SLUGS from 'resources/slugs';
-import { convertSlugToUrl } from 'resources/utilities';
+import { Delete } from '@material-ui/icons';
+
 import ImageModal from 'components/ImageModal/ImageModal';
 
+import { database } from 'configs/firebaseConfig';
+import { onValue, ref, update } from 'firebase/database';
+
+import { notify } from 'util/notify';
+import { formateData } from 'util/formateData';
+
+import SLUGS from 'resources/slugs';
+import { convertSlugToUrl } from 'resources/utilities';
+
 import styles from './styles';
-import { Delete } from '@material-ui/icons';
 
 export default function UserList() {
     const theme = useTheme();
@@ -28,6 +34,10 @@ export default function UserList() {
 
     const [user, setUsers] = useState([]);
     const [adminLevel, setAdminLevel] = useState(0);
+
+    useEffect(() => {
+        getUserList();
+    }, []);
 
     const getUserDetail = (id) => {
         let userData = null;
@@ -71,9 +81,6 @@ export default function UserList() {
             console.log(error);
         }
     };
-    useEffect(() => {
-        getUserList();
-    }, []);
 
     function onClick(slug, data, parameters = {}) {
         push({
@@ -81,6 +88,7 @@ export default function UserList() {
             state: data
         });
     }
+
     const StyledTableCell = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -97,6 +105,7 @@ export default function UserList() {
             }
         }
     }))(TableRow);
+
     const onAction = async (item) => {
         try {
             const id = await localStorage.getItem('userID');

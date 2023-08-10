@@ -6,18 +6,21 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import { Button } from '@material-ui/core';
+import { Delete } from '@material-ui/icons';
+import { withStyles } from '@material-ui/core/styles';
 
 import { set, onValue, ref, update } from 'firebase/database';
+
 import { v4 as uuid } from 'uuid';
-import { database } from 'configs/firebaseConfig';
-import { notify } from 'util/notify';
 import { ToastContainer } from 'react-toastify';
-import { Button } from '@material-ui/core';
 import { useTheme } from 'react-jss';
-import { withStyles } from '@material-ui/core/styles';
-import { Delete } from '@material-ui/icons';
+
+import { database } from 'configs/firebaseConfig';
+
 import { uploadProductImage } from 'util/uploadProductImage';
 import { formateData } from 'util/formateData';
+import { notify } from 'util/notify';
 
 import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 import ImageModal from 'components/ImageModal/ImageModal';
@@ -25,6 +28,10 @@ import ImageModal from 'components/ImageModal/ImageModal';
 import productStyle from './styles';
 
 function AddProduct() {
+    const { styles } = productStyle;
+    const uniqueId = uuid().slice(0, 8);
+    const theme = useTheme();
+
     const [imgfile, setImageFile] = useState('');
     const [productName, setProductName] = useState('');
     const [productDesc, setProductDesc] = useState('');
@@ -43,8 +50,9 @@ function AddProduct() {
     const [addToDatabase, setAddToDatabase] = useState(false);
     const [item, setItem] = useState('');
 
-    const { styles } = productStyle;
-    const uniqueId = uuid().slice(0, 8);
+    useEffect(() => {
+        getProduct();
+    }, []);
 
     const imgFilehandler = (e) => {
         setImageFile(e.target.files[0]);
@@ -57,10 +65,6 @@ function AddProduct() {
         } else setSubImageFile(e.target.files[0]);
     };
 
-    useEffect(() => {
-        getProduct();
-    }, []);
-
     const setProductDetail = async () => {
         try {
             setLoading(true);
@@ -72,6 +76,7 @@ function AddProduct() {
             setLoading(false);
         }
     };
+
     const addSubProductDatabase = async (id) => {
         try {
             subProduct.map(async (item, index) => {
@@ -108,6 +113,7 @@ function AddProduct() {
             console.log(error);
         }
     };
+
     const getProduct = () => {
         try {
             const refDetail = ref(database, `/ADMIN/PRODUCT`);
@@ -119,6 +125,7 @@ function AddProduct() {
             console.log(error);
         }
     };
+
     const createProduct = async (downloadURL) => {
         try {
             if (productName && productDesc && imgfile) {
@@ -152,6 +159,7 @@ function AddProduct() {
             console.log(error);
         }
     };
+
     const StyledTableCell = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -179,7 +187,6 @@ function AddProduct() {
             }
         }
     }))(TableRow);
-    const theme = useTheme();
 
     const addSubProduct = () => {
         if (!subProductName) notify('Please Fill The Product Name!', 2);
@@ -295,12 +302,10 @@ function AddProduct() {
 
     const deleteProduct = (productId, subProductId, type) => {
         if (type == 'product') {
-            console.log('please delete produc here', productId);
             const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
             set(refDetail, null);
             notify('Product Successfully Deleted!', 0);
         } else {
-            console.log('inside subproduct');
             const refDetail1 = ref(
                 database,
                 `/ADMIN/PRODUCT/${productId}/SUB_PRODUCT/${subProductId}`
@@ -350,16 +355,6 @@ function AddProduct() {
             onModalClose();
             setLoading(false);
         }
-    };
-
-    const onEdit = () => {
-        addToDatabase
-            ? addSubProductInDatabase()
-            : isEditable
-            ? productType == 0
-                ? editProductDetail()
-                : editSubProductDetail()
-            : addSubProduct();
     };
 
     const imageFileUrl = imgfile != '' ? window.URL.createObjectURL(imgfile) : '';
@@ -550,10 +545,6 @@ function AddProduct() {
                                             <StyledTableCell align='left' style={styles.width10}>
                                                 <Delete
                                                     onClick={() => {
-                                                        console.log(
-                                                            'before deleting product',
-                                                            item
-                                                        );
                                                         setProductType(0);
                                                         setProductId(item.ID);
                                                         deleteProduct(item.ID, null, 'product');
@@ -622,10 +613,6 @@ function AddProduct() {
                                                           >
                                                               <Delete
                                                                   onClick={() => {
-                                                                      console.log(
-                                                                          'before deleting sub product',
-                                                                          item
-                                                                      );
                                                                       setProductType(1);
                                                                       deleteProduct(
                                                                           item.ID,

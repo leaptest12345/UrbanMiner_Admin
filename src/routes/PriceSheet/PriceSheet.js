@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+
 import { v4 as uuid } from 'uuid';
 import { ToastContainer } from 'react-toastify';
-import { Button } from '@material-ui/core';
-import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 import { useTheme } from 'react-jss';
+import { onValue, ref, set, update } from 'firebase/database';
+import { useHistory } from 'react-router-dom';
+
+import { Button } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,18 +15,27 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { withStyles } from '@material-ui/core/styles';
 import { Delete } from '@material-ui/icons';
+
 import productStyle from './styles';
+
+import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 import ImageModal from 'components/ImageModal/ImageModal';
-import { notify } from 'util/notify';
-import { database } from 'configs/firebaseConfig';
-import { onValue, ref, set, update } from 'firebase/database';
-import { formateData } from 'util/formateData';
-import { uploadProductImage } from 'util/uploadProductImage';
-import { useHistory } from 'react-router-dom';
+
 import { convertSlugToUrl } from 'resources/utilities';
 import SLUGS from 'resources/slugs';
 
+import { database } from 'configs/firebaseConfig';
+
+import { formateData } from 'util/formateData';
+import { uploadProductImage } from 'util/uploadProductImage';
+import { notify } from 'util/notify';
+
 function PriceSheet() {
+    const { styles } = productStyle;
+    const { push } = useHistory();
+    const uniqueId = uuid().slice(0, 8);
+    const theme = useTheme();
+
     const dragItem = useRef();
     const dragOverItem = useRef();
     const containerRef = useRef(null);
@@ -50,11 +62,6 @@ function PriceSheet() {
     const [categoryId, setCategoryId] = useState(null);
     const [productId, setProductId] = useState(null);
     const [totalCategory, setTotalCategory] = useState(0);
-    const [ModalType, setModalType] = useState(0);
-    const { styles } = productStyle;
-    const uniqueId = uuid().slice(0, 8);
-
-    const { push } = useHistory();
 
     useEffect(() => {
         getCategories();
@@ -86,7 +93,6 @@ function PriceSheet() {
             backgroundColor: theme.color.BG
         }
     }))(TableCell);
-
     const StyledTableCell1 = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -97,7 +103,6 @@ function PriceSheet() {
             backgroundColor: theme.color.lightGrayishBlue
         }
     }))(TableCell);
-
     const StyledTableRow = withStyles(() => ({
         root: {
             '&:nth-of-type(odd)': {
@@ -105,8 +110,6 @@ function PriceSheet() {
             }
         }
     }))(TableRow);
-
-    const theme = useTheme();
 
     const addProductInDatabase = async (id) => {
         try {
@@ -122,6 +125,7 @@ function PriceSheet() {
             });
         } catch (error) {}
     };
+
     const createCategory = async () => {
         try {
             const id = uuid().slice(0, 10);
@@ -165,13 +169,6 @@ function PriceSheet() {
         const refDetail1 = ref(database, `/ADMIN/CATEGORY/${categoryId}/PRODUCT/${productId}`);
 
         try {
-            // onValue(imageRef, (snapShot) => {
-            //     const images = formateData(snapShot.val());
-            //     console.log('toatal iamges', snapShot.val());
-            //     images.map(async (item) => {
-            //         await deleteProductImage(item.name);
-            //     });
-            // });
             if (productType == 0) {
                 set(refDetail, null);
                 notify('Category Successfully Deleted!', 0);
@@ -264,9 +261,6 @@ function PriceSheet() {
 
         const FirstItem = parentNode[dragItem1.current];
         const secondItem = parentNode[dragOverItem1.current];
-
-        console.log("firstItem details",FirstItem)
-        console.log("second item details",secondItem)
 
         if (FirstItem?.id != undefined && secondItem?.id != undefined) {
             const FirstItemRef = ref(

@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { styles } from './styles';
-import { database } from 'configs/firebaseConfig';
+
 import { onValue, ref, update } from 'firebase/database';
-import { Button } from '@material-ui/core';
-import { notify } from 'util/notify';
 import { useHistory } from 'react-router-dom';
+
+import { Button } from '@material-ui/core';
+
+import { database } from 'configs/firebaseConfig';
+
+import { notify } from 'util/notify';
+
+import { styles } from './styles';
 
 export const UserPermission = (props) => {
     const { userId } = props.location.state;

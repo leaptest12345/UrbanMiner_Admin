@@ -31,17 +31,13 @@ function PrivateSection() {
     const getUserPermissionDetail = async () => {
         try {
             const id = await localStorage.getItem('userID');
-            console.log('user id', id);
             if (id != null) {
                 const refDetail = ref(database, `/ADMIN/USERS/${id}`);
                 onValue(refDetail, (snapShot) => {
-                    console.log(snapShot.val());
                     setPermissionStatus(snapShot.val()?.role?.PermissionStatus);
                 });
             }
-        } catch (error) {
-            console.log(error);
-        }
+        } catch (error) {}
     };
 
     useEffect(() => {

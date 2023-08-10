@@ -1,7 +1,12 @@
-import { database } from 'configs/firebaseConfig';
-import { onValue, ref, set, update } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
+
 import { useTheme } from 'react-jss';
+import { onValue, ref, set, update } from 'firebase/database';
+import { ToastContainer } from 'react-toastify';
+import { useHistory } from 'react-router-dom';
+
+import { database } from 'configs/firebaseConfig';
+
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -12,22 +17,31 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
+
 import { notify } from 'util/notify';
-import { ToastContainer } from 'react-toastify';
 import { formateData } from 'util/formateData';
-import { useHistory } from 'react-router-dom';
+
 import { convertSlugToUrl } from 'resources/utilities';
 import SLUGS from 'resources/slugs';
+
 import ImageModal from 'components/ImageModal/ImageModal';
+
 import userDetailStyle from './styles';
 
 export default function UserDetail(props) {
     const theme = useTheme();
     const { push } = useHistory();
+    const { styles } = userDetailStyle;
+    const { id } = props.location.state;
+
     const [data, setData] = useState([]);
     const [user, setUser] = useState('');
-    const { styles } = userDetailStyle;
     const [isApproved, setIsApproved] = useState(false);
+
+    useEffect(() => {
+        getUserDetail();
+        getUserCustomer();
+    }, []);
 
     function onClick(slug, data, parameters = {}) {
         push({
@@ -36,6 +50,7 @@ export default function UserDetail(props) {
             state: data
         });
     }
+
     const btn = {
         position: 'absolute',
         top: '20%',
@@ -48,6 +63,7 @@ export default function UserDetail(props) {
         color: 'white',
         marginLeft: 40
     };
+
     const StyledTableCell = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -65,11 +81,6 @@ export default function UserDetail(props) {
         }
     }))(TableRow);
 
-    const { id } = props.location.state;
-    useEffect(() => {
-        getUserDetail();
-        getUserCustomer();
-    }, []);
     const getUserCustomer = () => {
         try {
             const refDetail = ref(database, `/USER_CUSTOMER/${id}`);
@@ -83,6 +94,7 @@ export default function UserDetail(props) {
             console.log(error);
         }
     };
+
     const getUserDetail = () => {
         try {
             const refDetail = ref(database, `USERS/${id}`);
@@ -94,6 +106,7 @@ export default function UserDetail(props) {
             console.log(error);
         }
     };
+
     const onApproved = () => {
         try {
             const refDetail = ref(database, `/USERS/${id}`);
@@ -105,6 +118,7 @@ export default function UserDetail(props) {
             console.log(error);
         }
     };
+
     const onDelete = async (item) => {
         try {
             const id = await localStorage.getItem('userID');
@@ -115,12 +129,14 @@ export default function UserDetail(props) {
             console.log('error', error);
         }
     };
+
     const onViewDetailClick = (item) => {
         onClick(SLUGS.CustomerDetail, {
             userId: id,
             customerId: item.ID
         });
     };
+
     return (
         <div>
             <div style={styles.div}>

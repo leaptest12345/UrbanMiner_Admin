@@ -1,20 +1,27 @@
-import { database } from 'configs/firebaseConfig';
-import { onValue, ref, set } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
-import { formateData } from 'util/formateData';
-import styles from './styles';
-import ImageModal from 'components/ImageModal/ImageModal';
-import { Delete } from '@material-ui/icons';
-import { deleteProductImage, uploadProductImage } from 'util/uploadProductImage';
-import { Button } from '@material-ui/core';
+
 import { v4 as uuid } from 'uuid';
 import { useHistory } from 'react-router-dom';
+
+import { Delete } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
+
+import { database } from 'configs/firebaseConfig';
+import { onValue, ref, set } from 'firebase/database';
+
+import ImageModal from 'components/ImageModal/ImageModal';
+
+import { deleteProductImage, uploadProductImage } from 'util/uploadProductImage';
+import { formateData } from 'util/formateData';
+
+import styles from './styles';
 
 export default function CategoryImages(props) {
     const { categoryId } = props.location.state;
 
     const [imagesFile, setImagesFile] = useState([]);
     const [photoList, setPhotoList] = useState([]);
+
     useEffect(() => {
         getPhotos();
     }, []);
@@ -107,7 +114,6 @@ export default function CategoryImages(props) {
             <br />
             <div style={styles.rowWrap}>
                 {photoList.map((item) => {
-                    console.log('getted images', item);
                     return (
                         <div
                             style={{

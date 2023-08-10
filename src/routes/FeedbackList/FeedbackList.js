@@ -1,7 +1,8 @@
-import { database } from 'configs/firebaseConfig';
-import { onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
+
+import { ToastContainer } from 'react-toastify';
 import { useTheme } from 'react-jss';
+
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -10,11 +11,18 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { ToastContainer } from 'react-toastify';
+
+import { database } from 'configs/firebaseConfig';
+import { onValue, ref } from 'firebase/database';
 
 export default function FeedBackList() {
     const theme = useTheme();
     const [data, setData] = useState([]);
+
+    useEffect(() => {
+        getFeedbackList();
+    }, []);
+
     const ReadMore = ({ children }) => {
         const text = children;
         const [isReadMore, setIsReadMore] = useState(true);
@@ -49,8 +57,6 @@ export default function FeedBackList() {
                 } else {
                     let arr = [];
                     Object.keys(snapshot.val()).map((key) => arr.push(snapshot.val()[key]));
-
-                    console.log(arr);
                     setData(arr);
                 }
             });
@@ -58,9 +64,6 @@ export default function FeedBackList() {
             console.log(error);
         }
     };
-    useEffect(() => {
-        getFeedbackList();
-    }, []);
 
     const StyledTableCell = withStyles(() => ({
         head: {

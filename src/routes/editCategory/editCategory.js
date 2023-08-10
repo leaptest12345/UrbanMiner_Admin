@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
+
 import { v4 as uuid } from 'uuid';
-import { ToastContainer } from 'react-toastify';
-import { Button } from '@material-ui/core';
-import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 import { useTheme } from 'react-jss';
+import { ToastContainer } from 'react-toastify';
+import { useHistory } from 'react-router-dom';
+
+import LoadingSpinner from 'components/Spinner/LoadingSpinner';
+
+import { Button } from '@material-ui/core';
 import Modal from '@material-ui/core/Modal';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,32 +15,31 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import { withStyles } from '@material-ui/core/styles';
-import productStyle from './styles';
-import { notify } from 'util/notify';
+
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set, update } from 'firebase/database';
+
+import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
-import { useHistory } from 'react-router-dom';
+
+import productStyle from './styles';
 
 function EditCategory(props) {
+    const uniqueId = uuid().slice(0, 8);
+    const history = useHistory();
+    const theme = useTheme();
+
     const { categoryId } = props.location.state;
+    const { styles } = productStyle;
 
     const [categoryName, setCategoryName] = useState('');
-
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-
     const [subProduct, setSubProduct] = useState([]);
-
     const [productName, setProductName] = useState('');
     const [productPrice, setProductPrice] = useState('');
-
     const [productList, setProductList] = useState([]);
     const [totalProduct, setTotalProduct] = useState(0);
-    const { styles } = productStyle;
-    const uniqueId = uuid().slice(0, 8);
-
-    const history = useHistory();
 
     useEffect(() => {
         getProductList();
@@ -70,7 +73,6 @@ function EditCategory(props) {
             backgroundColor: theme.color.BG
         }
     }))(TableCell);
-
     const StyledTableRow = withStyles(() => ({
         root: {
             '&:nth-of-type(odd)': {
@@ -78,8 +80,6 @@ function EditCategory(props) {
             }
         }
     }))(TableRow);
-
-    const theme = useTheme();
 
     const addProductInDatabase = async () => {
         try {
@@ -100,6 +100,7 @@ function EditCategory(props) {
             console.log(error);
         }
     };
+
     const editCategory = async () => {
         try {
             setLoading(true);

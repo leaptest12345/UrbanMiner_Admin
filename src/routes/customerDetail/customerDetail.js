@@ -1,7 +1,9 @@
-import { database } from 'configs/firebaseConfig';
-import { onValue, ref } from 'firebase/database';
 import React, { useEffect, useState } from 'react';
+
 import { useTheme } from 'react-jss';
+import { ToastContainer } from 'react-toastify';
+import { useHistory } from 'react-router-dom';
+
 import { withStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,28 +13,43 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { Button } from '@material-ui/core';
-import { ToastContainer } from 'react-toastify';
-import { formateData } from 'util/formateData';
-import { convertIntoDoller } from 'util/convertIntoDoller';
-import { useHistory } from 'react-router-dom';
+
+import { database } from 'configs/firebaseConfig';
+import { onValue, ref } from 'firebase/database';
+
 import { convertSlugToUrl } from 'resources/utilities';
 import slugs from 'resources/slugs';
+
 import ImageModal from 'components/ImageModal/ImageModal';
+
+import { formateData } from 'util/formateData';
+import { convertIntoDoller } from 'util/convertIntoDoller';
+
 import customerStyle from './styles';
+
 export default function CustomerDetail(props) {
     const theme = useTheme();
     const { styles } = customerStyle;
+    const { userId, customerId } = props.location.state;
+    const { push } = useHistory();
 
     const [data, setData] = useState([]);
-    const { push } = useHistory();
     const [customerImages, setCustomerImages] = useState([]);
     const [user, setUser] = useState('');
+
+    useEffect(() => {
+        getCustomerDetail();
+        getInvoiceList();
+        getCustomerImages();
+    }, []);
+
     function onClick(slug, data, parameters = {}) {
         push({
             pathname: convertSlugToUrl(slug, parameters),
             state: data
         });
     }
+
     const StyledTableCell = withStyles(() => ({
         head: {
             backgroundColor: theme.color.veryDarkGrayishBlue,
@@ -50,13 +67,6 @@ export default function CustomerDetail(props) {
         }
     }))(TableRow);
 
-    const { userId, customerId } = props.location.state;
-
-    useEffect(() => {
-        getCustomerDetail();
-        getInvoiceList();
-        getCustomerImages();
-    }, []);
     const getCustomerImages = () => {
         try {
             const refDetail = ref(database, `/CUSTOMER_IMG/user:${userId}/customer:${customerId}`);
@@ -68,6 +78,7 @@ export default function CustomerDetail(props) {
             console.log(error);
         }
     };
+
     const getCustomerDetail = () => {
         try {
             const refDetail = ref(database, `/USER_CUSTOMER/${userId}/CUSTOMER/${customerId}`);
@@ -79,6 +90,7 @@ export default function CustomerDetail(props) {
             console.log(error);
         }
     };
+
     const getInvoiceList = () => {
         try {
             const refDetail = ref(database, `/INVOICE_LIST`);
@@ -96,10 +108,12 @@ export default function CustomerDetail(props) {
             console.log(error);
         }
     };
+
     function openInNewTab(url) {
         var win = window.open(url, '_blank');
         win.focus();
     }
+
     const viewPdf = (id) => {
         // .ref(`/PDF/user:${userId}/customer:${customerId}/invoiceid:${ID}/1`)
         try {
@@ -115,6 +129,7 @@ export default function CustomerDetail(props) {
             console.log(error);
         }
     };
+
     const onActions = (item) => {
         if (item.type == 'draft') {
             onClick(slugs.ViewDraft, {
@@ -124,6 +139,7 @@ export default function CustomerDetail(props) {
             });
         } else viewPdf(item.ID);
     };
+
     return (
         <div>
             <div style={{ height: '330' }}>
