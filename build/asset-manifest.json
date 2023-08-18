@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/UrbanMiner_Admin/static/css/main.86d18a3c.css",
-    "main.js": "/UrbanMiner_Admin/static/js/main.49af1269.js",
+    "main.js": "/UrbanMiner_Admin/static/js/main.21f70d8b.js",
     "static/js/709.62777016.chunk.js": "/UrbanMiner_Admin/static/js/709.62777016.chunk.js",
     "static/media/urbanminer.png": "/UrbanMiner_Admin/static/media/urbanminer.8d3c32bd3bf64523c88a.png",
     "index.html": "/UrbanMiner_Admin/index.html",
     "main.86d18a3c.css.map": "/UrbanMiner_Admin/static/css/main.86d18a3c.css.map",
-    "main.49af1269.js.map": "/UrbanMiner_Admin/static/js/main.49af1269.js.map",
+    "main.21f70d8b.js.map": "/UrbanMiner_Admin/static/js/main.21f70d8b.js.map",
     "709.62777016.chunk.js.map": "/UrbanMiner_Admin/static/js/709.62777016.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.86d18a3c.css",
-    "static/js/main.49af1269.js"
+    "static/js/main.21f70d8b.js"
   ]
 }

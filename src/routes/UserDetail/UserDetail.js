@@ -299,7 +299,7 @@ export default function UserDetail(props) {
                                         firstName: values.firstName,
                                         lastName: values.lastName,
                                         email: values.emailAddress,
-                                        cca2: values.country
+                                        phoneNumber: values.phoneNumber
                                     });
                                     notify('UserDetail Successfully Updated!', 1);
                                 } catch (error) {
