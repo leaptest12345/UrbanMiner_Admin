@@ -241,8 +241,9 @@ export default function UserDetail(props) {
                                 }
                             }}
                             onSubmit={async (values) => {
-                                console.log('called', id);
                                 const starCountRef = ref(database, `/USER_DETAILS/${id}`);
+                                const refDetail = ref(database, `USERS/${id}`);
+
                                 try {
                                     await update(starCountRef, {
                                         firstName: values.firstName,
@@ -293,6 +294,12 @@ export default function UserDetail(props) {
                                                 expireDate: values?.license?.federal?.expireDate
                                             }
                                         }
+                                    });
+                                    await update(refDetail, {
+                                        firstName: values.firstName,
+                                        lastName: values.lastName,
+                                        email: values.emailAddress,
+                                        cca2: values.country
                                     });
                                     notify('UserDetail Successfully Updated!', 1);
                                 } catch (error) {
