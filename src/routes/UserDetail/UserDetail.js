@@ -532,6 +532,7 @@ export default function UserDetail(props) {
                                             onChange={(value) =>
                                                 setFieldValue('interactionDetail', value, false)
                                             }
+                                            isTextArea={true}
                                             label='Interaction Details:'
                                         />
                                         <h3 style={{ marginTop: 20 }}>
