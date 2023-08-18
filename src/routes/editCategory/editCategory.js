@@ -91,7 +91,7 @@ function EditCategory(props) {
                 );
                 await set(starCount, {
                     id: uniqueId,
-                    productName: item.name,
+                    productName: item?.name,
                     productPrice: item.price,
                     order: totalProduct + index + 1
                 });
@@ -167,7 +167,7 @@ function EditCategory(props) {
                                                 {index + 1}
                                             </StyledTableCell>
                                             <StyledTableCell component='th' scope='row'>
-                                                {item.name}
+                                                {item?.name}
                                             </StyledTableCell>
                                             <StyledTableCell align='left'>
                                                 $ {item.price ? item.price : '-'}

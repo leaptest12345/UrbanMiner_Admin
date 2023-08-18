@@ -54,7 +54,7 @@ export default function CategoryImages(props) {
                 const refDetail = ref(database, `/ADMIN/CATEGORY_PHOTOS/${categoryId}/${uniqueId}`);
                 set(refDetail, {
                     ID: uniqueId,
-                    name: item.name,
+                    name: item?.name,
                     url: url
                 });
             });
@@ -129,7 +129,7 @@ export default function CategoryImages(props) {
                             />
                             <Delete
                                 style={{ margin: 10 }}
-                                onClick={() => deleteImage(item.ID, item.name)}
+                                onClick={() => deleteImage(item.ID, item?.name)}
                             ></Delete>
                         </div>
                     );

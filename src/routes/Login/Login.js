@@ -33,6 +33,9 @@ const Login = () => {
         getDetail();
     }, []);
 
+    const imageUrl =
+        'https://c4.wallpaperflare.com/wallpaper/644/305/118/pattern-black-gradient-texture-wallpaper-preview.jpg';
+
     const paperStyle = {
         padding: 20,
         height: '90vh',
@@ -126,9 +129,6 @@ const Login = () => {
             console.log(error);
         }
     };
-
-    const imageUrl =
-        'https://c4.wallpaperflare.com/wallpaper/644/305/118/pattern-black-gradient-texture-wallpaper-preview.jpg';
 
     return (
         <div style={containerStyle}>

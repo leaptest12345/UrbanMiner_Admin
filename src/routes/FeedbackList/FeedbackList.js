@@ -101,13 +101,13 @@ export default function FeedBackList() {
                                     {index + 1}
                                 </StyledTableCell>
                                 <StyledTableCell component='th' scope='row'>
-                                    {item.name}
+                                    {item?.name}
                                 </StyledTableCell>
                                 <StyledTableCell component='th' scope='row'>
-                                    {item.email}
+                                    {item?.email}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
-                                    <ReadMore>{item.feedBack}</ReadMore>
+                                    <ReadMore>{item?.feedBack}</ReadMore>
                                 </StyledTableCell>
                             </StyledTableRow>
                         ))}

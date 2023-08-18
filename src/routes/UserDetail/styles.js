@@ -31,6 +31,26 @@ const styles = {
         alignItems: 'center',
         display: 'flex',
         gap: 10
+    },
+    button: {
+        height: 50,
+        borderRadius: 10,
+        borderWidth: 0.5,
+        color: 'white',
+        marginTop: 20,
+        marginBottom: 20
+    },
+    rowView: {
+        flex: 1,
+        flexDirection: 'row',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap'
+    },
+    view: {
+        width: '210px',
+        marginBottom: '10px'
     }
 };
 

@@ -88,7 +88,7 @@ function AddProduct() {
                     );
                     await set(starCount, {
                         id: index + 1,
-                        productName: item.name,
+                        productName: item?.name,
                         productImage: url,
                         prodductDescription: item.description,
                         updatedAt: new Date().toString()
@@ -101,7 +101,7 @@ function AddProduct() {
                     );
                     await set(starCount, {
                         id: index + 1,
-                        productName: item.name,
+                        productName: item?.name,
                         productImage: '',
                         prodductDescription: item.description,
                         updatedAt: new Date().toString()
@@ -446,7 +446,7 @@ function AddProduct() {
                                                 )}
                                             </StyledTableCell>
                                             <StyledTableCell component='th' scope='row'>
-                                                {item.name}
+                                                {item?.name}
                                             </StyledTableCell>
                                             <StyledTableCell align='left'>
                                                 {item.description ? item.description : '-'}

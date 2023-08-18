@@ -70,7 +70,7 @@ export const Table = () => {
                                     )}
                                 </StyledTableCell>
                                 <StyledTableCell component='th' scope='row'>
-                                    {item.name}
+                                    {item?.name}
                                 </StyledTableCell>
                                 <StyledTableCell align='left'>
                                     {item.description ? item.description : '-'}
