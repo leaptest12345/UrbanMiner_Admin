@@ -22,7 +22,7 @@ const styles = {
     modalDiv: {
         backgroundColor: 'white',
         borderRadius: '10px',
-        height: '45vh',
+        // height: '70vh',
         width: '70vw',
         padding: '30px',
         display: 'flex',
@@ -61,7 +61,7 @@ const styles = {
         width: '70vw',
         margin: 'auto',
         left: '10%',
-        top: '10%'
+        top: '-40%'
     },
     inputStyle: {
         height: '45px',
@@ -111,6 +111,12 @@ const styles = {
         width: '20vw',
         borderRadius: 10,
         marginTop: '20px'
+    },
+    imgStyle2: {
+        height: '10vh',
+        width: '20vh',
+        borderRadius: 10,
+        marginTop: '10px'
     },
     imgStyle1: {
         height: '15vh',

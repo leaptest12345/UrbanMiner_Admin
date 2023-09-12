@@ -62,6 +62,7 @@ function PriceSheet() {
     const [categoryId, setCategoryId] = useState(null);
     const [productId, setProductId] = useState(null);
     const [totalCategory, setTotalCategory] = useState(0);
+    const [productImage, setProductImage] = useState('');
 
     useEffect(() => {
         getCategories();
@@ -81,6 +82,9 @@ function PriceSheet() {
 
     const imgFilehandler = (e) => {
         setImagesFile(formateData(e.target.files));
+    };
+    const imgFilehandler1 = (e) => {
+        setProductImage(e.target.files[0]);
     };
 
     const StyledTableCell = withStyles(() => ({
@@ -116,11 +120,16 @@ function PriceSheet() {
             subProduct.map(async (item, index) => {
                 const uniqueId = uuid().slice(0, 10);
                 const starCount = ref(database, `/ADMIN/CATEGORY/${id}/PRODUCT/${uniqueId}`);
+                let url = '';
+                if (item.image) {
+                    url = await uploadProductImage(item.image);
+                }
                 await set(starCount, {
                     id: uniqueId,
                     productName: item.name,
                     productPrice: item.price,
-                    order: index + 1
+                    order: index + 1,
+                    image: url
                 });
             });
         } catch (error) {}
@@ -187,14 +196,25 @@ function PriceSheet() {
         setProductPrice('');
     };
 
-    const onProductEdit = () => {
+    const onProductEdit = async () => {
         setLoading(true);
 
         const refDetail = ref(database, `ADMIN/CATEGORY/${categoryId}/PRODUCT/${productId}`);
-        update(refDetail, {
-            productName: productName,
-            productPrice: productPrice
-        });
+
+        if (typeof productImage == 'object') {
+            const url = await uploadProductImage(productImage);
+            update(refDetail, {
+                productName: productName,
+                productPrice: productPrice,
+                image: url
+            });
+        } else {
+            update(refDetail, {
+                productName: productName,
+                productPrice: productPrice
+            });
+        }
+
         setLoading(false);
         notify('Product detail has been updated!', 2);
         onModalClose();
@@ -309,6 +329,13 @@ function PriceSheet() {
         }
     }
 
+    const onClearProduct = () => {
+        setProductName('');
+        setProductPrice('');
+        setProductImage('');
+        setOpen(false);
+    };
+
     return (
         <div ref={containerRef} style={{ height: '700px', overflow: 'auto' }}>
             {loading ? <LoadingSpinner /> : null}
@@ -379,6 +406,7 @@ function PriceSheet() {
                                 <StyledTableCell align='left'>No.</StyledTableCell>
                                 <StyledTableCell align='left'>ProductName</StyledTableCell>
                                 <StyledTableCell align='left'>ProductPrice</StyledTableCell>
+                                <StyledTableCell align='left'>ProductImage</StyledTableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -394,6 +422,16 @@ function PriceSheet() {
                                             </StyledTableCell>
                                             <StyledTableCell align='left'>
                                                 $ {item.price ? item.price : '-'}
+                                            </StyledTableCell>
+                                            <StyledTableCell align='left'>
+                                                <ImageModal
+                                                    imageStyle={styles.imgStyle2}
+                                                    url={
+                                                        item.image != ''
+                                                            ? window.URL.createObjectURL(item.image)
+                                                            : ''
+                                                    }
+                                                />
                                             </StyledTableCell>
                                         </StyledTableRow>
                                     </>
@@ -420,6 +458,9 @@ function PriceSheet() {
                                         ProductPrice
                                     </StyledTableCell>
                                     <StyledTableCell align='left' style={styles.width10}>
+                                        ProductImage
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left' style={{ width: '20%' }}>
                                         Actions
                                     </StyledTableCell>
                                     <StyledTableCell align='left' style={styles.width10}>
@@ -458,7 +499,11 @@ function PriceSheet() {
                                                     align='left'
                                                     style={styles.width10}
                                                 ></StyledTableCell>
-                                                <StyledTableCell style={{ ...styles.width10 }}>
+                                                <StyledTableCell
+                                                    align='left'
+                                                    style={styles.width10}
+                                                ></StyledTableCell>
+                                                <StyledTableCell style={{ width: '20%' }}>
                                                     <Button
                                                         style={styles.dangerBtn1}
                                                         onClick={() => {
@@ -548,8 +593,25 @@ function PriceSheet() {
                                                                       $ {item1.productPrice}
                                                                   </StyledTableCell1>
                                                                   <StyledTableCell1
+                                                                      style={{
+                                                                          width: '35%'
+                                                                      }}
+                                                                  >
+                                                                      {item1.image ? (
+                                                                          <ImageModal
+                                                                              imageStyle={
+                                                                                  styles.imgStyle2
+                                                                              }
+                                                                              url={item1.image}
+                                                                          />
+                                                                      ) : (
+                                                                          '-'
+                                                                      )}
+                                                                  </StyledTableCell1>
+
+                                                                  <StyledTableCell1
                                                                       align='left'
-                                                                      style={styles.width10}
+                                                                      style={{ width: '20%' }}
                                                                   >
                                                                       <Button
                                                                           style={styles.dangerBtn}
@@ -561,6 +623,9 @@ function PriceSheet() {
                                                                               );
                                                                               setProductPrice(
                                                                                   item1.productPrice
+                                                                              );
+                                                                              setProductImage(
+                                                                                  item1.image
                                                                               );
                                                                               setProductId(
                                                                                   item1.id
@@ -608,7 +673,13 @@ function PriceSheet() {
             <Modal onClose={() => setOpen(false)} open={open} style={styles.modal}>
                 <div style={styles.modalDiv}>
                     {loading ? <LoadingSpinner /> : null}
-                    <Button onClick={() => setOpen(false)} style={styles.closeBtn}>
+                    <Button
+                        onClick={() => {
+                            onClearProduct();
+                            setOpen(false);
+                        }}
+                        style={styles.closeBtn}
+                    >
                         Close
                     </Button>
                     <div>
@@ -632,6 +703,42 @@ function PriceSheet() {
                             style={styles.inputStyle}
                         />
                     </div>
+                    <div>
+                        <text>Select Product Image: </text>
+                        <br />
+                        <input
+                            style={styles.marginTopView}
+                            type='file'
+                            accept='image/*'
+                            onChange={imgFilehandler1}
+                        />
+                        {productImage ? (
+                            <>
+                                <hr />
+                                <div>
+                                    <h2>Preview</h2>
+                                    <div style={styles.rowWrap}>
+                                        <div
+                                            style={{
+                                                marginRight: 20
+                                            }}
+                                        >
+                                            <ImageModal
+                                                imageStyle={styles.imgStyle2}
+                                                url={
+                                                    typeof productImage === 'string'
+                                                        ? productImage
+                                                        : productImage != ''
+                                                        ? window.URL.createObjectURL(productImage)
+                                                        : ''
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        ) : null}
+                    </div>
                     <div style={{ marginTop: '4%' }}>
                         <Button
                             style={{
@@ -647,12 +754,11 @@ function PriceSheet() {
                                             {
                                                 id: uniqueId,
                                                 name: productName,
-                                                price: productPrice
+                                                price: productPrice,
+                                                image: productImage
                                             }
                                         ]);
-                                        setProductName('');
-                                        setProductPrice('');
-                                        setOpen(false);
+                                        onClearProduct();
                                     }
                                 }
                             }}

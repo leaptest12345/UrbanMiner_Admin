@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useTheme } from 'react-jss';
-import { onValue, ref, set, update } from 'firebase/database';
+import { onValue, ref, set, update, remove } from 'firebase/database';
 import { ToastContainer } from 'react-toastify';
 import { useHistory } from 'react-router-dom';
 
@@ -33,8 +33,7 @@ import DropdownListWithLabel from 'components/DropdownListWithLabel';
 import RadioButtonGroupWithLabel from 'components/RadioButtonGroupWithLabel';
 import { Formik } from 'formik';
 import { interactionType, materialTypes, recyclingMethod, referralSources } from './utils';
-import ImagePickerWithLabel from 'components/ImagePickerWithLable';
-import { uploadLicences, uploadProductImage } from 'util/uploadProductImage';
+import { uploadLicences } from 'util/uploadProductImage';
 import ImagePicker from 'components/ImagePicker';
 
 export default function UserDetail(props) {
@@ -153,10 +152,10 @@ export default function UserDetail(props) {
 
     const onDelete = async (item) => {
         try {
-            const id = await localStorage.getItem('userID');
             const starCountRef = ref(database, `/USER_CUSTOMER/${id}/CUSTOMER/${item.ID}`);
-            set(starCountRef, null);
+            remove(starCountRef, null);
             notify('Customer has been Deleted Successfully', 0);
+            getUserCustomer();
         } catch (error) {
             console.log('error', error);
         }

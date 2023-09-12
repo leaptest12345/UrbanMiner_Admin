@@ -7,6 +7,14 @@ const styles = {
         justifyContent: 'center',
         height: 250
     },
+    button: {
+        height: 50,
+        borderRadius: 10,
+        borderWidth: 0.5,
+        color: 'white',
+        marginTop: 20,
+        marginBottom: 20
+    },
     marginDiv: {
         margin: 20
     },
@@ -20,6 +28,18 @@ const styles = {
         alignItems: 'center',
         display: 'flex',
         gap: 10
+    },
+    view: {
+        width: '210px',
+        marginBottom: '10px'
+    },
+    rowView: {
+        flex: 1,
+        flexDirection: 'row',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap'
     }
 };
 export default {

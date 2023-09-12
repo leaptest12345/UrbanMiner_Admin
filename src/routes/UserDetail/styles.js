@@ -51,6 +51,14 @@ const styles = {
     view: {
         width: '210px',
         marginBottom: '10px'
+    },
+    rowView: {
+        flex: 1,
+        flexDirection: 'row',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap'
     }
 };
 
