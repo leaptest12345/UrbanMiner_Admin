@@ -244,14 +244,10 @@ export default function CustomerDetail(props) {
                                     scrapCard: values?.scrapCard,
                                     thumbPrint: values?.thumbPrint
                                 });
-                                notify('CustomerDetail Successfully Updated!', 1);
-                                push({
-                                    pathname: convertSlugToUrl(slugs.UserDetail, {}),
-                                    state: { id: userId }
-                                });
                             } catch (error) {
                                 console.log(error);
                             }
+                            notify('Customer Detail Successfully Updated!', 1);
                         }}
                     >
                         {({ values, setFieldValue, handleSubmit, initialValues }) => {
