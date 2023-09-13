@@ -19,8 +19,6 @@ import { onValue, ref, update } from 'firebase/database';
 import { convertSlugToUrl } from 'resources/utilities';
 import slugs from 'resources/slugs';
 
-import ImageModal from 'components/ImageModal/ImageModal';
-
 import { formateData } from 'util/formateData';
 import { convertIntoDoller } from 'util/convertIntoDoller';
 
@@ -28,13 +26,13 @@ import customerStyle from './styles';
 import { Formik } from 'formik';
 import InputWithLabel from 'components/InputWithLabel';
 import ImagePicker from 'components/ImagePicker';
-import DatePickerWithLabel from 'components/DatePickerWithLabel';
 import { uploadLicences } from 'util/uploadProductImage';
 import RadioButtonGroupWithLabel from 'components/RadioButtonGroupWithLabel';
 import DropdownListWithLabel from 'components/DropdownListWithLabel';
 import { customerTypes, formateDate, jobTitles } from './utilts';
 import { notify } from 'util/notify';
 import moment from 'moment';
+import CustomDatePicker from 'components/CustomDatePicker';
 
 export default function CustomerDetail(props) {
     const theme = useTheme();
@@ -177,22 +175,14 @@ export default function CustomerDetail(props) {
                             typeOfProduct: user?.typeOfProduct,
                             age: user?.age,
                             gender: user?.gender,
-                            firstInteractionDate: user?.firstInteractionDate
-                                ? formateDate(user?.firstInteractionDate)
-                                : '',
-                            lastInteractionDate: user?.lastInteractionDate
-                                ? formateDate(user?.lastInteractionDate)
-                                : '',
+                            firstInteractionDate: user?.firstInteractionDate ?? '',
+                            lastInteractionDate: user?.lastInteractionDate ?? '',
                             family: {
                                 marriedStatus: user?.family?.marriedStatus,
                                 wifeName: user?.family?.wifeName,
                                 childName: user?.family?.childName,
-                                wifeDob: user?.family?.wifeDob
-                                    ? formateDate(user?.family?.wifeDob)
-                                    : '',
-                                childDob: user?.family?.childDob
-                                    ? formateDate(user?.family?.childDob)
-                                    : ''
+                                wifeDob: user?.family?.wifeDob ?? '',
+                                childDob: user?.family?.childDob ?? ''
                             },
                             hobbyAndInterest: user?.hobbyAndInterest,
                             contactPreference: user?.contactPreference,
@@ -398,14 +388,14 @@ export default function CustomerDetail(props) {
                                     <h3 style={{ marginTop: 20 }}>
                                         5) Interactions and Communication
                                     </h3>
-                                    <DatePickerWithLabel
+                                    <CustomDatePicker
                                         selectedDate={values.firstInteractionDate}
+                                        label='First interaction date:'
                                         onChange={(value) =>
                                             setFieldValue('firstInteractionDate', value, false)
                                         }
-                                        label='First interaction date:'
                                     />
-                                    <DatePickerWithLabel
+                                    <CustomDatePicker
                                         selectedDate={values.lastInteractionDate}
                                         onChange={(value) =>
                                             setFieldValue('lastInteractionDate', value, false)
@@ -436,11 +426,11 @@ export default function CustomerDetail(props) {
                                             setFieldValue('family.marriedStatus', value, false)
                                         }
                                         options={[
-                                            { value: 'Married', label: 'Married' },
-                                            { value: 'Single', label: 'Single' }
+                                            { value: 'married', label: 'Married' },
+                                            { value: 'single', label: 'Single' }
                                         ]}
                                     />
-                                    {values.family.marriedStatus == 'Married' && (
+                                    {values.family.marriedStatus == 'married' && (
                                         <>
                                             <InputWithLabel
                                                 label="Wife's name:"
@@ -449,7 +439,7 @@ export default function CustomerDetail(props) {
                                                     setFieldValue('family.wifeName', value, false)
                                                 }
                                             />
-                                            <DatePickerWithLabel
+                                            <CustomDatePicker
                                                 selectedDate={values.family.wifeDob}
                                                 onChange={(value) =>
                                                     setFieldValue('family.wifeDob', value, false)
@@ -463,7 +453,7 @@ export default function CustomerDetail(props) {
                                                     setFieldValue('family.childName', value, false)
                                                 }
                                             />
-                                            <DatePickerWithLabel
+                                            <CustomDatePicker
                                                 selectedDate={values.family.childDob}
                                                 onChange={(value) =>
                                                     setFieldValue('family.childDob', value, false)
