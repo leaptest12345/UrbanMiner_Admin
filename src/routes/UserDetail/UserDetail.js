@@ -130,6 +130,7 @@ export default function UserDetail(props) {
             });
 
             onValue(refDetail, (snapShot) => {
+                console.log('approval details', snapShot.val()?.isApproved);
                 setIsApproved(snapShot.val()?.isApproved);
                 setUser(snapShot.val());
             });
@@ -662,7 +663,7 @@ export default function UserDetail(props) {
                     }
                 </div>
             </div>
-            {isApproved ? (
+            {!isApproved ? (
                 <Button
                     type='Approve'
                     style={{
