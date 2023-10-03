@@ -672,7 +672,7 @@ export default function UserDetail(props) {
                     }}
                     onClick={() => onApproved()}
                 >
-                    Approved
+                    Approve User
                 </Button>
             ) : null}
             <Button
