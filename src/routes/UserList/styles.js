@@ -11,6 +11,13 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         display: 'flex'
+    },
+    btn: {
+        borderRadius: 10,
+        borderWidth: 0.5,
+        backgroundColor: '#d8504d',
+        color: 'white',
+        marginLeft: 40
     }
 };
 

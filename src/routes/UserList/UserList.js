@@ -33,6 +33,7 @@ export default function UserList() {
     const { push } = useHistory();
 
     const [user, setUsers] = useState([]);
+    const [deletedUser, setDeletedUser] = useState([]);
     const [adminLevel, setAdminLevel] = useState(0);
 
     useEffect(() => {
@@ -68,6 +69,7 @@ export default function UserList() {
                     onValue(starCountRef, (snapshot) => {
                         const data = snapshot.val();
                         setUsers(formateData(data).filter((item) => item.isDeleted != true));
+                        setDeletedUser(formateData(data).filter((item) => item.isDeleted == true));
                     });
                 } else {
                     //no need to show this for level3 user
@@ -106,6 +108,26 @@ export default function UserList() {
         }
     }))(TableRow);
 
+    const onRestore = async (item) => {
+        try {
+            const id = await localStorage.getItem('userID');
+            if (id != item.ID) {
+                const starCountRef = ref(database, `/USERS/${item.ID}`);
+                if (starCountRef) {
+                    update(starCountRef, {
+                        isDeleted: false
+                    });
+                    setTimeout(() => {
+                        notify(`User has been Activated Successfully`, !item.isDeleted ? 0 : 1);
+                    }, 200);
+                }
+            } else {
+                notify("You can't delete this User", 0);
+            }
+        } catch (error) {
+            console.log('error');
+        }
+    };
     const onAction = async (item) => {
         try {
             const id = await localStorage.getItem('userID');
@@ -132,64 +154,139 @@ export default function UserList() {
         }
     };
     return (
-        <TableContainer component={Paper}>
-            <Table aria-label='customized table'>
-                <TableHead>
-                    <TableRow>
-                        <StyledTableCell align='left'>No.</StyledTableCell>
-                        <StyledTableCell align='left'>Photo</StyledTableCell>
-                        <StyledTableCell align='left'>Name</StyledTableCell>
-                        <StyledTableCell align='left'>PhoneNumber</StyledTableCell>
-                        <StyledTableCell align='left'>Detail</StyledTableCell>
-                        <StyledTableCell align='left'>Delete</StyledTableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {user.map((itemDetails, index) => {
-                        const item = getUserDetail(itemDetails.ID);
-                        return (
-                            <StyledTableRow align='left' key={itemDetails.ID + '['}>
-                                <StyledTableCell component='th' scope='row'>
-                                    {index + 1}
-                                </StyledTableCell>
-                                <StyledTableCell align='left'>
-                                    {item?.photo ? (
-                                        <ImageModal url={item?.photo} imageStyle={styles.img} />
-                                    ) : (
-                                        <div className={styles.img}>-</div>
-                                    )}
-                                </StyledTableCell>
-                                <StyledTableCell component='th' scope='row'>
-                                    {item?.firstName == undefined
-                                        ? item?.email
-                                        : item?.firstName + '   ' + item?.lastName}
-                                </StyledTableCell>
-                                <StyledTableCell align='left'>
-                                    {item?.phoneNumber
-                                        ? (item?.phoneNumber + '').substring(0, 3) +
-                                          '   ' +
-                                          (item?.phoneNumber + '').substring(3, 6) +
-                                          '   ' +
-                                          (item?.phoneNumber + '').substring(6, 10) +
-                                          '   '
-                                        : '-'}
-                                </StyledTableCell>
-                                <StyledTableCell align='left'>
-                                    <Button
-                                        onClick={() => onClick(SLUGS.UserDetail, { id: item?.ID })}
-                                    >
-                                        View Detail
-                                    </Button>
-                                </StyledTableCell>
-                                <StyledTableCell align='left'>
-                                    <Delete onClick={() => onAction(item)}></Delete>
-                                </StyledTableCell>
-                            </StyledTableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-            <ToastContainer />
-        </TableContainer>
+        <>
+            <TableContainer component={Paper}>
+                <Table aria-label='customized table'>
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell align='left'>No.</StyledTableCell>
+                            <StyledTableCell align='left'>Photo</StyledTableCell>
+                            <StyledTableCell align='left'>Name</StyledTableCell>
+                            <StyledTableCell align='left'>PhoneNumber</StyledTableCell>
+                            <StyledTableCell align='left'>Detail</StyledTableCell>
+                            <StyledTableCell align='left'>Delete</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {user.map((itemDetails, index) => {
+                            const item = getUserDetail(itemDetails.ID);
+                            return (
+                                <StyledTableRow align='left' key={itemDetails.ID + '['}>
+                                    <StyledTableCell component='th' scope='row'>
+                                        {index + 1}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        {item?.photo ? (
+                                            <ImageModal url={item?.photo} imageStyle={styles.img} />
+                                        ) : (
+                                            <div className={styles.img}>-</div>
+                                        )}
+                                    </StyledTableCell>
+                                    <StyledTableCell component='th' scope='row'>
+                                        {item?.firstName == undefined
+                                            ? item?.email
+                                            : item?.firstName + '   ' + item?.lastName}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        {item?.phoneNumber
+                                            ? (item?.phoneNumber + '').substring(0, 3) +
+                                              '   ' +
+                                              (item?.phoneNumber + '').substring(3, 6) +
+                                              '   ' +
+                                              (item?.phoneNumber + '').substring(6, 10) +
+                                              '   '
+                                            : '-'}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        <Button
+                                            onClick={() =>
+                                                onClick(SLUGS.UserDetail, { id: item?.ID })
+                                            }
+                                        >
+                                            View Detail
+                                        </Button>
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        <Delete onClick={() => onAction(item)}></Delete>
+                                    </StyledTableCell>
+                                </StyledTableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+            <h2
+                style={{
+                    marginTop: 50,
+                    marginBottom: 50
+                }}
+            >
+                DeletedUser
+            </h2>
+            <TableContainer component={Paper}>
+                <Table aria-label='customized table'>
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell align='left'>No.</StyledTableCell>
+                            <StyledTableCell align='left'>Photo</StyledTableCell>
+                            <StyledTableCell align='left'>Name</StyledTableCell>
+                            <StyledTableCell align='left'>PhoneNumber</StyledTableCell>
+                            <StyledTableCell align='left'>Detail</StyledTableCell>
+                            <StyledTableCell align='left'>Restore</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {deletedUser.map((itemDetails, index) => {
+                            const item = getUserDetail(itemDetails.ID);
+                            return (
+                                <StyledTableRow align='left' key={itemDetails.ID + '['}>
+                                    <StyledTableCell component='th' scope='row'>
+                                        {index + 1}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        {item?.photo ? (
+                                            <ImageModal url={item?.photo} imageStyle={styles.img} />
+                                        ) : (
+                                            <div className={styles.img}>-</div>
+                                        )}
+                                    </StyledTableCell>
+                                    <StyledTableCell component='th' scope='row'>
+                                        {item?.firstName == undefined
+                                            ? item?.email
+                                            : item?.firstName + '   ' + item?.lastName}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        {item?.phoneNumber
+                                            ? (item?.phoneNumber + '').substring(0, 3) +
+                                              '   ' +
+                                              (item?.phoneNumber + '').substring(3, 6) +
+                                              '   ' +
+                                              (item?.phoneNumber + '').substring(6, 10) +
+                                              '   '
+                                            : '-'}
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        <Button
+                                            onClick={() =>
+                                                onClick(SLUGS.UserDetail, { id: item?.ID })
+                                            }
+                                        >
+                                            View Detail
+                                        </Button>
+                                    </StyledTableCell>
+                                    <StyledTableCell align='left'>
+                                        <Button style={styles.btn} onClick={() => onRestore(item)}>
+                                            Restore User
+                                        </Button>
+                                    </StyledTableCell>
+                                </StyledTableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+
+                <ToastContainer />
+            </TableContainer>
+        </>
     );
 }
