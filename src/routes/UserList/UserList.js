@@ -27,6 +27,7 @@ import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
 
 import styles from './styles';
+import { ConfirmationCard } from 'components/ConfirmationCard';
 
 export default function UserList() {
     const theme = useTheme();
@@ -35,6 +36,8 @@ export default function UserList() {
     const [user, setUsers] = useState([]);
     const [deletedUser, setDeletedUser] = useState([]);
     const [adminLevel, setAdminLevel] = useState(0);
+    const [isVisible, setIsVisible] = useState(false);
+    const [userDeletetionData, setUserDeletionData] = useState(null);
 
     useEffect(() => {
         getUserList();
@@ -128,21 +131,23 @@ export default function UserList() {
             console.log('error');
         }
     };
-    const onAction = async (item) => {
+
+    const onAction = async () => {
         try {
+            setIsVisible(false);
             const id = await localStorage.getItem('userID');
-            if (id != item.ID) {
-                const starCountRef = ref(database, `/USERS/${item.ID}`);
+            if (id != userDeletetionData.ID) {
+                const starCountRef = ref(database, `/USERS/${userDeletetionData.ID}`);
                 if (starCountRef) {
                     update(starCountRef, {
-                        isDeleted: !item.isDeleted
+                        isDeleted: !userDeletetionData.isDeleted
                     });
                     setTimeout(() => {
                         notify(
                             `User has been ${
-                                !item.isDeleted ? 'Deleted' : 'Activated'
+                                !userDeletetionData.isDeleted ? 'Deleted' : 'Activated'
                             } Successfully`,
-                            !item.isDeleted ? 0 : 1
+                            !userDeletetionData.isDeleted ? 0 : 1
                         );
                     }, 200);
                 }
@@ -153,8 +158,15 @@ export default function UserList() {
             console.log('error');
         }
     };
+
     return (
         <>
+            <ConfirmationCard
+                isVisible={isVisible}
+                onClose={() => setIsVisible(false)}
+                onDelete={() => onAction()}
+                type={'User'}
+            />
             <TableContainer component={Paper}>
                 <Table aria-label='customized table'>
                     <TableHead>
@@ -207,7 +219,12 @@ export default function UserList() {
                                         </Button>
                                     </StyledTableCell>
                                     <StyledTableCell align='left'>
-                                        <Delete onClick={() => onAction(item)}></Delete>
+                                        <Delete
+                                            onClick={() => {
+                                                setUserDeletionData(item);
+                                                setIsVisible(true);
+                                            }}
+                                        ></Delete>
                                     </StyledTableCell>
                                 </StyledTableRow>
                             );

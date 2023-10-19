@@ -22,6 +22,7 @@ import { convertSlugToUrl } from 'resources/utilities';
 
 import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
+import { ConfirmationCard } from 'components/ConfirmationCard';
 
 export default function AdminList() {
     const theme = useTheme();
@@ -29,6 +30,8 @@ export default function AdminList() {
 
     const [users, setUsers] = useState([]);
     const [adminLevel, setAdminLevel] = useState('');
+    const [subUserId, setSubUserId] = useState(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         getUsers();
@@ -96,13 +99,14 @@ export default function AdminList() {
         });
     }
 
-    const deleteSubUser = async (id) => {
+    const deleteSubUser = async () => {
+        setIsVisible(false);
         const userId = await localStorage.getItem('userID');
         if (adminLevel == 1) {
-            const userRef = ref(database, `/ADMIN/USERS/${id}`);
+            const userRef = ref(database, `/ADMIN/USERS/${subUserId}`);
             set(userRef, null);
         }
-        const subUserRef = ref(database, `/ADMIN/USERS/${userId}/SUB_USERS/${id}`);
+        const subUserRef = ref(database, `/ADMIN/USERS/${userId}/SUB_USERS/${subUserId}`);
         set(subUserRef, null);
         notify(`Your ${adminLevel == 1 ? 'Admin' : 'User'}  Successfully Deleted`, 0);
     };
@@ -112,6 +116,12 @@ export default function AdminList() {
             <label className='form-check-label' htmlFor='flexCheckChecked'>
                 AdminLevel:{parseInt(adminLevel) + 1}
             </label>
+            <ConfirmationCard
+                isVisible={isVisible}
+                onClose={() => setIsVisible(false)}
+                onDelete={() => deleteSubUser()}
+                type={adminLevel == 1 ? 'Admin' : 'SubUser'}
+            />
             <Button type='submit' style={btn} onClick={() => onClick(SLUGS.AddAdmin, { id: null })}>
                 {adminLevel == 1 ? 'Create New Admin' : 'Add New User'}
             </Button>
@@ -157,7 +167,12 @@ export default function AdminList() {
                                             </StyledTableCell>
                                         )}
                                         <StyledTableCell align='left'>
-                                            <Delete onClick={() => deleteSubUser(item.ID)}></Delete>
+                                            <Delete
+                                                onClick={() => {
+                                                    setSubUserId(item.ID);
+                                                    setIsVisible(true);
+                                                }}
+                                            ></Delete>
                                         </StyledTableCell>
                                     </StyledTableRow>
                                 );

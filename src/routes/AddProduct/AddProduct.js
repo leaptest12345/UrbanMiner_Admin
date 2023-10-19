@@ -26,6 +26,7 @@ import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 import ImageModal from 'components/ImageModal/ImageModal';
 
 import productStyle from './styles';
+import { ConfirmationCard } from 'components/ConfirmationCard';
 
 function AddProduct() {
     const { styles } = productStyle;
@@ -49,6 +50,10 @@ function AddProduct() {
     const [isImageChange, setIsImageChange] = useState(false);
     const [addToDatabase, setAddToDatabase] = useState(false);
     const [item, setItem] = useState('');
+    const [isVisible, setIsVisible] = useState(false);
+    const [isVisible1, setIsVisible1] = useState(false);
+
+    const [subProductId, setSubProductId] = useState(null);
 
     useEffect(() => {
         getProduct();
@@ -203,11 +208,15 @@ function AddProduct() {
         }
     };
 
-    const deleteSubProduct = (data) => {
+    const deleteSubProduct = () => {
+        setIsVisible(false);
         const result = subProduct.filter((item) => {
-            return item.id != data.id;
+            return item.id != subProductId;
         });
         setSubProduct(result);
+        setProductId(null);
+        setSubProductId(null);
+        setProductType(null);
     };
 
     const editProduct = (item) => {
@@ -300,8 +309,9 @@ function AddProduct() {
         setAddToDatabase(false);
     };
 
-    const deleteProduct = (productId, subProductId, type) => {
-        if (type == 'product') {
+    const deleteProduct = () => {
+        setIsVisible1(false);
+        if (productType == 0) {
             const refDetail = ref(database, `/ADMIN/PRODUCT/${productId}`);
             set(refDetail, null);
             notify('Product Successfully Deleted!', 0);
@@ -313,6 +323,9 @@ function AddProduct() {
             set(refDetail1, null);
             notify('Sub_Product Successfully Deleted!', 0);
         }
+        setProductId(null);
+        setSubProductId(null);
+        setProductType(null);
     };
 
     const addSubProductInDatabase = async () => {
@@ -362,6 +375,18 @@ function AddProduct() {
     return (
         <div>
             {loading ? <LoadingSpinner /> : null}
+            <ConfirmationCard
+                isVisible={isVisible}
+                onClose={() => setIsVisible(false)}
+                onDelete={() => deleteSubProduct()}
+                type={'SubProduct'}
+            />
+            <ConfirmationCard
+                isVisible={isVisible1}
+                onClose={() => setIsVisible1(false)}
+                onDelete={() => deleteProduct()}
+                type={'Product'}
+            />
             <text>Enter Product Name: </text>
             <br />
             <input
@@ -453,7 +478,10 @@ function AddProduct() {
                                             </StyledTableCell>
                                             <StyledTableCell align='left'>
                                                 <Delete
-                                                    onClick={() => deleteSubProduct(item)}
+                                                    onClick={() => {
+                                                        setSubProductId(item.id);
+                                                        setIsVisible(true);
+                                                    }}
                                                 ></Delete>
                                             </StyledTableCell>
                                         </StyledTableRow>
@@ -547,7 +575,7 @@ function AddProduct() {
                                                     onClick={() => {
                                                         setProductType(0);
                                                         setProductId(item.ID);
-                                                        deleteProduct(item.ID, null, 'product');
+                                                        setIsVisible1(true);
                                                     }}
                                                 ></Delete>
                                             </StyledTableCell>
@@ -614,11 +642,9 @@ function AddProduct() {
                                                               <Delete
                                                                   onClick={() => {
                                                                       setProductType(1);
-                                                                      deleteProduct(
-                                                                          item.ID,
-                                                                          item1.id,
-                                                                          1
-                                                                      );
+                                                                      setProductId(item.ID);
+                                                                      setSubProductId(item1.id);
+                                                                      setIsVisible1(true);
                                                                   }}
                                                               ></Delete>
                                                           </StyledTableCell1>

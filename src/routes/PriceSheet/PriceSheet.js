@@ -29,6 +29,7 @@ import { database } from 'configs/firebaseConfig';
 import { formateData } from 'util/formateData';
 import { uploadProductImage } from 'util/uploadProductImage';
 import { notify } from 'util/notify';
+import { ConfirmationCard } from 'components/ConfirmationCard';
 
 function PriceSheet() {
     const { styles } = productStyle;
@@ -63,6 +64,8 @@ function PriceSheet() {
     const [productId, setProductId] = useState(null);
     const [totalCategory, setTotalCategory] = useState(0);
     const [productImage, setProductImage] = useState('');
+    const [isVisible, setIsVisible] = useState(false);
+    const [productType, setProductType] = useState(null);
 
     useEffect(() => {
         getCategories();
@@ -172,7 +175,9 @@ function PriceSheet() {
         }
     };
 
-    const deleteCategory = (categoryId, productId, productType) => {
+    const deleteCategory = () => {
+        setIsVisible(false);
+
         const refDetail = ref(database, `/ADMIN/CATEGORY/${categoryId}`);
         const imageRef = ref(database, `ADMIN/CATEGORY_PHOTOS/${categoryId}`);
         const refDetail1 = ref(database, `/ADMIN/CATEGORY/${categoryId}/PRODUCT/${productId}`);
@@ -185,6 +190,9 @@ function PriceSheet() {
                 set(refDetail1, null);
                 notify('Category Product Successfully Deleted!', 0);
             }
+            setCategoryId(null);
+            setProductId(null);
+            productType(null);
         } catch (error) {}
     };
 
@@ -338,6 +346,13 @@ function PriceSheet() {
 
     return (
         <div ref={containerRef} style={{ height: '700px', overflow: 'auto' }}>
+            <ConfirmationCard
+                isVisible={isVisible}
+                onClose={() => setIsVisible(false)}
+                onDelete={() => deleteCategory()}
+                type={productType == 0 ? 'Category' : 'Product'}
+            />
+
             {loading ? <LoadingSpinner /> : null}
             <text>Enter Category Name: </text>
             <br />
@@ -541,9 +556,12 @@ function PriceSheet() {
                                                     style={styles.width10}
                                                 >
                                                     <Delete
-                                                        onClick={() =>
-                                                            deleteCategory(item.ID, null, 0)
-                                                        }
+                                                        onClick={() => {
+                                                            setCategoryId(item.ID);
+                                                            setProductId(null);
+                                                            setProductType(0);
+                                                            setIsVisible(true);
+                                                        }}
                                                     ></Delete>
                                                 </StyledTableCell>
                                             </StyledTableRow>
@@ -649,13 +667,16 @@ function PriceSheet() {
                                                                       style={styles.width10}
                                                                   >
                                                                       <Delete
-                                                                          onClick={() =>
-                                                                              deleteCategory(
-                                                                                  item.ID,
-                                                                                  item1.id,
-                                                                                  1
-                                                                              )
-                                                                          }
+                                                                          onClick={() => {
+                                                                              setCategoryId(
+                                                                                  item.ID
+                                                                              );
+                                                                              setProductId(
+                                                                                  item1.id
+                                                                              );
+                                                                              setProductType(1);
+                                                                              setIsVisible(true);
+                                                                          }}
                                                                       ></Delete>
                                                                   </StyledTableCell1>
                                                               </StyledTableRow>

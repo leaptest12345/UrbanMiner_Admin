@@ -35,6 +35,7 @@ import { Formik } from 'formik';
 import { interactionType, materialTypes, recyclingMethod, referralSources } from './utils';
 import { uploadLicences } from 'util/uploadProductImage';
 import ImagePicker from 'components/ImagePicker';
+import { ConfirmationCard } from 'components/ConfirmationCard';
 
 export default function UserDetail(props) {
     const theme = useTheme();
@@ -47,6 +48,8 @@ export default function UserDetail(props) {
     const [isApproved, setIsApproved] = useState(false);
     const [userDetails, setUserDetails] = useState('');
     const [paymentTypes, setPaymentTypes] = useState([]);
+    const [customerDelete, setCustomerDetele] = useState(null);
+    const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         getUserDetail();
@@ -151,9 +154,13 @@ export default function UserDetail(props) {
         }
     };
 
-    const onDelete = async (item) => {
+    const onDelete = async () => {
         try {
-            const starCountRef = ref(database, `/USER_CUSTOMER/${id}/CUSTOMER/${item.ID}`);
+            setIsVisible(false);
+            const starCountRef = ref(
+                database,
+                `/USER_CUSTOMER/${id}/CUSTOMER/${customerDelete.ID}`
+            );
             remove(starCountRef, null);
             notify('Customer has been Deleted Successfully', 0);
             getUserCustomer();
@@ -172,6 +179,12 @@ export default function UserDetail(props) {
     return (
         <div>
             <div style={styles.div}>
+                <ConfirmationCard
+                    isVisible={isVisible}
+                    onClose={() => setIsVisible(false)}
+                    onDelete={() => onDelete()}
+                    type={'Customer'}
+                />
                 {user?.photo ? <ImageModal url={user?.photo} imageStyle={styles.img} /> : null}
 
                 <div style={{ marginTop: 20, width: '65%' }}>
@@ -719,7 +732,12 @@ export default function UserDetail(props) {
                                         <Button onClick={() => onViewDetailClick(item)}>
                                             View Detail
                                         </Button>
-                                        <Delete onClick={() => onDelete(item)}></Delete>
+                                        <Delete
+                                            onClick={() => {
+                                                setCustomerDetele(item);
+                                                setIsVisible(true);
+                                            }}
+                                        ></Delete>
                                     </StyledTableCell>
                                 </StyledTableRow>
                             ))}
