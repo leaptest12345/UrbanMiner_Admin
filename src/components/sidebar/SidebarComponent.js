@@ -75,6 +75,12 @@ function SidebarComponent(props) {
                         onClick={() => onClick(SLUGS.items)}
                     />
                 ) : null}
+                <MenuItem
+                    id={SLUGS.blog}
+                    title='Blog'
+                    icon={IconTickets}
+                    onClick={() => onClick(SLUGS.blog)}
+                />
                 {permission?.payment ? (
                     <MenuItem
                         id={SLUGS.PaymentList}

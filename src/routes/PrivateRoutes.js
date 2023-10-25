@@ -19,6 +19,7 @@ import PriceSheet from './PriceSheet/PriceSheet';
 import CategoryImages from './CategoryImages/CategoryImages';
 import EditCategory, { editCategory } from './editCategory/editCategory';
 import { UserPermission } from './UserPermission/UserPermission';
+import Blog from './Blog/Blog';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -26,6 +27,7 @@ function PrivateRoutes() {
     return (
         <Suspense fallback={<LoadingComponent loading />}>
             <Switch>
+                <Route exact path={SLUGS.blog} component={Blog} render={() => <div>Blog</div>} />
                 <Route
                     exact
                     path={SLUGS.UserDetail}
