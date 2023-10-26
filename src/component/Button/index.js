@@ -1,15 +1,21 @@
 import React from 'react';
 
-export const Button = ({ title, onClick, isDisabled }) => {
+export const Button = ({ title, onClick, isDisabled, type }) => {
     return (
         <button
             onClick={isDisabled ? undefined : onClick}
             className={`h-12 w-fit px-10 rounded-md ${
-                !isDisabled ? 'bg-slate-900 hover:bg-slate-600' : 'bg-slate-500'
+                type == 'primary'
+                    ? 'bg-green-700 hover:bg-green-900'
+                    : !isDisabled
+                    ? 'bg-slate-900 hover:bg-slate-600'
+                    : 'bg-slate-500'
             }`}
             title='Submit'
         >
-            <h5 className='font-bold text-base text-white'>{isDisabled ? 'Loading...' : title}</h5>
+            <h5 className='font-bold text-base text-white'>
+                {isDisabled ? 'Uploading...' : title}
+            </h5>
         </button>
     );
 };

@@ -77,7 +77,7 @@ function SidebarComponent(props) {
                 ) : null}
                 <MenuItem
                     id={SLUGS.blog}
-                    title='Blog'
+                    title='Articles'
                     icon={IconTickets}
                     onClick={() => onClick(SLUGS.blog)}
                 />

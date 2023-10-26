@@ -34,6 +34,37 @@ export const uploadLicences = async (imgfile) => {
     });
 };
 
+export const uploadBlogVideo = async (videoFile) => {
+    return new Promise((resolve, reject) => {
+        const storage = getStorage();
+        const storageRef = ref(storage, `videos/${videoFile?.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, videoFile);
+
+        uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                switch (snapshot.state) {
+                    case 'paused':
+                        // Handle paused state if needed
+                        break;
+                    case 'running':
+                        // Handle running state if needed
+                        break;
+                }
+            },
+            (error) => {
+                reject(error);
+            },
+            () => {
+                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                    resolve(downloadURL);
+                });
+            }
+        );
+    });
+};
+
 export const uploadBlogImages = async (imgfile) => {
     return new Promise((resolve, reject) => {
         const storage = getStorage();

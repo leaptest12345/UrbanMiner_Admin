@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import Lightbox from 'react-modal-image/lib/Lightbox';
 
-export default function ImageModal({ url, imageStyle, disable }) {
+export default function ImageModal({ url, imageStyle, className, disable }) {
     const [openImage, setOpenImage] = useState(false);
     return (
         <div>
             <img
+                className={className}
                 src={url}
                 loading='lazy'
                 onClick={() => {

@@ -26,5 +26,6 @@ export default {
     AddProduct: '/AddProduct',
     PriceSheet: '/PriceSheet',
     categoryImages: '/CategoryImages',
-    blog: '/blog'
+    blog: '/blog',
+    blogDetails: '/blogDetails'
 };
