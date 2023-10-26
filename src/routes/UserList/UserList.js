@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { useTheme } from 'react-jss';
 import { useHistory } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
-import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import { Button } from '@material-ui/core';
-import { Delete } from '@material-ui/icons';
+import { Delete, RemoveRedEye } from '@material-ui/icons';
 
 import ImageModal from 'components/ImageModal/ImageModal';
 
@@ -26,11 +16,10 @@ import { formateData } from 'util/formateData';
 import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
 
-import styles from './styles';
 import { ConfirmationCard } from 'components/ConfirmationCard';
+import { RestorePageSharp } from '@mui/icons-material';
 
 export default function UserList() {
-    const theme = useTheme();
     const { push } = useHistory();
 
     const [user, setUsers] = useState([]);
@@ -64,7 +53,7 @@ export default function UserList() {
                     //can only see subusers data
                     onValue(subUserRef, (snapshot) => {
                         const data = snapshot.val();
-                        setUsers(formateData(data));
+                        setUsers(formateData(data).filter);
                     });
                 } else if (snapshot.val().adminLevel == '1') {
                     //level 1 admin will be able to see all the user data
@@ -93,23 +82,6 @@ export default function UserList() {
             state: data
         });
     }
-
-    const StyledTableCell = withStyles(() => ({
-        head: {
-            backgroundColor: theme.color.veryDarkGrayishBlue,
-            color: theme.color.white
-        },
-        body: {
-            fontSize: 14
-        }
-    }))(TableCell);
-    const StyledTableRow = withStyles(() => ({
-        root: {
-            '&:nth-of-type(odd)': {
-                backgroundColor: theme.color.lightGrayishBlue
-            }
-        }
-    }))(TableRow);
 
     const onRestore = async (item) => {
         try {
@@ -158,6 +130,7 @@ export default function UserList() {
             console.log('error');
         }
     };
+    const users = user.filter((item) => item.email != undefined);
 
     return (
         <>
@@ -167,71 +140,79 @@ export default function UserList() {
                 onDelete={() => onAction()}
                 type={'User'}
             />
-            <TableContainer component={Paper}>
-                <Table aria-label='customized table'>
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell align='left'>No.</StyledTableCell>
-                            <StyledTableCell align='left'>Photo</StyledTableCell>
-                            <StyledTableCell align='left'>Name</StyledTableCell>
-                            <StyledTableCell align='left'>PhoneNumber</StyledTableCell>
-                            <StyledTableCell align='left'>Detail</StyledTableCell>
-                            <StyledTableCell align='left'>Delete</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {user.map((itemDetails, index) => {
-                            const item = getUserDetail(itemDetails.ID);
-                            return (
-                                <StyledTableRow align='left' key={itemDetails.ID + '['}>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {index + 1}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        {item?.photo ? (
-                                            <ImageModal url={item?.photo} imageStyle={styles.img} />
-                                        ) : (
-                                            <div className={styles.img}>-</div>
-                                        )}
-                                    </StyledTableCell>
-                                    <StyledTableCell component='th' scope='row'>
+            <section>
+                <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
+                    <h5 className='w-[100px]'>No</h5>
+                    <h5 className='w-[100px]'>Photo</h5>
+                    <div className='flex flex-1 items-center justify-between'>
+                        <h5 className='flex-1'>Name</h5>
+                        <div className='flex flex-1 items-center justify-between'>
+                            <h5 className='flex-1'>PhoneNumber</h5>
+                            <h5 className='flex-1'>Actions</h5>
+                        </div>
+                    </div>
+                </div>
+                {users &&
+                    users.map((itemDetails, index) => {
+                        const item = getUserDetail(itemDetails.ID);
+
+                        return (
+                            <div
+                                className={`flex border ${
+                                    index + 1 != users.length && 'border-b-0'
+                                } flex-1 items-center font-bold text-black text-sm ${
+                                    index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
+                                } p-4`}
+                            >
+                                <h5 className='w-[100px]'>{index + 1}</h5>
+                                <h5 className='w-[100px]'>
+                                    {item?.photo ? (
+                                        <ImageModal
+                                            url={item?.photo}
+                                            className='w-12 h-12 -ml-2 rounded-full'
+                                        />
+                                    ) : (
+                                        <div className='w-12 h-12  rounded-full'>-----</div>
+                                    )}
+                                </h5>
+                                <div className='flex flex-1 items-center justify-between'>
+                                    <h5 className='flex-1'>
                                         {item?.firstName == undefined
-                                            ? item?.email
+                                            ? item?.email ?? '-----'
                                             : item?.firstName + '   ' + item?.lastName}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        {item?.phoneNumber
-                                            ? (item?.phoneNumber + '').substring(0, 3) +
-                                              '   ' +
-                                              (item?.phoneNumber + '').substring(3, 6) +
-                                              '   ' +
-                                              (item?.phoneNumber + '').substring(6, 10) +
-                                              '   '
-                                            : '-'}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        <Button
-                                            onClick={() =>
-                                                onClick(SLUGS.UserDetail, { id: item?.ID })
-                                            }
-                                        >
-                                            View Detail
-                                        </Button>
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        <Delete
-                                            onClick={() => {
-                                                setUserDeletionData(item);
-                                                setIsVisible(true);
-                                            }}
-                                        ></Delete>
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                                    </h5>
+                                    <div className='flex flex-1 items-center justify-between'>
+                                        <h5 className='flex-1'>
+                                            {item?.phoneNumber
+                                                ? (item?.phoneNumber + '').substring(0, 3) +
+                                                  '   ' +
+                                                  (item?.phoneNumber + '').substring(3, 6) +
+                                                  '   ' +
+                                                  (item?.phoneNumber + '').substring(6, 10) +
+                                                  '   '
+                                                : '--- --- --- ----'}
+                                        </h5>
+                                        <div className='flex-1 flex items-center gap-14'>
+                                            <RemoveRedEye
+                                                onClick={() =>
+                                                    onClick(SLUGS.UserDetail, { id: item?.ID })
+                                                }
+                                                className='cursor-pointer text-blue-900 hover:text-blue-700'
+                                            />
+                                            <Delete
+                                                onClick={() => {
+                                                    setUserDeletionData(item);
+                                                    setIsVisible(true);
+                                                }}
+                                                className='cursor-pointer text-red-600 hover:text-red-800'
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+            </section>
             <h2
                 style={{
                     marginTop: 50,
@@ -240,70 +221,80 @@ export default function UserList() {
             >
                 DeletedUser
             </h2>
-            <TableContainer component={Paper}>
-                <Table aria-label='customized table'>
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell align='left'>No.</StyledTableCell>
-                            <StyledTableCell align='left'>Photo</StyledTableCell>
-                            <StyledTableCell align='left'>Name</StyledTableCell>
-                            <StyledTableCell align='left'>PhoneNumber</StyledTableCell>
-                            <StyledTableCell align='left'>Detail</StyledTableCell>
-                            <StyledTableCell align='left'>Restore</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {deletedUser.map((itemDetails, index) => {
-                            const item = getUserDetail(itemDetails.ID);
-                            return (
-                                <StyledTableRow align='left' key={itemDetails.ID + '['}>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {index + 1}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        {item?.photo ? (
-                                            <ImageModal url={item?.photo} imageStyle={styles.img} />
-                                        ) : (
-                                            <div className={styles.img}>-</div>
-                                        )}
-                                    </StyledTableCell>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {item?.firstName == undefined
-                                            ? item?.email
-                                            : item?.firstName + '   ' + item?.lastName}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        {item?.phoneNumber
-                                            ? (item?.phoneNumber + '').substring(0, 3) +
-                                              '   ' +
-                                              (item?.phoneNumber + '').substring(3, 6) +
-                                              '   ' +
-                                              (item?.phoneNumber + '').substring(6, 10) +
-                                              '   '
-                                            : '-'}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        <Button
-                                            onClick={() =>
-                                                onClick(SLUGS.UserDetail, { id: item?.ID })
-                                            }
-                                        >
-                                            View Detail
-                                        </Button>
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>
-                                        <Button style={styles.btn} onClick={() => onRestore(item)}>
-                                            Restore User
-                                        </Button>
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
+            <section>
+                <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
+                    <h5 className='w-[100px]'>No</h5>
+                    <h5 className='w-[100px]'>Photo</h5>
+                    <div className='flex flex-1 items-center justify-between'>
+                        <h5 className='flex-1'>Name</h5>
+                        <div className='flex flex-1 items-center justify-between'>
+                            <h5 className='flex-1'>PhoneNumber</h5>
+                            <h5 className='flex-1'>Actions</h5>
+                        </div>
+                    </div>
+                </div>
+                {deletedUser &&
+                    deletedUser.map((itemDetails, index) => {
+                        const item = getUserDetail(itemDetails.ID);
 
-                <ToastContainer />
-            </TableContainer>
+                        return (
+                            <div
+                                className={`flex border ${
+                                    index + 1 != users.length && 'border-b-0'
+                                } flex-1 items-center font-bold text-black text-sm ${
+                                    index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
+                                } p-4`}
+                            >
+                                <h5 className='w-[100px]'>{index + 1}</h5>
+                                <h5 className='w-[100px]'>
+                                    {item?.photo ? (
+                                        <ImageModal
+                                            url={item?.photo}
+                                            className='w-12 h-12 -ml-2 rounded-full'
+                                        />
+                                    ) : (
+                                        <div className='w-12 h-12  rounded-full'>-----</div>
+                                    )}
+                                </h5>
+                                <div className='flex flex-1 items-center justify-between'>
+                                    <h5 className='flex-1'>
+                                        {item?.firstName == undefined
+                                            ? item?.email ?? '-----'
+                                            : item?.firstName + '   ' + item?.lastName}
+                                    </h5>
+                                    <div className='flex flex-1 items-center justify-between'>
+                                        <h5 className='flex-1'>
+                                            {item?.phoneNumber
+                                                ? (item?.phoneNumber + '').substring(0, 3) +
+                                                  '   ' +
+                                                  (item?.phoneNumber + '').substring(3, 6) +
+                                                  '   ' +
+                                                  (item?.phoneNumber + '').substring(6, 10) +
+                                                  '   '
+                                                : '--- --- --- ----'}
+                                        </h5>
+                                        <div className='flex-1 flex items-center gap-14'>
+                                            <RemoveRedEye
+                                                onClick={() =>
+                                                    onClick(SLUGS.UserDetail, { id: item?.ID })
+                                                }
+                                                className='cursor-pointer text-blue-900 hover:text-blue-700'
+                                            />
+                                            <div
+                                                className='flex items-center gap-2 cursor-pointer  text-red-600 hover:text-red-800'
+                                                onClick={() => onRestore(item)}
+                                            >
+                                                <RestorePageSharp className='cursor-pointer' />
+                                                <h5>Restore User</h5>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+            </section>
+            <ToastContainer />
         </>
     );
 }

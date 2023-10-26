@@ -29,9 +29,7 @@ const getMenuStyles = ({ theme }) => ({
         width: 255,
         zIndex: 30
     },
-    bmMenu: {
-        background: theme.color.veryDarkGrayishBlue
-    },
+    bmMenu: {},
     bmItem: {
         outline: 'none',
         '&:focus': {
@@ -58,6 +56,7 @@ function MenuComponent({ children, isMobile }) {
             noOverlay={!isMobile}
             disableCloseOnEsc
             styles={menuStyles}
+            className='bg-slate-800 p-2'
             onStateChange={(state) => setIsOpen(state.isOpen)}
         >
             {children}

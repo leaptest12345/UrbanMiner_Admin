@@ -14,7 +14,6 @@ const useStyles = createUseStyles({
     },
     mainBlock: {
         marginLeft: 255,
-        padding: 30,
         '@media (max-width: 1080px)': {
             marginLeft: 0
         }
@@ -50,7 +49,7 @@ function PrivateSection() {
                 <SidebarComponent permission={permissionStatus} />
                 <Column flexGrow={1} className={classes.mainBlock}>
                     <HeaderComponent />
-                    <div className={classes.contentBlock}>
+                    <div className='p-9 mt-20'>
                         <PrivateRoutes />
                     </div>
                 </Column>

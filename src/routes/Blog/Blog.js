@@ -13,6 +13,7 @@ import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
 import { useHistory } from 'react-router-dom';
 import ImageModal from 'components/ImageModal/ImageModal';
+import { Input } from 'components/Input';
 
 export default function Blog(props) {
     const [blogList, setBlogList] = useState([]);
@@ -97,27 +98,19 @@ export default function Blog(props) {
                         <h1 className='text-4xl font-bold text-blue-800 -mt-10'>Articles</h1>
                         <Button title={'Cancel'} onClick={() => setAddArticle(false)} />
                     </div>
-                    <div className='flex flex-col gap-2 w-full'>
-                        <h2 className='font-bold text-lg'>Title</h2>
-
-                        <input
-                            value={formik.values.title}
-                            onChange={(e) => formik.setFieldValue('title', e.target.value, false)}
-                            className='h-12 px-2 text-base w-full bg-white outline-none border border-gray-300 rounded-md'
-                        />
-                        <h5 className='text-sm text-red-600'>{formik.errors.title}</h5>
-                    </div>
-                    <div className='flex flex-col gap-2 w-full'>
-                        <h2 className='font-bold text-lg'>Description</h2>
-                        <textarea
-                            value={formik.values.description}
-                            onChange={(e) =>
-                                formik.setFieldValue('description', e.target.value, false)
-                            }
-                            className='h-96 p-2 text-base w-full bg-white outline-none border border-gray-300 rounded-md'
-                        />
-                        <h5 className='text-sm text-red-600'>{formik.errors.description}</h5>
-                    </div>
+                    <Input
+                        error={formik.errors.title}
+                        label={'Title'}
+                        onChange={(e) => formik.setFieldValue('title', e.target.value, false)}
+                        value={formik.values.title}
+                    />
+                    <Input
+                        error={formik.errors.description}
+                        label={'Description'}
+                        type='textarea'
+                        onChange={(e) => formik.setFieldValue('description', e.target.value, false)}
+                        value={formik.values.description}
+                    />
                     <h4 className='font-bold text-yellow-950'>Add Images</h4>
                     <input
                         type='file'
@@ -172,31 +165,48 @@ export default function Blog(props) {
                         <Button title={'Add Article'} onClick={() => setAddArticle(true)} />
                     </div>
                     <div className='flex flex-col gap-1'>
-                        {blogList.map((item, index) => {
-                            return (
-                                <div className='bg-slate-500 rounded-md px-2 py-4 flex items-center justify-between'>
-                                    <h4 className='font-medium text-lg text-white'>
-                                        {index + 1}. {item.title}
-                                    </h4>
-                                    <div className='flex items-center'>
-                                        <div
-                                            onClick={() => {
-                                                onClick(SLUGS.blogDetails, { blogId: item.id });
-                                            }}
-                                            className='cursor-pointer w-12 h-10 flex items-center justify-center'
-                                        >
-                                            <Edit className='text-white' />
-                                        </div>
-                                        <div
-                                            onClick={() => handleDeleteBlog(item.id)}
-                                            className='cursor-pointer w-12 h-10 flex items-center justify-center'
-                                        >
-                                            <Delete className='text-red-700' />
+                        <section>
+                            <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
+                                <h5 className='w-[100px]'>No</h5>
+                                <div className='flex items-center justify-between flex-1 pr-10'>
+                                    <h5>title</h5>
+                                    <h5>Actions</h5>
+                                </div>
+                            </div>
+                            {blogList &&
+                                blogList.map((item, index) => (
+                                    <div
+                                        className={`flex border ${
+                                            index + 1 != blogList.length && 'border-b-0'
+                                        } flex-1 items-center font-bold text-black text-sm ${
+                                            index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
+                                        } p-4`}
+                                    >
+                                        <h5 className='w-[100px]'>{index + 1}</h5>
+                                        <div className='flex items-center justify-between flex-1'>
+                                            <h5>{item.title}</h5>
+                                            <div className='flex items-center gap-6'>
+                                                <div
+                                                    onClick={() => {
+                                                        onClick(SLUGS.blogDetails, {
+                                                            blogId: item.id
+                                                        });
+                                                    }}
+                                                    className='cursor-pointer w-12 h-10 flex items-center justify-center'
+                                                >
+                                                    <Edit className='text-blue-900 hover:text-blue-700' />
+                                                </div>
+                                                <div
+                                                    onClick={() => handleDeleteBlog(item.id)}
+                                                    className='cursor-pointer w-12 h-10 flex items-center justify-center'
+                                                >
+                                                    <Delete className='text-red-600 hover:text-red-800' />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                ))}
+                        </section>
                     </div>
                 </>
             )}

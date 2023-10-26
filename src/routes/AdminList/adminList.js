@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
-import { useTheme } from 'react-jss';
 import { useHistory } from 'react-router-dom';
 
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set } from 'firebase/database';
 
-import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import { Delete } from '@material-ui/icons';
-import { Button } from '@material-ui/core';
 
 import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
@@ -23,9 +13,10 @@ import { convertSlugToUrl } from 'resources/utilities';
 import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
 import { ConfirmationCard } from 'components/ConfirmationCard';
+import { Button } from 'component';
+import { Update } from '@mui/icons-material';
 
 export default function AdminList() {
-    const theme = useTheme();
     const { push } = useHistory();
 
     const [users, setUsers] = useState([]);
@@ -63,35 +54,6 @@ export default function AdminList() {
         }
     };
 
-    const StyledTableCell = withStyles(() => ({
-        head: {
-            backgroundColor: theme.color.veryDarkGrayishBlue,
-            color: theme.color.white
-        },
-        body: {
-            fontSize: 14
-        }
-    }))(TableCell);
-    const StyledTableRow = withStyles(() => ({
-        root: {
-            '&:nth-of-type(odd)': {
-                backgroundColor: theme.color.lightGrayishBlue
-            }
-        }
-    }))(TableRow);
-
-    const btn = {
-        height: 50,
-        width: '20%',
-        borderRadius: 10,
-        borderWidth: 0.5,
-        backgroundColor: theme.color.veryDarkGrayishBlue,
-        color: 'white',
-        position: 'absolute',
-        right: 30,
-        top: 30
-    };
-
     function onClick(slug, data, parameters = {}) {
         push({
             pathname: convertSlugToUrl(slug, parameters),
@@ -112,74 +74,64 @@ export default function AdminList() {
     };
 
     return (
-        <div>
-            <label className='form-check-label' htmlFor='flexCheckChecked'>
-                AdminLevel:{parseInt(adminLevel) + 1}
-            </label>
+        <div className='flex flex-col gap-6'>
             <ConfirmationCard
                 isVisible={isVisible}
                 onClose={() => setIsVisible(false)}
                 onDelete={() => deleteSubUser()}
                 type={adminLevel == 1 ? 'Admin' : 'SubUser'}
             />
-            <Button type='submit' style={btn} onClick={() => onClick(SLUGS.AddAdmin, { id: null })}>
-                {adminLevel == 1 ? 'Create New Admin' : 'Add New User'}
-            </Button>
-            <TableContainer
-                style={{
-                    marginTop: 30,
-                    marginBottom: 20
-                }}
-                component={Paper}
-            >
-                <Table aria-label='customized table'>
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell align='left'>No.</StyledTableCell>
-                            <StyledTableCell align='left'>
-                                {adminLevel == 1 ? 'Admin List' : 'User List'}
-                            </StyledTableCell>
-                            {adminLevel != 1 ? null : (
-                                <StyledTableCell align='left'>Actions</StyledTableCell>
-                            )}
-                            <StyledTableCell align='left'>Delete</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {formateData(users) &&
-                            formateData(users).map((item, index) => {
-                                const data = getUserDetail(item.ID);
-                                return (
-                                    <StyledTableRow align='left' key={item.ID + '-'}>
-                                        <StyledTableCell component='th' scope='row'>
-                                            {index + 1}
-                                        </StyledTableCell>
-                                        <StyledTableCell align='left'>{data.email}</StyledTableCell>
-                                        {adminLevel != 1 ? null : (
-                                            <StyledTableCell align='left'>
-                                                <Button
-                                                    onClick={() =>
-                                                        onClick(SLUGS.AddAdmin, { id: item.ID })
-                                                    }
-                                                >
-                                                    Update Permission
-                                                </Button>
-                                            </StyledTableCell>
-                                        )}
-                                        <StyledTableCell align='left'>
-                                            <Delete
-                                                onClick={() => {
-                                                    setSubUserId(item.ID);
-                                                    setIsVisible(true);
-                                                }}
-                                            ></Delete>
-                                        </StyledTableCell>
-                                    </StyledTableRow>
-                                );
-                            })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <div className='flex items-center justify-between'>
+                <label className='form-check-label' htmlFor='flexCheckChecked'>
+                    AdminLevel:{parseInt(adminLevel) + 1}
+                </label>
+                <Button
+                    title={adminLevel == 1 ? 'Create New Admin' : 'Add New User'}
+                    onClick={() => onClick(SLUGS.AddAdmin, { id: null })}
+                />
+            </div>
+
+            <section>
+                <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
+                    <h5 className='w-[100px]'>No</h5>
+                    <h5 className='flex-1'>AdminName</h5>
+                    <h5 className='flex-1'>Actions</h5>
+                </div>
+                {formateData(users) &&
+                    formateData(users).map((item, index) => {
+                        const data = getUserDetail(item.ID);
+                        return (
+                            <div
+                                className={`flex border ${
+                                    index + 1 != formateData(users).length && 'border-b-0'
+                                } flex-1 items-center font-bold text-black text-sm ${
+                                    index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
+                                } p-4`}
+                            >
+                                <h5 className='w-[100px]'>{index + 1}</h5>
+                                <h5 className='flex-1'>{data.email}</h5>
+                                <div className='flex items-center gap-10 flex-1 pr-10'>
+                                    {adminLevel != 1 ? null : (
+                                        <div
+                                            className='flex text-blue-700 hover:text-blue-900 items-center gap-2 cursor-pointer'
+                                            onClick={() => onClick(SLUGS.AddAdmin, { id: item.ID })}
+                                        >
+                                            <Update />
+                                            <p className='text-sm'>Update Permission</p>
+                                        </div>
+                                    )}
+                                    <Delete
+                                        className='text-red-600 cursor-pointer hover:text-red-800'
+                                        onClick={() => {
+                                            setSubUserId(item.ID);
+                                            setIsVisible(true);
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    })}
+            </section>
         </div>
     );
 }

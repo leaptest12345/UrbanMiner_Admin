@@ -23,9 +23,9 @@ function LogoComponent() {
     const theme = useTheme();
     const classes = useStyles({ theme });
     return (
-        <Row className={classes.container} horizontal='center' vertical='center'>
+        <Row className='flex items-center gap-4' horizontal='center' vertical='center'>
             <img src={LOGO} className={classes.img} />
-            <span className={classes.title}>UrbanMiner</span>
+            <span className='font-bold text-white'>Urban Miner</span>
         </Row>
     );
 }

@@ -1,31 +1,20 @@
 import React, { useEffect, useState } from 'react';
 
-import { useTheme } from 'react-jss';
 import { ToastContainer } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 
-import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
 import { Delete } from '@material-ui/icons';
-import { Button } from '@material-ui/core';
 
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set } from 'firebase/database';
 
 import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
-import { useStyles } from './styles';
+import { Button } from 'component';
+import { Input } from 'components/Input';
 
 export default function Items() {
-    const theme = useTheme();
     const id = uuid().slice(0, 8);
-    const classes = useStyles({ theme });
 
     const [itemName, setItemName] = useState('');
     const [data, setData] = useState([]);
@@ -33,16 +22,6 @@ export default function Items() {
     useEffect(() => {
         getItemValues();
     }, []);
-
-    const btn = {
-        height: 50,
-        width: '20%',
-        borderRadius: 10,
-        borderWidth: 0.5,
-        backgroundColor: theme.color.veryDarkGrayishBlue,
-        color: 'white',
-        marginLeft: 40
-    };
 
     const addedOrNot = () => {
         let temp = false;
@@ -100,63 +79,42 @@ export default function Items() {
         }
     };
 
-    const StyledTableCell = withStyles(() => ({
-        head: {
-            backgroundColor: theme.color.veryDarkGrayishBlue,
-            color: theme.color.white
-        },
-        body: {
-            fontSize: 14
-        }
-    }))(TableCell);
-    const StyledTableRow = withStyles(() => ({
-        root: {
-            '&:nth-of-type(odd)': {
-                backgroundColor: theme.color.lightGrayishBlue
-            }
-        }
-    }))(TableRow);
-
     return (
-        <div className={classes.mainDiv}>
+        <div className='flex flex-col gap-10'>
             <form onSubmit={handleSubmit}>
-                <div className={classes.addItemView}>
-                    <input value={itemName} className={classes.input} onChange={onchange} />
-                    <Button type='submit' style={btn}>
-                        Add
-                    </Button>
+                <div className='flex items-center gap-10 w-3/6'>
+                    <Input value={itemName} onChange={onchange} />
+                    <Button title='Add' />
                 </div>
             </form>
-            <TableContainer
-                style={{
-                    marginTop: 100
-                }}
-                component={Paper}
-            >
-                <Table aria-label='customized table'>
-                    <TableHead>
-                        <TableRow>
-                            <StyledTableCell align='left'>No.</StyledTableCell>
-                            <StyledTableCell align='left'>ItemName</StyledTableCell>
-                            <StyledTableCell align='left'>Action</StyledTableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {data &&
-                            data.map((item, index) => (
-                                <StyledTableRow align='left' key={item.id}>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {index + 1}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left'>{item.title}</StyledTableCell>
-                                    <StyledTableCell component='th' scope='row'>
-                                        <Delete onClick={() => onDelete(item)}></Delete>
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+            <section>
+                <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
+                    <h5 className='w-[100px]'>No</h5>
+                    <div className='flex items-center justify-between flex-1 pr-10'>
+                        <h5>ItemName</h5>
+                        <h5>Action</h5>
+                    </div>
+                </div>
+                {data &&
+                    data.map((item, index) => (
+                        <div
+                            className={`flex border ${
+                                index + 1 != data.length && 'border-b-0'
+                            } flex-1 items-center font-bold text-black text-sm ${
+                                index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
+                            } p-4`}
+                        >
+                            <h5 className='w-[100px]'>{index + 1}</h5>
+                            <div className='flex items-center justify-between flex-1 pr-10'>
+                                <h5>{item.title}</h5>
+                                <Delete
+                                    onClick={() => onDelete(item)}
+                                    className='text-red-600 cursor-pointer hover:text-red-900'
+                                />
+                            </div>
+                        </div>
+                    ))}
+            </section>
             <ToastContainer />
         </div>
     );

@@ -8,6 +8,7 @@ import { database } from 'configs/firebaseConfig';
 import { notify } from 'util/notify';
 import { useHistory } from 'react-router-dom';
 import ImageModal from 'components/ImageModal/ImageModal';
+import { Input } from 'components/Input';
 
 export default function BlogDetails(props) {
     const [blogDetail, setBlogDetail] = useState(null);
@@ -23,7 +24,6 @@ export default function BlogDetails(props) {
     const getAllDetails = async () => {
         const subUserRef = ref(database, `/ADMIN/Blog/${blogId}`);
         onValue(subUserRef, (snapShot1) => {
-            console.log('list ing', snapShot1.val());
             setBlogDetail(snapShot1.val());
         });
     };
@@ -42,7 +42,6 @@ export default function BlogDetails(props) {
         },
         onSubmit: async (values) => {
             try {
-                console.log('inside');
                 let uploadVideo = values.videoUrl;
 
                 let uploadedImages = values.images;
@@ -87,24 +86,19 @@ export default function BlogDetails(props) {
     return (
         <section className='flex flex-col w-full gap-6'>
             <h1 className='text-4xl font-bold text-blue-800 -mt-10'>Edit Article</h1>
-            <div className='flex flex-col gap-2 w-full'>
-                <h2 className='font-bold text-lg'>Title</h2>
-                <input
-                    value={formik.values.title}
-                    onChange={(e) => formik.setFieldValue('title', e.target.value, false)}
-                    className='h-12 px-2 text-base w-full bg-white outline-none border border-gray-300 rounded-md'
-                />
-                <h5 className='text-sm text-red-600'>{formik.errors.title}</h5>
-            </div>
-            <div className='flex flex-col gap-2 w-full'>
-                <h2 className='font-bold text-lg'>Description</h2>
-                <textarea
-                    value={formik.values.description}
-                    onChange={(e) => formik.setFieldValue('description', e.target.value, false)}
-                    className='h-96 p-2 text-base w-full bg-white outline-none border border-gray-300 rounded-md'
-                />
-                <h5 className='text-sm text-red-600'>{formik.errors.description}</h5>
-            </div>
+            <Input
+                error={formik.errors.title}
+                label={'Title'}
+                onChange={(e) => formik.setFieldValue('title', e.target.value, false)}
+                value={formik.values.title}
+            />
+            <Input
+                error={formik.errors.description}
+                label={'Description'}
+                type='textarea'
+                onChange={(e) => formik.setFieldValue('description', e.target.value, false)}
+                value={formik.values.description}
+            />
             <h4 className='font-bold text-yellow-950'>Add Images</h4>
             <input
                 type='file'

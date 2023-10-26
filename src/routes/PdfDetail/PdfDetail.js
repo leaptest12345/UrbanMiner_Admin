@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from 'react';
 
-import { createUseStyles, useTheme } from 'react-jss';
 import { ToastContainer } from 'react-toastify';
 import { ref, onValue, set } from 'firebase/database';
-
-import { Button } from '@material-ui/core';
 
 import { database } from 'configs/firebaseConfig';
 
 import { notify } from 'util/notify';
+import { Input } from 'components/Input';
+import { Button } from 'component';
 
 export default function PdfDetail() {
-    const theme = useTheme();
-    const classes = useStyles(theme);
-
     const [description, setDescription] = useState('');
     const [description1, setDescription1] = useState('');
 
@@ -57,77 +53,24 @@ export default function PdfDetail() {
         }
     }
 
-    const btnstyle = {
-        backgroundColor: theme.color.veryDarkGrayishBlue,
-        color: 'white',
-        margin: 30
-    };
-
     return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <>
-                    <h3
-                        style={{
-                            marginBottom: 10
-                        }}
-                    >
-                        Address:
-                    </h3>
-                    <textarea
-                        className={classes.areaText}
-                        value={description}
-                        onChange={handleMessageChange}
-                    />
-                </>
-                <>
-                    <h3
-                        style={{
-                            marginBottom: 10,
-                            marginTop: 10
-                        }}
-                    >
-                        Pdf Description:
-                    </h3>
-                    <textarea
-                        className={classes.areaText}
-                        value={description1}
-                        onChange={handleMessageChange1}
-                    />
-                    <Button
-                        className={classes.btn}
-                        type='submit'
-                        style={btnstyle}
-                        variant='contained'
-                    >
-                        Add
-                    </Button>
-                </>
+            <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
+                <Input
+                    label='Address:'
+                    value={description}
+                    onChange={handleMessageChange}
+                    type='textarea'
+                />
+                <Input
+                    label='Pdf Description:'
+                    value={description1}
+                    onChange={handleMessageChange1}
+                    type='textarea'
+                />
+                <Button title='submit' />
             </form>
             <ToastContainer />
         </div>
     );
 }
-
-const useStyles = createUseStyles((theme) => ({
-    mainDiv: {
-        display: 'flex',
-        height: '100%',
-        width: '100%'
-    },
-    btn: {
-        width: '30%',
-        borderRadius: 10,
-        height: 50,
-        color: 'white',
-        marginTop: '5%',
-        backgroundColor: 'black'
-    },
-    areaText: {
-        width: '100%',
-        height: 300,
-        borderRadius: 10,
-        padding: 20,
-        backgroundColor: theme.color.WHITE
-    }
-}));

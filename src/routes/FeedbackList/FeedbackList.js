@@ -1,22 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { ToastContainer } from 'react-toastify';
-import { useTheme } from 'react-jss';
-
-import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref } from 'firebase/database';
 
 export default function FeedBackList() {
-    const theme = useTheme();
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -65,55 +52,31 @@ export default function FeedBackList() {
         }
     };
 
-    const StyledTableCell = withStyles(() => ({
-        head: {
-            backgroundColor: theme.color.veryDarkGrayishBlue,
-            color: theme.color.white
-        },
-        body: {
-            fontSize: 14
-        }
-    }))(TableCell);
-    const StyledTableRow = withStyles(() => ({
-        root: {
-            '&:nth-of-type(odd)': {
-                backgroundColor: theme.color.lightGrayishBlue
-            }
-        }
-    }))(TableRow);
-
     return (
-        <TableContainer component={Paper}>
-            <Table aria-label='customized table'>
-                <TableHead>
-                    <TableRow>
-                        <StyledTableCell align='left'>No.</StyledTableCell>
-                        <StyledTableCell align='left'>Name</StyledTableCell>
-                        <StyledTableCell align='left'>Email</StyledTableCell>
-                        <StyledTableCell align='left'>FeedBack</StyledTableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {data &&
-                        data.map((item, index) => (
-                            <StyledTableRow align='left' key={item.id}>
-                                <StyledTableCell component='th' scope='row'>
-                                    {index + 1}
-                                </StyledTableCell>
-                                <StyledTableCell component='th' scope='row'>
-                                    {item?.name}
-                                </StyledTableCell>
-                                <StyledTableCell component='th' scope='row'>
-                                    {item?.email}
-                                </StyledTableCell>
-                                <StyledTableCell align='left'>
-                                    <ReadMore>{item?.feedBack}</ReadMore>
-                                </StyledTableCell>
-                            </StyledTableRow>
-                        ))}
-                </TableBody>
-            </Table>
-            <ToastContainer />
-        </TableContainer>
+        <section>
+            <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
+                <h5 className='w-[100px]'>No</h5>
+                <h5 className='flex-1'>Name</h5>
+                <h5 className='flex-1'>Email</h5>
+                <h5 className='flex-1'>Feedback</h5>
+            </div>
+            {data &&
+                data.map((item, index) => (
+                    <div
+                        className={`flex border ${
+                            index + 1 != data.length && 'border-b-0'
+                        } flex-1 items-center font-bold text-black text-sm ${
+                            index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
+                        } p-4`}
+                    >
+                        <h5 className='w-[100px]'>{index + 1}</h5>
+                        <h5 className='flex-1'>{item.name}</h5>
+                        <h5 className='flex-1'>{item.email}</h5>
+                        <div className='flex-1'>
+                            <ReadMore>{item?.feedBack}</ReadMore>
+                        </div>
+                    </div>
+                ))}
+        </section>
     );
 }

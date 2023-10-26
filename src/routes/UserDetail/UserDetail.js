@@ -15,7 +15,6 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { Button } from '@material-ui/core';
 import { Delete } from '@material-ui/icons';
 
 import { notify } from 'util/notify';
@@ -36,6 +35,7 @@ import { interactionType, materialTypes, recyclingMethod, referralSources } from
 import { uploadLicences } from 'util/uploadProductImage';
 import ImagePicker from 'components/ImagePicker';
 import { ConfirmationCard } from 'components/ConfirmationCard';
+import { Button } from 'component';
 
 export default function UserDetail(props) {
     const theme = useTheme();
@@ -178,7 +178,7 @@ export default function UserDetail(props) {
 
     return (
         <div>
-            <div style={styles.div}>
+            <div className='flex flex-col gap-6'>
                 <ConfirmationCard
                     isVisible={isVisible}
                     onClose={() => setIsVisible(false)}
@@ -186,7 +186,15 @@ export default function UserDetail(props) {
                     type={'Customer'}
                 />
                 {user?.photo ? <ImageModal url={user?.photo} imageStyle={styles.img} /> : null}
-
+                {!isApproved ? <Button title='Approve User' onClick={() => onApproved()} /> : null}
+                <Button
+                    title='Edit Permission'
+                    onClick={() => {
+                        onClick(SLUGS.UserPermission, {
+                            userId: id
+                        });
+                    }}
+                />
                 <div style={{ marginTop: 20, width: '65%' }}>
                     {
                         <Formik
@@ -322,39 +330,47 @@ export default function UserDetail(props) {
                         >
                             {({ values, setFieldValue, handleSubmit, initialValues }) => {
                                 return (
-                                    <>
-                                        <h3 style={{ marginTop: 10 }}>1) Full Name</h3>
-                                        <InputWithLabel
-                                            value={values.firstName}
-                                            onChange={(value) =>
-                                                setFieldValue('firstName', value, false)
-                                            }
-                                            label='firstName:'
-                                        />
-                                        <InputWithLabel
-                                            value={values.lastName}
-                                            onChange={(value) =>
-                                                setFieldValue('lastName', value, false)
-                                            }
-                                            label='LastName:'
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>1) Contact Information</h3>
-                                        <InputWithLabel
-                                            type='number'
-                                            value={values.phoneNumber}
-                                            onChange={(value) =>
-                                                setFieldValue('phoneNumber', value, false)
-                                            }
-                                            label='Phone Number:'
-                                        />
-                                        <InputWithLabel
-                                            value={values.emailAddress}
-                                            type='email'
-                                            onChange={(value) =>
-                                                setFieldValue('emailAddress', value, false)
-                                            }
-                                            label='Email Address:'
-                                        />
+                                    <div className='flex flex-col gap-6'>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                1) Full Name
+                                            </h3>
+                                            <InputWithLabel
+                                                value={values.firstName}
+                                                onChange={(value) =>
+                                                    setFieldValue('firstName', value, false)
+                                                }
+                                                label='firstName:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.lastName}
+                                                onChange={(value) =>
+                                                    setFieldValue('lastName', value, false)
+                                                }
+                                                label='LastName:'
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                2) Contact Information
+                                            </h3>
+                                            <InputWithLabel
+                                                type='number'
+                                                value={values.phoneNumber}
+                                                onChange={(value) =>
+                                                    setFieldValue('phoneNumber', value, false)
+                                                }
+                                                label='Phone Number:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.emailAddress}
+                                                type='email'
+                                                onChange={(value) =>
+                                                    setFieldValue('emailAddress', value, false)
+                                                }
+                                                label='Email Address:'
+                                            />
+                                        </div>
                                         <div style={styles.rowView}>
                                             <div style={styles.view}>
                                                 <ImagePicker
@@ -463,245 +479,252 @@ export default function UserDetail(props) {
                                                 />
                                             </div>
                                         </div>
-                                        <h3 style={{ marginTop: 20 }}>3) Address</h3>
-                                        <InputWithLabel
-                                            value={values.streetAddress}
-                                            onChange={(value) =>
-                                                setFieldValue('streetAddress', value, false)
-                                            }
-                                            label='Street Address:'
-                                        />
-                                        <InputWithLabel
-                                            label='City:'
-                                            value={values.city}
-                                            onChange={(value) =>
-                                                setFieldValue('city', value, false)
-                                            }
-                                        />
-                                        <InputWithLabel
-                                            label='State/Province:'
-                                            value={values.state}
-                                            onChange={(value) =>
-                                                setFieldValue('state', value, false)
-                                            }
-                                        />
-                                        <InputWithLabel
-                                            label='Postal/ZIP Code:'
-                                            value={values.postalCode}
-                                            onChange={(value) =>
-                                                setFieldValue('postalCode', value, false)
-                                            }
-                                        />
-                                        <InputWithLabel
-                                            label='Country:'
-                                            value={values.country}
-                                            onChange={(value) =>
-                                                setFieldValue('country', value, false)
-                                            }
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>4) Recycling History </h3>
-                                        <DatePickerWithLabel
-                                            label='Recycling Date:'
-                                            selectedDate={values.recyclingDate}
-                                            onChange={(value) => {
-                                                setFieldValue('recyclingDate', value, false);
-                                            }}
-                                        />
-                                        <DropdownListWithLabel
-                                            value={values.materialType}
-                                            label='Material Type:'
-                                            onSelect={(value) =>
-                                                setFieldValue('materialType', value, false)
-                                            }
-                                            options={materialTypes}
-                                        />
-                                        <InputWithLabel
-                                            label='Quantity Recycled:'
-                                            value={values.quantityRecycled}
-                                            onChange={(value) =>
-                                                setFieldValue('quantityRecycled', value, false)
-                                            }
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>
-                                            5) Interactions and Communication
-                                        </h3>
-                                        <DatePickerWithLabel
-                                            selectedDate={values.interactionDate}
-                                            onChange={(value) =>
-                                                setFieldValue('interactionDate', value, false)
-                                            }
-                                            label='Interaction Date:'
-                                        />
-                                        <DropdownListWithLabel
-                                            value={values.interactionType}
-                                            label='Interaction Type:'
-                                            onSelect={(value) =>
-                                                setFieldValue('interactionType', value, false)
-                                            }
-                                            options={interactionType}
-                                        />
-                                        <InputWithLabel
-                                            value={values.interactionDetail}
-                                            onChange={(value) =>
-                                                setFieldValue('interactionDetail', value, false)
-                                            }
-                                            isTextArea={true}
-                                            label='Interaction Details:'
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>
-                                            6) Demographic Information
-                                        </h3>
-                                        <InputWithLabel
-                                            type='number'
-                                            label='Age:'
-                                            value={values.age}
-                                            onChange={(value) => setFieldValue('age', value, false)}
-                                        />
-                                        <RadioButtonGroupWithLabel
-                                            label='Gender:'
-                                            selectedValue={values.gender}
-                                            onSelect={(value) =>
-                                                setFieldValue('gender', value, false)
-                                            }
-                                            options={[
-                                                { value: 'male', label: 'Male' },
-                                                { value: 'female', label: 'Female' }
-                                            ]}
-                                        />
-                                        <InputWithLabel
-                                            value={values.occupation}
-                                            onChange={(value) =>
-                                                setFieldValue('occupation', value, false)
-                                            }
-                                            label='Occupation:'
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>7) Recycling Preferences</h3>
-                                        <DropdownListWithLabel
-                                            value={values.recyclingMethod}
-                                            label='Preferred Recycling Method:'
-                                            onSelect={(value) =>
-                                                setFieldValue('recyclingMethod', value, false)
-                                            }
-                                            options={recyclingMethod}
-                                        />
-                                        <RadioButtonGroupWithLabel
-                                            label='Recycling Program Enrollment:'
-                                            selectedValue={values.recyclingEnNo}
-                                            onSelect={(value) =>
-                                                setFieldValue('recyclingEnNo', value, false)
-                                            }
-                                            options={[
-                                                { value: 'yes', label: 'Yes' },
-                                                { value: 'no', label: 'No' }
-                                            ]}
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>
-                                            8) Payment performance type
-                                        </h3>
-                                        <DropdownListWithLabel
-                                            label='type:'
-                                            value={values.paymentType}
-                                            onSelect={(value) =>
-                                                setFieldValue('paymentType', value, false)
-                                            }
-                                            options={paymentTypes}
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>9) Social Media Profiles:</h3>
-                                        <InputWithLabel
-                                            value={values.facebookProfile}
-                                            onChange={(value) =>
-                                                setFieldValue('facebookProfile', value, false)
-                                            }
-                                            label='Facebook Handle:'
-                                        />
-                                        <InputWithLabel
-                                            value={values.twitterProfile}
-                                            onChange={(value) =>
-                                                setFieldValue('twitterProfile', value, false)
-                                            }
-                                            label='Twitter Handle:'
-                                        />
-                                        <InputWithLabel
-                                            value={values.instagramProfile}
-                                            onChange={(value) =>
-                                                setFieldValue('instagramProfile', value, false)
-                                            }
-                                            label='Instagram Handle:'
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>10) Referral Sources: </h3>
-                                        <DropdownListWithLabel
-                                            value={values.sourceOfReferral}
-                                            label='How did you hear about our recycling program? Source of Referral:'
-                                            onSelect={(value) =>
-                                                setFieldValue('sourceOfReferral', value, false)
-                                            }
-                                            options={referralSources}
-                                        />
-                                        <h3 style={{ marginTop: 20 }}>
-                                            11)Loyalty Program Participation:
-                                        </h3>
-                                        <InputWithLabel
-                                            value={values.recyclingLoyaltyId}
-                                            onChange={(value) =>
-                                                setFieldValue('recyclingLoyaltyId', value, false)
-                                            }
-                                            label='Recycling Loyalty Program ID:'
-                                        />
-                                        <InputWithLabel
-                                            value={values.recyclingLoyaltyCurrentPoint}
-                                            onChange={(value) =>
-                                                setFieldValue(
-                                                    'recyclingLoyaltyCurrentPoint',
-                                                    value,
-                                                    false
-                                                )
-                                            }
-                                            label='Current Recycling Loyalty Points:'
-                                        />
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                3) Address
+                                            </h3>
+                                            <InputWithLabel
+                                                value={values.streetAddress}
+                                                onChange={(value) =>
+                                                    setFieldValue('streetAddress', value, false)
+                                                }
+                                                label='Street Address:'
+                                            />
+                                            <InputWithLabel
+                                                label='City:'
+                                                value={values.city}
+                                                onChange={(value) =>
+                                                    setFieldValue('city', value, false)
+                                                }
+                                            />
+                                            <InputWithLabel
+                                                label='State/Province:'
+                                                value={values.state}
+                                                onChange={(value) =>
+                                                    setFieldValue('state', value, false)
+                                                }
+                                            />
+                                            <InputWithLabel
+                                                label='Postal/ZIP Code:'
+                                                value={values.postalCode}
+                                                onChange={(value) =>
+                                                    setFieldValue('postalCode', value, false)
+                                                }
+                                            />
+                                            <InputWithLabel
+                                                label='Country:'
+                                                value={values.country}
+                                                onChange={(value) =>
+                                                    setFieldValue('country', value, false)
+                                                }
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                4) Recycling History
+                                            </h3>
+                                            <DatePickerWithLabel
+                                                label='Recycling Date:'
+                                                selectedDate={values.recyclingDate}
+                                                onChange={(value) => {
+                                                    setFieldValue('recyclingDate', value, false);
+                                                }}
+                                            />
+                                            <DropdownListWithLabel
+                                                value={values.materialType}
+                                                label='Material Type:'
+                                                onSelect={(value) =>
+                                                    setFieldValue('materialType', value, false)
+                                                }
+                                                options={materialTypes}
+                                            />
+                                            <InputWithLabel
+                                                label='Quantity Recycled:'
+                                                value={values.quantityRecycled}
+                                                onChange={(value) =>
+                                                    setFieldValue('quantityRecycled', value, false)
+                                                }
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                5) Interactions and Communication
+                                            </h3>
 
-                                        <Button
-                                            type='submit'
-                                            style={{
-                                                ...styles.button,
-                                                backgroundColor: theme.color.veryDarkGrayishBlue
-                                            }}
-                                            onClick={handleSubmit}
-                                        >
-                                            Update Details
-                                        </Button>
-                                    </>
+                                            <DatePickerWithLabel
+                                                selectedDate={values.interactionDate}
+                                                onChange={(value) =>
+                                                    setFieldValue('interactionDate', value, false)
+                                                }
+                                                label='Interaction Date:'
+                                            />
+                                            <DropdownListWithLabel
+                                                value={values.interactionType}
+                                                label='Interaction Type:'
+                                                onSelect={(value) =>
+                                                    setFieldValue('interactionType', value, false)
+                                                }
+                                                options={interactionType}
+                                            />
+                                            <InputWithLabel
+                                                value={values.interactionDetail}
+                                                onChange={(value) =>
+                                                    setFieldValue('interactionDetail', value, false)
+                                                }
+                                                isTextArea={true}
+                                                label='Interaction Details:'
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                6) Demographic Information
+                                            </h3>
+
+                                            <InputWithLabel
+                                                type='number'
+                                                label='Age:'
+                                                value={values.age}
+                                                onChange={(value) =>
+                                                    setFieldValue('age', value, false)
+                                                }
+                                            />
+                                            <RadioButtonGroupWithLabel
+                                                label='Gender:'
+                                                selectedValue={values.gender}
+                                                onSelect={(value) =>
+                                                    setFieldValue('gender', value, false)
+                                                }
+                                                options={[
+                                                    { value: 'male', label: 'Male' },
+                                                    { value: 'female', label: 'Female' }
+                                                ]}
+                                            />
+                                            <InputWithLabel
+                                                value={values.occupation}
+                                                onChange={(value) =>
+                                                    setFieldValue('occupation', value, false)
+                                                }
+                                                label='Occupation:'
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                7) Recycling Preferences
+                                            </h3>
+
+                                            <DropdownListWithLabel
+                                                value={values.recyclingMethod}
+                                                label='Preferred Recycling Method:'
+                                                onSelect={(value) =>
+                                                    setFieldValue('recyclingMethod', value, false)
+                                                }
+                                                options={recyclingMethod}
+                                            />
+                                            <RadioButtonGroupWithLabel
+                                                label='Recycling Program Enrollment:'
+                                                selectedValue={values.recyclingEnNo}
+                                                onSelect={(value) =>
+                                                    setFieldValue('recyclingEnNo', value, false)
+                                                }
+                                                options={[
+                                                    { value: 'yes', label: 'Yes' },
+                                                    { value: 'no', label: 'No' }
+                                                ]}
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                8) Payment performance type
+                                            </h3>
+
+                                            <DropdownListWithLabel
+                                                label='type:'
+                                                value={values.paymentType}
+                                                onSelect={(value) =>
+                                                    setFieldValue('paymentType', value, false)
+                                                }
+                                                options={paymentTypes}
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                9) Social Media Profiles:
+                                            </h3>
+
+                                            <InputWithLabel
+                                                value={values.facebookProfile}
+                                                onChange={(value) =>
+                                                    setFieldValue('facebookProfile', value, false)
+                                                }
+                                                label='Facebook Handle:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.twitterProfile}
+                                                onChange={(value) =>
+                                                    setFieldValue('twitterProfile', value, false)
+                                                }
+                                                label='Twitter Handle:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.instagramProfile}
+                                                onChange={(value) =>
+                                                    setFieldValue('instagramProfile', value, false)
+                                                }
+                                                label='Instagram Handle:'
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                10) Referral Sources:
+                                            </h3>
+
+                                            <DropdownListWithLabel
+                                                value={values.sourceOfReferral}
+                                                label='How did you hear about our recycling program? Source of Referral:'
+                                                onSelect={(value) =>
+                                                    setFieldValue('sourceOfReferral', value, false)
+                                                }
+                                                options={referralSources}
+                                            />
+                                        </div>
+                                        <div className='flex flex-col gap-2'>
+                                            <h3 className='font-bold text-xl text-black'>
+                                                11)Loyalty Program Participation:
+                                            </h3>
+
+                                            <InputWithLabel
+                                                value={values.recyclingLoyaltyId}
+                                                onChange={(value) =>
+                                                    setFieldValue(
+                                                        'recyclingLoyaltyId',
+                                                        value,
+                                                        false
+                                                    )
+                                                }
+                                                label='Recycling Loyalty Program ID:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.recyclingLoyaltyCurrentPoint}
+                                                onChange={(value) =>
+                                                    setFieldValue(
+                                                        'recyclingLoyaltyCurrentPoint',
+                                                        value,
+                                                        false
+                                                    )
+                                                }
+                                                label='Current Recycling Loyalty Points:'
+                                            />
+                                        </div>
+
+                                        <Button title='Update Details' onClick={handleSubmit} />
+                                    </div>
                                 );
                             }}
                         </Formik>
                     }
                 </div>
             </div>
-            {!isApproved ? (
-                <Button
-                    type='Approve'
-                    style={{
-                        ...btn,
-                        top: '18%'
-                    }}
-                    onClick={() => onApproved()}
-                >
-                    Approve User
-                </Button>
-            ) : null}
-            <Button
-                type='Approve'
-                style={{
-                    ...btn,
-                    top: '30%'
-                }}
-                onClick={() => {
-                    onClick(SLUGS.UserPermission, {
-                        userId: id
-                    });
-                }}
-            >
-                Edit Permission
-            </Button>
+
             {data.length != 0 && <h1 style={styles.title}>CustomerList</h1>}
             <TableContainer component={Paper}>
                 <Table aria-label='customized table'>

@@ -352,7 +352,6 @@ function PriceSheet() {
                 onDelete={() => deleteCategory()}
                 type={productType == 0 ? 'Category' : 'Product'}
             />
-
             {loading ? <LoadingSpinner /> : null}
             <text>Enter Category Name: </text>
             <br />

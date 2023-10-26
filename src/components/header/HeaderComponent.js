@@ -9,6 +9,8 @@ import DropdownComponent from 'components/dropdown';
 import { onValue, ref } from 'firebase/database';
 import { database } from 'configs/firebaseConfig';
 import { UserContext } from 'util/userContext';
+import { ArrowBack, ArrowBackIosNew } from '@mui/icons-material';
+import ImageModal from 'components/ImageModal/ImageModal';
 const useStyles = createUseStyles((theme) => ({
     avatar: {
         height: 35,
@@ -112,6 +114,15 @@ function HeaderComponent() {
         case currentItem === SLUGS.PdfDetail:
             title = 'PdfDetail';
             break;
+        case currentItem === SLUGS.PriceSheet:
+            title = 'PriceSheet';
+            break;
+        case currentItem === SLUGS.blog:
+            title = 'Articles';
+            break;
+        case currentItem === SLUGS.blogDetails:
+            title = 'Article Details';
+            break;
         default:
             title = '';
     }
@@ -127,11 +138,12 @@ function HeaderComponent() {
         try {
             const userID = await localStorage.getItem('userID');
             if (userID != null) {
-                const result = ref(database, `/ADMIN/USERS/${userID}`);
+                const result = ref(database, `/USERS/${userID}`);
                 onValue(result, (snapshot) => {
                     const data = snapshot.val();
-                    setName(data?.firstName + data?.lastName);
-                    setPhoto(data?.photo);
+                    console.log('user details', data);
+                    setName(data?.firstName + ' ' + data?.lastName);
+                    setPhoto(data?.photo ?? 'https://www.yttags.com/portraits/women/15.jpg');
                 });
             }
         } catch (error) {
@@ -139,43 +151,18 @@ function HeaderComponent() {
         }
     };
     return (
-        <Row className={classes.container} vertical='center' horizontal='space-between'>
-            <span className={classes.title}>{title}</span>
-            <Row vertical='center'>
-                <div className={classes.iconStyles}>{/* <IconSearch /> */}</div>
-                <div className={classes.iconStyles}></div>
-                <div className={classes.separator}></div>
-                <DropdownComponent
-                    label={
-                        <>
-                            {/* <img
-                                src={
-                                    photo
-                                        ? photo
-                                        : ''
-                                }
-                                alt='avatar'
-                                className={classes.avatar}
-                            /> */}
-                        </>
-                    }
-                    options={[
-                        {
-                            label: 'Settings',
-                            onClick: onSettingsClick
-                        },
-                        {
-                            label: 'Logout',
-                            onClick: () => signOut1()
-                        }
-                    ]}
-                    position={{
-                        top: 52,
-                        right: -6
-                    }}
-                />
-            </Row>
-        </Row>
+        <div className='bg-white max-xl:hidden max-lg:visible shadow-md fixed pr-[350px] max-md:pr-[100px] min-w-full z-50 flex px-10 py-3 items-center justify-between'>
+            {/* <ArrowBackIosNew className='text-white' /> */}
+            <span className='text-black font-bold text-xl'>{title}</span>
+            <div className='flex items-center gap-2'>
+                {photo ? (
+                    <img src={photo} className='w-10 h-10 -ml-2 rounded-full' />
+                ) : (
+                    <div className='w-10 h-10  rounded-full'>-----</div>
+                )}
+                <p className='text-black text-base font-bold'>{name}</p>
+            </div>
+        </div>
     );
 }
 
