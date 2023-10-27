@@ -1,10 +1,11 @@
 import React from 'react';
 
-export const Button = ({ title, onClick, isDisabled, type }) => {
+export const Button = ({ title, onClick, width, isDisabled, type }) => {
     return (
         <button
             onClick={isDisabled ? undefined : onClick}
-            className={`h-12 w-fit px-10 rounded-md ${
+            className={`h-12
+            ${width == 'full' ? 'w-full' : 'w-fit'}  px-10 rounded-md ${
                 type == 'primary'
                     ? 'bg-green-700 hover:bg-green-900'
                     : !isDisabled

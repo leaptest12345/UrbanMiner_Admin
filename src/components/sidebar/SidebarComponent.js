@@ -2,14 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { createUseStyles, useTheme } from 'react-jss';
 import { useHistory } from 'react-router-dom';
 import SLUGS from 'resources/slugs';
-import {
-    IconAgents,
-    IconArticles,
-    IconContacts,
-    IconLogout,
-    IconSubscription,
-    IconTickets
-} from 'assets/icons';
 import { convertSlugToUrl } from 'resources/utilities';
 import LogoComponent from './LogoComponent';
 import Menu from './MenuComponent';

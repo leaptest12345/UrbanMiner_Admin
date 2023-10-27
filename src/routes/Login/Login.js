@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { useTheme } from 'react-jss';
 import { ToastContainer } from 'react-toastify';
-import { v4 as uuid } from 'uuid';
 
-import { Grid, Paper, Avatar, TextField, Button } from '@material-ui/core';
+import { Grid, Paper, Avatar, TextField } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
@@ -17,6 +16,8 @@ import LoadingSpinner from 'components/Spinner/LoadingSpinner';
 import { UserContext } from 'util/userContext';
 import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
+import { Button } from 'component';
+import { Lock, LockClockSharp, LockOpen } from '@mui/icons-material';
 
 const Login = () => {
     const auth = getAuth();
@@ -33,23 +34,9 @@ const Login = () => {
         getDetail();
     }, []);
 
+    // const imageUrl = 'https://cdn.wallpapersafari.com/74/49/F7dPYn.jpg';
     const imageUrl =
-        'https://c4.wallpaperflare.com/wallpaper/644/305/118/pattern-black-gradient-texture-wallpaper-preview.jpg';
-
-    const paperStyle = {
-        padding: 20,
-        height: '90vh',
-        width: 500,
-        backgroundColor: theme.color.WHITE
-    };
-    const avatarStyle = { backgroundColor: '#1bbd7e' };
-    const btnstyle = {
-        margin: '10px 0',
-        height: 50,
-        marginTop: 70,
-        backgroundColor: theme.color.veryDarkGrayishBlue,
-        color: theme.color.white
-    };
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFGxG4TqP21CAeCARSRmBFhHe8VVxJoKsjxw&usqp=CAU';
     const containerStyle = {
         display: 'flex',
         flex: 1,
@@ -57,7 +44,10 @@ const Login = () => {
         backgroundColor: theme.color.BG,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundImage: `url(${imageUrl})`
+        backgroundImage: `url(${imageUrl})`,
+        backgroundSize: 'cover', // This will make the image cover the entire container
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center center'
     };
 
     const onSubmit = async () => {
@@ -133,41 +123,34 @@ const Login = () => {
     return (
         <div style={containerStyle}>
             {loading ? <LoadingSpinner /> : null}
-            <Paper elevation={10} style={paperStyle}>
+            <Paper
+                elevation={10}
+                className='p-10 w-[500px] flex flex-col gap-10 rounded-md bg-veryDarkGrayishBlue'
+            >
                 <Grid align='center' style={{ margin: '20px 0px' }}>
-                    <Avatar style={avatarStyle}>
-                        <LockOutlinedIcon />
-                    </Avatar>
-                    <h2 style={{ margin: 20 }}>Sign In</h2>
+                    <LockOpen />
+                    <h2 className='text-2xl font-bold '>Sign In</h2>
                 </Grid>
-                <TextField
-                    onChange={onchangeEmail}
-                    style={{ margin: '20px 0px' }}
-                    label='Username'
-                    placeholder='Enter username'
-                    variant='outlined'
-                    fullWidth
-                    required
-                />
-                <TextField
-                    onChange={onchangePassword}
-                    label='Password'
-                    placeholder='Enter password'
-                    type='password'
-                    variant='outlined'
-                    fullWidth
-                    required
-                />
-                <Button
-                    onClick={() => onSubmit()}
-                    type='submit'
-                    color={theme.color.white}
-                    variant='contained'
-                    style={btnstyle}
-                    fullWidth
-                >
-                    Sign in
-                </Button>
+                <div className='flex flex-1 w-full flex-col gap-4'>
+                    <TextField
+                        onChange={onchangeEmail}
+                        label='Username'
+                        placeholder='Enter username'
+                        variant='outlined'
+                        fullWidth
+                        required
+                    />
+                    <TextField
+                        onChange={onchangePassword}
+                        label='Password'
+                        placeholder='Enter password'
+                        type='password'
+                        variant='outlined'
+                        fullWidth
+                        required
+                    />
+                </div>
+                <Button onClick={() => onSubmit()} title='Sign In' width='full' />
             </Paper>
             <ToastContainer />
         </div>

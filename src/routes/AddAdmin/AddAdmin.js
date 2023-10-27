@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button } from '@material-ui/core';
 import { ToastContainer } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 import { useHistory } from 'react-router-dom';
@@ -13,6 +12,8 @@ import { onValue, ref, set, update } from 'firebase/database';
 import { formateData } from 'util/formateData';
 import { notify } from 'util/notify';
 import { styles } from './styles';
+import { Input } from 'components/Input';
+import { Button } from 'component';
 
 export default function AddAdmin(props) {
     const history = useHistory();
@@ -274,33 +275,32 @@ export default function AddAdmin(props) {
 
     return (
         <div>
-            <div>
+            <div className='flex flex-col gap-6'>
                 {id ? null : (
                     <>
-                        <input
-                            className='form-check-input'
-                            placeholder='Enter Email Address'
-                            style={styles.inputStyle}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                        />
-                        <input
-                            type='password'
-                            className='form-check-input'
-                            placeholder='Enter Password'
-                            style={styles.inputStyle}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
+                        <div className='flex gap-10 items-center'>
+                            <Input
+                                label='Email'
+                                placeholder='Enter Email Address'
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                            <Input
+                                label='Password'
+                                type='password'
+                                placeholder='Enter Password'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                        </div>
                     </>
                 )}
                 {adminLevel != 1 ? null : (
-                    <div style={{ marginLeft: 40 }}>
+                    <div className='pl-1 flex flex-col gap-2'>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
+                                className='w-6 h-6'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
                                 checked={userPermission}
                                 onChange={() => setUserPermission(!userPermission)}
                             />
@@ -315,9 +315,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={itemPermission}
                                 onChange={() => setItemPermission(!itemPermission)}
                             />
@@ -331,9 +330,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={paymentPermission}
                                 onChange={() => setPaymentPermission(!paymentPermission)}
                             />
@@ -348,9 +346,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={pdfDetailPermission}
                                 onChange={() => setpdfDetailPermission(!pdfDetailPermission)}
                             />
@@ -366,9 +363,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={priceSheetPermission}
                                 onChange={() => setPriceSheetPermission(!priceSheetPermission)}
                             />
@@ -384,9 +380,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={feedbackPermission}
                                 onChange={() => setFeedBackPermission(!feedbackPermission)}
                             />
@@ -401,9 +396,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={adminPermission}
                                 onChange={() => setAdminPermission(!adminPermission)}
                             />
@@ -419,9 +413,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={termPermission}
                                 onChange={() => setTermPermission(!termPermission)}
                             />
@@ -436,9 +429,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={privacyPermission}
                                 onChange={() => setPrivacyPermission(!privacyPermission)}
                             />
@@ -453,9 +445,8 @@ export default function AddAdmin(props) {
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
                             <input
-                                className='form-check-input'
                                 type='checkbox'
-                                style={styles.checkboxStyle}
+                                className='w-6 h-6'
                                 checked={addProduct}
                                 onChange={() => setAddProduct(!addProduct)}
                             />
@@ -469,10 +460,8 @@ export default function AddAdmin(props) {
                         </div>
                     </div>
                 )}
+                <Button onClick={() => onSubmit()} title={id ? 'UPDATE' : 'SUBMIT'} />
             </div>
-            <Button onClick={() => onSubmit()} style={styles.btnStyle}>
-                <span style={{ color: 'white' }}>{id ? 'UPDATE' : 'SUBMIT'}</span>
-            </Button>
 
             <ToastContainer />
         </div>

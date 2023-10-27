@@ -123,6 +123,18 @@ function HeaderComponent() {
         case currentItem === SLUGS.blogDetails:
             title = 'Article Details';
             break;
+        case currentItem === SLUGS.UserPermission:
+            title = 'Permission';
+            break;
+        case currentItem === SLUGS.AddAdmin:
+            title = 'Create Admin';
+            break;
+        case currentItem === SLUGS.categoryImages:
+            title = 'Category Images';
+            break;
+        case currentItem === SLUGS.EditCategory:
+            title = 'Edit Category';
+            break;
         default:
             title = '';
     }
