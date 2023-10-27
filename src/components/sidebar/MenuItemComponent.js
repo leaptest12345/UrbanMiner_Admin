@@ -21,7 +21,7 @@ function MenuItemComponent({ children, icon, id, items = [], level = 1, onClick,
     return (
         <div
             onClick={onItemClicked}
-            className={`flex px-6 py-1.5 mb-1 ${
+            className={`flex px-6 py-2.5  mb-1 ${
                 isActive ? 'bg-slate-600' : ''
             } hover:bg-slate-600 rounded-sm cursor-pointer items-center gap-4`}
         >

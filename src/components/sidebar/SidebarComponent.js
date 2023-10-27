@@ -59,7 +59,7 @@ function SidebarComponent(props) {
     }, []);
 
     return (
-        <div className='max-md:hidden z-50'>
+        <div className=' z-50'>
             <Menu isMobile={isMobile}>
                 <div style={{ paddingTop: 30, paddingBottom: 30 }}>
                     <LogoComponent />

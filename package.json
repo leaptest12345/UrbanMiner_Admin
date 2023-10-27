@@ -1,7 +1,7 @@
 {
     "name": "UrbanMiner_Admin",
     "version": "0.1.0",
-    "homepage": "https://leaptest12345.github.io/UrbanMiner_Admin/",
+    "homepage": "https://urban-miner-admin.vercel.app/",
     "private": false,
     "dependencies": {
         "@emotion/react": "^11.10.5",

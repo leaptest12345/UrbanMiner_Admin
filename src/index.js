@@ -9,7 +9,7 @@ import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
     <ThemeProvider theme={Theme}>
-        <Router basename={process.env.PUBLIC_URL}>
+        <Router>
             <Routes />
         </Router>
     </ThemeProvider>,

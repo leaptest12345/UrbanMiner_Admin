@@ -130,7 +130,7 @@ export default function UserList() {
             console.log('error');
         }
     };
-    const users = user.filter((item) => item.email != undefined);
+    const users = user?.filter((item) => item.email != undefined);
 
     return (
         <>

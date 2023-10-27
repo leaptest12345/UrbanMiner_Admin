@@ -167,11 +167,7 @@ function HeaderComponent() {
             {/* <ArrowBackIosNew className='text-white' /> */}
             <span className='text-black font-bold text-xl'>{title}</span>
             <div className='flex items-center gap-2'>
-                {photo ? (
-                    <img src={photo} className='w-10 h-10 -ml-2 rounded-full' />
-                ) : (
-                    <div className='w-10 h-10  rounded-full'>-----</div>
-                )}
+                {photo && <img src={photo} className='w-10 h-10 -ml-2 rounded-full' />}
                 <p className='text-black text-base font-bold'>{name}</p>
             </div>
         </div>

@@ -26,7 +26,7 @@ const getMenuStyles = ({ theme }) => ({
     bmMenuWrap: {
         position: 'fixed',
         height: '100%',
-        width: 255,
+        width: 270,
         zIndex: 30
     },
     bmMenu: {},
