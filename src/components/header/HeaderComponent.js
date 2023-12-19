@@ -153,7 +153,6 @@ function HeaderComponent() {
                 const result = ref(database, `/USERS/${userID}`);
                 onValue(result, (snapshot) => {
                     const data = snapshot.val();
-                    console.log('user details', data);
                     setName(data?.firstName + ' ' + data?.lastName);
                     setPhoto(data?.photo ?? 'https://www.yttags.com/portraits/women/15.jpg');
                 });

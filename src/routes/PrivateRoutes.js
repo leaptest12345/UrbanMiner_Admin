@@ -21,6 +21,7 @@ import EditCategory, { editCategory } from './editCategory/editCategory';
 import { UserPermission } from './UserPermission/UserPermission';
 import Blog from './Blog/Blog';
 import BlogDetails from './BlogDetails/BlogDetails';
+import MaterialList from './MaterialList';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -40,6 +41,12 @@ function PrivateRoutes() {
                     path={SLUGS.UserDetail}
                     component={UserDetail}
                     render={() => <div>userDetail</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.materialList}
+                    component={MaterialList}
+                    render={() => <div>MaterialList</div>}
                 />
                 <Route
                     exact

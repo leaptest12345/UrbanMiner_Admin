@@ -27,5 +27,6 @@ export default {
     PriceSheet: '/PriceSheet',
     categoryImages: '/CategoryImages',
     blog: '/blog',
-    blogDetails: '/blogDetails'
+    blogDetails: '/blogDetails',
+    materialList: '/materialList'
 };
