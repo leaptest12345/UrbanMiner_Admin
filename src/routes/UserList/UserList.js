@@ -53,7 +53,7 @@ export default function UserList() {
                     //can only see subusers data
                     onValue(subUserRef, (snapshot) => {
                         const data = snapshot.val();
-                        setUsers(formateData(data).filter);
+                        setUsers(formateData(data));
                     });
                 } else if (snapshot.val().adminLevel == '1') {
                     //level 1 admin will be able to see all the user data
@@ -67,7 +67,6 @@ export default function UserList() {
                     //no need to show this for level3 user
                     onValue(userRef, (snapshot) => {
                         user.push(snapshot.val());
-                        console.log(user);
                     });
                 }
             });

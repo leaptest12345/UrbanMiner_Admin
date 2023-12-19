@@ -101,7 +101,12 @@ function SidebarComponent(props) {
                             onClick={() => onClick(SLUGS.PaymentList)}
                         />
                     ) : null}
-
+                    <MenuItem
+                        id={SLUGS.materialList}
+                        title='Material List'
+                        icon={<AdminPanelSettingsTwoTone className='text-white' />}
+                        onClick={() => onClick(SLUGS.materialList)}
+                    />
                     {permission?.addAdmin ? (
                         <MenuItem
                             id={SLUGS.AdminList}
