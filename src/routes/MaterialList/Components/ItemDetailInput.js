@@ -12,6 +12,14 @@ const ItemDetailsInputs = ({
     const inputClassName =
         'h-9 bg-white border rounded-lg outline-none px-4 font-bold text-base placeholder:text-gray-400 placeholder:font-bold text-black';
 
+    const MATERIAL_UM_TYPES = [
+        { value: 'LBS', label: 'LBS' },
+        { value: 'EACH', label: 'EACH' },
+        { value: 'CTW', label: 'CTW' },
+        { value: 'NT', label: 'NT' },
+        { value: 'GT', label: 'GT' }
+    ];
+
     return (
         <div className='flex items-center gap-10'>
             <input
@@ -25,14 +33,18 @@ const ItemDetailsInputs = ({
                 onChange={onPriceChange}
                 placeholder={'Price'}
                 type='number'
-                className={`${inputClassName} w-[200px]`}
+                className={`${inputClassName} w-[100px]`}
             />
-            <input
+            <select
                 value={um}
                 onChange={onUmChange}
                 placeholder={'UM'}
                 className={`${inputClassName} w-[100px]`}
-            />
+            >
+                {MATERIAL_UM_TYPES.map((item) => {
+                    return <option value={item.value}>{item.label}</option>;
+                })}
+            </select>
         </div>
     );
 };

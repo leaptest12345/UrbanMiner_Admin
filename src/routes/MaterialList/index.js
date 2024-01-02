@@ -22,6 +22,9 @@ export default function MaterialList() {
     const [selectedId, setSelectedId] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
     const [search, setSearch] = useState('');
+    const [filter, setFilter] = useState(null);
+
+    //DESCRIPTION|CATEGORY|PRICE|UM|MARGINS|NULL
 
     useEffect(() => {
         getMaterialList();
@@ -76,6 +79,14 @@ export default function MaterialList() {
                         tier1: values.margins.tier1,
                         tier2: values.margins.tier2,
                         tier3: values.margins.tier3
+                    },
+                    buy: {
+                        price: '',
+                        um: ''
+                    },
+                    sell: {
+                        price: '',
+                        um: ''
                     }
                 });
                 notify('Material Item Successfully Added!', 1);
@@ -104,6 +115,24 @@ export default function MaterialList() {
               )
             : materialList;
 
+    if (filter) {
+        if (filter === 'DESCRIPTION') {
+            list.sort((a, b) => a?.description?.localeCompare(b?.description));
+        }
+        if (filter === 'CATEGORY') {
+            list.sort((a, b) => a?.category?.localeCompare(b?.category));
+        }
+        if (filter === 'PRICE') {
+            list.sort((a, b) => a?.price - b?.price);
+        }
+        if (filter === 'UM') {
+            list.sort((a, b) => a?.um?.localeCompare(b?.um));
+        }
+        if (filter === 'MARGINS') {
+            list.sort((a, b) => a?.margins?.tier1 - b?.margins?.tier1);
+        }
+    }
+
     return (
         <div className='flex flex-1 flex-col gap-10'>
             {/*  */}
@@ -130,50 +159,66 @@ export default function MaterialList() {
                     onClick={() => {
                         if (selectedId) {
                             formik.handleSubmit();
-                        }
-                    }}
-                >
-                    EDIT
-                </div>
-                <div
-                    onClick={() => {
-                        if (isCreateNewItem) {
-                            if (
-                                formik.values.description &&
-                                formik.values.category &&
-                                formik.values.price &&
-                                formik.values.um
-                            ) {
-                                formik.handleSubmit();
-                            } else {
-                                alert('Please fill all the fields!', 0);
+                        } else {
+                            if (isCreateNewItem) {
+                                if (
+                                    formik.values.description &&
+                                    formik.values.category &&
+                                    formik.values.price &&
+                                    formik.values.um
+                                ) {
+                                    formik.handleSubmit();
+                                } else {
+                                    alert('Please fill all the fields!', 0);
+                                }
                             }
                         }
                     }}
-                    className='cursor-pointer'
                 >
                     SAVE
                 </div>
             </div>
             {/*  */}
             <div className='flex items-center gap-10 text-base font-bold'>
-                <div className='flex items-center gap-1'>
+                <div
+                    onClick={() => setFilter('DESCRIPTION')}
+                    className='flex items-center gap-1 hover:text-red-500 cursor-pointer '
+                >
                     <ArrowDropDown />
-                    <h5 className='w-[400px]'>ITEM DESCRIPTION</h5>
+                    <h5 className='w-[300px]'>ITEM DESCRIPTION</h5>
                 </div>
-                <div className='flex items-center '>
-                    <div className='flex items-center gap-1 w-[250px]'>
+                <div className='flex items-center'>
+                    <div
+                        onClick={() => setFilter('CATEGORY')}
+                        className='flex items-center gap-1 w-[200px] hover:text-red-500 cursor-pointer '
+                    >
                         <ArrowDropDown />
                         <h5>CATEGORY</h5>
                     </div>
-                    <div className='flex items-center gap-1 w-[250px]'>
+                    <div
+                        onClick={() => setFilter('PRICE')}
+                        className='flex items-center gap-1 w-[100px] hover:text-red-500 cursor-pointer '
+                    >
                         <ArrowDropDown />
                         <h5>PRICE</h5>
                     </div>
-
-                    <h5 className='w-[100px]'>UM</h5>
+                    <div
+                        onClick={() => setFilter('UM')}
+                        className='flex items-center gap-1 w-[100px] hover:text-red-500 cursor-pointer '
+                    >
+                        <ArrowDropDown />
+                        <h5>UM</h5>
+                    </div>
+                    <div
+                        onClick={() => setFilter('MARGINS')}
+                        className='flex items-center gap-1 w-[200px] hover:text-red-500 cursor-pointer'
+                    >
+                        <ArrowDropDown />
+                        <h5>MARGINS</h5>
+                    </div>
                 </div>
             </div>
+
             {isCreateNewItem && (
                 <div className='flex flex-col gap-4'>
                     <div className='flex items-center gap-20 text-base font-bold'>
@@ -205,14 +250,21 @@ export default function MaterialList() {
                     )}
                 </div>
             )}
-            <div className='flex flex-col gap-1'>
+            <div className={`flex flex-col gap-1 relative`}>
+                {selectedId == null && (
+                    <div className='flex font-bold text-lg items-center absolute right-7 -top-7'>
+                        <h5 className='w-[100px]'>Tier1</h5>
+                        <h5 className='w-[100px]'>Tier2</h5>
+                        <h5 className='w-[100px]'>Tier3</h5>
+                    </div>
+                )}
                 {list?.map((item) => {
                     const isSelected = item.id === selectedId;
 
                     return (
                         <>
                             <div className='flex items-center gap-20 text-base font-bold'>
-                                <div className='flex items-center gap-2 w-[400px]'>
+                                <div className='flex items-center gap-2 w-[300px]'>
                                     <div
                                         onClick={() => {
                                             if (item.id === selectedId) {
@@ -230,24 +282,46 @@ export default function MaterialList() {
                                             }
                                         />
                                     </div>
-                                    <div className='font-bold text-lg'>
+                                    <div className='font-bold text-lg line-clamp-1'>
                                         {item?.description.toUpperCase()}
                                     </div>
                                 </div>
-                                <div className='flex items-center gap-10'>
-                                    <div className='font-bold text-lg w-[200px]'>
-                                        {isSelected ? '' : item?.category.toUpperCase()}
+                                {!isSelected && (
+                                    <div className='flex items-center '>
+                                        <div className='font-bold text-lg w-[200px] '>
+                                            {item?.category.toUpperCase()}
+                                        </div>
+                                        <div className='font-bold text-lg w-[100px]'>
+                                            {`$ ${item?.price}`}
+                                        </div>
+                                        <div className='font-bold text-lg w-[90px]'>
+                                            {item?.um.toUpperCase()}
+                                        </div>
+                                        <div className='flex font-bold text-sm  items-center w-[300px]'>
+                                            <h5 className='w-[100px]'>
+                                                $
+                                                {item?.margins?.tier1 != ''
+                                                    ? item?.margins?.tier1
+                                                    : '0'}
+                                            </h5>
+                                            <h5 className='w-[100px]'>
+                                                $
+                                                {item?.margins?.tier2 != ''
+                                                    ? item?.margins?.tier2
+                                                    : '0'}
+                                            </h5>
+                                            <h5 className='w-[100px]'>
+                                                $
+                                                {item?.margins?.tier3 != ''
+                                                    ? item?.margins?.tier3
+                                                    : '0'}
+                                            </h5>
+                                        </div>
                                     </div>
-                                    <div className='font-bold text-lg w-[200px]'>
-                                        {isSelected ? '' : `$ ${item?.price}`}
-                                    </div>
-                                    <div className='font-bold text-lg w-[100px]'>
-                                        {isSelected ? '' : item?.um.toUpperCase()}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                             {item.id === selectedId && (
-                                <div className='flex flex-col gap-4'>
+                                <div className='flex flex-col gap-4 m-4'>
                                     <div className='flex items-center gap-20 text-base font-bold'>
                                         <ItemDescriptionInput
                                             description={formik.values.description}

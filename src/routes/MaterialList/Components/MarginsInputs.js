@@ -15,7 +15,7 @@ const MarginsInputs = ({
         'h-9 bg-white border rounded-lg outline-none px-4 font-bold text-base placeholder:text-gray-400 placeholder:font-bold text-black';
 
     return (
-        <div className='flex items-center gap-10 pl-8'>
+        <div className='flex items-center gap-10'>
             <div className='flex items-center gap-2'>
                 <div onClick={onDelete} className='cursor-pointer'>
                     <Delete />
