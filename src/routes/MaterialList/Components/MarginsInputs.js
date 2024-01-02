@@ -12,16 +12,10 @@ const MarginsInputs = ({
     onDelete
 }) => {
     const inputClassName =
-        'h-9 bg-white border rounded-lg outline-none px-4 font-bold text-base placeholder:text-gray-400 placeholder:font-bold text-black';
+        'h-9 bg-white border rounded-lg outline-none px-4 font-bold text-sm placeholder:text-gray-400 placeholder:font-bold text-black';
 
     return (
-        <div className='flex items-center gap-10'>
-            <div className='flex items-center gap-2'>
-                <div onClick={onDelete} className='cursor-pointer'>
-                    <Delete />
-                </div>
-                <div className='font-bold'>MARGINS</div>
-            </div>
+        <div className='flex items-center gap-2 pl-4'>
             <div className='flex flex-col gap-1 w-[100px]'>
                 <div className='text-sm'>TIER 1</div>
                 <input
@@ -49,6 +43,7 @@ const MarginsInputs = ({
                     type='number'
                 />
             </div>
+            <Delete onClick={onDelete} className='text-red-500 cursor-pointer mt-6' />
         </div>
     );
 };

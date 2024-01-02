@@ -21,9 +21,8 @@ import {
     ProductionQuantityLimitsSharp,
     ProductionQuantityLimitsTwoTone,
     TerminalSharp,
-    VerifiedUserSharp
+    ViewListSharp
 } from '@mui/icons-material';
-import { Avatar, List, ListItemSecondaryAction } from '@mui/material';
 
 const useStyles = createUseStyles({
     separator: {
@@ -50,9 +49,6 @@ function SidebarComponent(props) {
         push(convertSlugToUrl(slug, parameters));
     }
     const data = JSON.parse(localStorage.getItem('permission'));
-
-    const handler = (e) => setShow(e.matches);
-    // window.matchMedia('(min-width: 768px)').addEventListener('change', handler);
 
     useEffect(() => {
         setPermissionStatus(data);
@@ -104,7 +100,7 @@ function SidebarComponent(props) {
                     <MenuItem
                         id={SLUGS.materialList}
                         title='Material List'
-                        icon={<AdminPanelSettingsTwoTone className='text-white' />}
+                        icon={<ViewListSharp className='text-white' />}
                         onClick={() => onClick(SLUGS.materialList)}
                     />
                     {permission?.addAdmin ? (

@@ -161,6 +161,7 @@ export default function MaterialList() {
                             formik.handleSubmit();
                         } else {
                             if (isCreateNewItem) {
+                                console.log(formik.values);
                                 if (
                                     formik.values.description &&
                                     formik.values.category &&
@@ -169,7 +170,7 @@ export default function MaterialList() {
                                 ) {
                                     formik.handleSubmit();
                                 } else {
-                                    alert('Please fill all the fields!', 0);
+                                    notify('Please fill all the fields!', 0);
                                 }
                             }
                         }
@@ -221,7 +222,7 @@ export default function MaterialList() {
 
             {isCreateNewItem && (
                 <div className='flex flex-col gap-4'>
-                    <div className='flex items-center gap-20 text-base font-bold'>
+                    <div className='flex items-center gap-2 text-base font-bold'>
                         <ItemDescriptionInput
                             description={formik.values.description}
                             onChange={formik.handleChange('description')}
@@ -234,10 +235,11 @@ export default function MaterialList() {
                             um={formik.values.um}
                             onCategoryChange={formik.handleChange('category')}
                             onPriceChange={formik.handleChange('price')}
-                            onUmChange={formik.handleChange('um')}
+                            onUmChange={(value) => {
+                                console.log(value.target.value);
+                                formik.setFieldValue('um', value.target.value, false);
+                            }}
                         />
-                    </div>
-                    {open && (
                         <MarginsInputs
                             tier1={formik.values.margins.tier1}
                             tier2={formik.values.margins.tier2}
@@ -247,7 +249,7 @@ export default function MaterialList() {
                             onTier3Change={formik.handleChange('margins.tier3')}
                             onDelete={() => setIsCreateNewItem(false)}
                         />
-                    )}
+                    </div>
                 </div>
             )}
             <div className={`flex flex-col gap-1 relative`}>
@@ -322,7 +324,7 @@ export default function MaterialList() {
                             </div>
                             {item.id === selectedId && (
                                 <div className='flex flex-col gap-4 m-4'>
-                                    <div className='flex items-center gap-20 text-base font-bold'>
+                                    <div className='flex items-center gap-2 text-base font-bold'>
                                         <ItemDescriptionInput
                                             description={formik.values.description}
                                             onChange={formik.handleChange('description')}
@@ -336,16 +338,16 @@ export default function MaterialList() {
                                             onPriceChange={formik.handleChange('price')}
                                             onUmChange={formik.handleChange('um')}
                                         />
+                                        <MarginsInputs
+                                            tier1={formik.values.margins.tier1}
+                                            tier2={formik.values.margins?.tier2}
+                                            tier3={formik.values.margins?.tier3}
+                                            onTier1Change={formik.handleChange('margins.tier1')}
+                                            onTier2Change={formik.handleChange('margins.tier2')}
+                                            onTier3Change={formik.handleChange('margins.tier3')}
+                                            onDelete={() => removeItem(item.id)}
+                                        />
                                     </div>
-                                    <MarginsInputs
-                                        tier1={formik.values.margins.tier1}
-                                        tier2={formik.values.margins?.tier2}
-                                        tier3={formik.values.margins?.tier3}
-                                        onTier1Change={formik.handleChange('margins.tier1')}
-                                        onTier2Change={formik.handleChange('margins.tier2')}
-                                        onTier3Change={formik.handleChange('margins.tier3')}
-                                        onDelete={() => removeItem(item.id)}
-                                    />
                                 </div>
                             )}
                         </>
