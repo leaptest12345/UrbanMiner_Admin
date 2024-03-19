@@ -1,6 +1,7 @@
 import React from 'react';
+import { Props } from './types';
 
-export const Button = ({ title, onClick, width, isDisabled, type }) => {
+export const Button = ({ title, onClick, width, isDisabled, type }: Props) => {
     return (
         <button
             onClick={isDisabled ? undefined : onClick}

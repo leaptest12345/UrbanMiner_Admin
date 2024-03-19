@@ -4,16 +4,16 @@ import { ToastContainer } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 import { useHistory } from 'react-router-dom';
 
-import { database } from 'configs/firebaseConfig';
+import { database } from '../../configs/firebaseConfig';
 
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { onValue, ref, set, update } from 'firebase/database';
 
-import { formateData } from 'util/formateData';
-import { notify } from 'util/notify';
+import { formateData } from '../../util/formateData';
+import { notify } from '../../util/notify';
 import { styles } from './styles';
-import { Input } from 'components/Input';
-import { Button } from 'component';
+import { Input } from '../../components/Input';
+import { Button } from '../../component';
 
 export default function AddAdmin(props) {
     const history = useHistory();
@@ -34,8 +34,7 @@ export default function AddAdmin(props) {
     const [priceSheetPermission, setPriceSheetPermission] = useState(false);
     const [addProduct, setAddProduct] = useState(false);
     const [userList, setUserList] = useState([]);
-    const [adminLevel, setAdminLevel] = useState('');
-    const [adminUsers, setAdminUsers] = useState('');
+    const [adminLevel, setAdminLevel] = useState<number>(1);
 
     useEffect(() => {
         getUsers();
@@ -72,7 +71,6 @@ export default function AddAdmin(props) {
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             onValue(userRef, (snapshot) => {
                 setAdminLevel(snapshot.val().adminLevel);
-                setAdminUsers(snapshot.val().users);
             });
             const refDetail = ref(database, '/ADMIN/USERS');
             onValue(refDetail, (snapshOT) => {
@@ -127,6 +125,7 @@ export default function AddAdmin(props) {
                         if (adminLevel == 1) {
                             //only add admin2 in the adminlist admin3 is user so no need to add them in adminlist
                             const refDetail = ref(database, `/ADMIN/USERS/${subUserID}`);
+
                             await set(refDetail, {
                                 ID: subUserID,
                                 email: email,
@@ -144,6 +143,8 @@ export default function AddAdmin(props) {
                                         addProduct: addProduct,
                                         pdfDetail: pdfDetailPermission,
                                         priceSheet: priceSheetPermission
+                                        // WhoReportsAreEmailedTo: '',
+                                        // CCOnAllEmails: ''
                                     }
                                 }
                             });
@@ -423,7 +424,7 @@ export default function AddAdmin(props) {
                                 className='form-check-label'
                                 htmlFor='flexCheckChecked'
                             >
-                                User can <lable style={styles.dangerLabel}>VIEW/UPDATE</lable> the
+                                User can <label className='text-red-600'>VIEW/UPDATE</label> the
                                 TermAndCondition
                             </label>
                         </div>
@@ -441,6 +442,38 @@ export default function AddAdmin(props) {
                             >
                                 User can <label style={styles.dangerLabel}>VIEW/UPDATE </label>the
                                 PrivacyPolicy
+                            </label>
+                        </div>
+                        <div className='form-check' style={styles.formCheckStyle}>
+                            <input
+                                type='checkbox'
+                                className='w-6 h-6'
+                                checked={addProduct}
+                                onChange={() => setAddProduct(!addProduct)}
+                            />
+                            <label
+                                style={styles.labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={styles.dangerLabel}>ADD_PRODUCT</label>
+                            </label>
+                        </div>
+
+                        <div className='text-xl font-medium py-2'>Notification Permission</div>
+                        <div className='form-check' style={styles.formCheckStyle}>
+                            <input
+                                type='checkbox'
+                                className='w-6 h-6'
+                                checked={addProduct}
+                                onChange={() => setAddProduct(!addProduct)}
+                            />
+                            <label
+                                style={styles.labelStyle}
+                                className='form-check-label'
+                                htmlFor='flexCheckChecked'
+                            >
+                                User can <label style={styles.dangerLabel}>ADD_PRODUCT</label>
                             </label>
                         </div>
                         <div className='form-check' style={styles.formCheckStyle}>
