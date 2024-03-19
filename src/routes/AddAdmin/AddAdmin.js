@@ -3,39 +3,26 @@ import React, { useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
 import { useHistory } from 'react-router-dom';
-
 import { database } from 'configs/firebaseConfig';
 
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { onValue, ref, set, update } from 'firebase/database';
 
-import { formateData } from 'util/formateData';
 import { notify } from 'util/notify';
-import { styles } from './styles';
 import { Input } from 'components/Input';
 import { Button } from 'component';
+import { PermissionCard } from './_Components';
+import { useFormik } from 'formik';
+
+import { findAdminByEmail, getAdmin, getMyDetails } from '../../Firebase/Database/admin/index';
+import { findUserByEmail } from '../../Firebase/Database/user/index';
 
 export default function AddAdmin(props) {
     const history = useHistory();
-
     const { id } = props.location.state;
 
-    const [email, setEmail] = useState('');
-    const [users, setUsers] = useState([]);
-    const [password, setPassword] = useState('');
-    const [itemPermission, setItemPermission] = useState(false);
-    const [userPermission, setUserPermission] = useState(false);
-    const [paymentPermission, setPaymentPermission] = useState(false);
-    const [feedbackPermission, setFeedBackPermission] = useState(false);
-    const [termPermission, setTermPermission] = useState(false);
-    const [privacyPermission, setPrivacyPermission] = useState(false);
-    const [adminPermission, setAdminPermission] = useState(false);
-    const [pdfDetailPermission, setpdfDetailPermission] = useState(false);
-    const [priceSheetPermission, setPriceSheetPermission] = useState(false);
-    const [addProduct, setAddProduct] = useState(false);
-    const [userList, setUserList] = useState([]);
-    const [adminLevel, setAdminLevel] = useState('');
-    const [adminUsers, setAdminUsers] = useState('');
+    const [adminDetails, setAdminDeails] = useState(null);
+    const [adminLevel, setAdminLevel] = useState(0);
 
     useEffect(() => {
         getUsers();
@@ -44,77 +31,64 @@ export default function AddAdmin(props) {
         }
     }, []);
 
-    const getAdminDetails = (id) => {
-        const refDetail = ref(database, `/ADMIN/USERS/${id}`);
-        onValue(refDetail, (snapshOT) => {
-            if (snapshOT.val()) {
-                setEmail(snapshOT.val()?.email);
-                const permissionStatus = snapshOT.val()?.role?.PermissionStatus;
-                if (permissionStatus) {
-                    setItemPermission(permissionStatus.item);
-                    setTermPermission(permissionStatus.term);
-                    setUserPermission(permissionStatus.user);
-                    setAdminPermission(permissionStatus.addAdmin);
-                    setpdfDetailPermission(permissionStatus.pdfDetail ? true : false);
-                    setFeedBackPermission(permissionStatus.feedback);
-                    setPriceSheetPermission(permissionStatus.priceSheet ? true : false);
-                    setPaymentPermission(permissionStatus.payment);
-                    setPrivacyPermission(permissionStatus.privacy);
-                    setAddProduct(permissionStatus.addProduct);
-                }
-            }
-        });
+    const getAdminDetails = async (id) => {
+        const data = await getAdmin(id);
+        setAdminDeails(data);
     };
+
+    const permissionStatus = adminDetails?.role?.PermissionStatus;
+
+    const formik = useFormik({
+        initialValues: {
+            email: adminDetails?.email || '',
+            password: adminDetails?.password || '',
+            userPermission: permissionStatus?.user || false,
+            itemPermission: permissionStatus?.item || false,
+            paymentPermission: permissionStatus?.payment || false,
+            feedbackPermission: permissionStatus?.feedback || false,
+            termPermission: permissionStatus?.term || false,
+            privacyPermission: permissionStatus?.privacy || false,
+            adminPermission: permissionStatus?.addAdmin || false,
+            pdfDetailPermission: permissionStatus?.pdfDetail || false,
+            priceSheetPermission: permissionStatus?.priceSheet || false,
+            addProduct: permissionStatus?.addProduct || false
+        },
+        enableReinitialize: true,
+        onSubmit: (values) => {
+            console.log(values);
+        }
+    });
 
     const getUsers = async () => {
         try {
-            const id = await localStorage.getItem('userID');
-            const userRef = ref(database, `/ADMIN/USERS/${id}`);
-            onValue(userRef, (snapshot) => {
-                setAdminLevel(snapshot.val().adminLevel);
-                setAdminUsers(snapshot.val().users);
-            });
-            const refDetail = ref(database, '/ADMIN/USERS');
-            onValue(refDetail, (snapshOT) => {
-                const data = snapshOT.val();
-                setUsers(formateData(data));
-            });
-            const refDetail1 = ref(database, '/USERS');
-            onValue(refDetail1, (snapshot) => {
-                const data = snapshot.val();
-                setUserList(data);
-            });
+            const myData = getMyDetails();
+            setAdminLevel(myData.adminLevel);
         } catch (error) {}
-    };
-
-    const getUserId = () => {
-        let result = 0;
-        users &&
-            users.map((item) => {
-                if (email == item.email) {
-                    result = item.ID;
-                }
-            });
-        return result;
-    };
-
-    const userAlreadyExist = () => {
-        let result = null;
-        formateData(userList).map((item) => {
-            if (item.email == email) {
-                result = item.ID;
-            }
-        });
-        return result;
     };
 
     const createAdmin = async () => {
         try {
-            const result = await getUserId();
-            if (result == 0) {
-                const subUserID = userAlreadyExist();
+            const email = formik.values.email;
+            const password = formik.values.password;
+            const userPermission = formik.values.userPermission;
+            const itemPermission = formik.values.itemPermission;
+            const paymentPermission = formik.values.paymentPermission;
+            const feedbackPermission = formik.values.feedbackPermission;
+            const termPermission = formik.values.termPermission;
+            const privacyPermission = formik.values.privacyPermission;
+            const adminPermission = formik.values.adminPermission;
+            const pdfDetailPermission = formik.values.pdfDetailPermission;
+            const priceSheetPermission = formik.values.priceSheetPermission;
+            const addProduct = formik.values.addProduct;
+
+            const admin = findAdminByEmail(email);
+
+            if (admin) {
+                const subUser = await findUserByEmail(email);
+                const subUserID = subUser ? subUser.ID : null;
+
                 //check if user exist or not
-                if (subUserID != null) {
+                if (subUser?.ID) {
                     //if user  exist
                     const id = await localStorage.getItem('userID');
                     const userDetailRef = ref(database, `/USERS/${subUserID}`);
@@ -266,7 +240,7 @@ export default function AddAdmin(props) {
     };
 
     const onSubmit = () => {
-        if (!email) {
+        if (!formik.values.email) {
             notify('Please Enter Email Value!', 0);
         } else {
             createAdmin();
@@ -282,182 +256,129 @@ export default function AddAdmin(props) {
                             <Input
                                 label='Email'
                                 placeholder='Enter Email Address'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={formik.values.email}
+                                onChange={(e) => formik.setFieldValue('email', e.target.value)}
                             />
                             <Input
                                 label='Password'
                                 type='password'
                                 placeholder='Enter Password'
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                value={formik.values.password}
+                                onChange={(e) => formik.setFieldValue('password', e.target.value)}
                             />
                         </div>
                     </>
                 )}
                 {adminLevel != 1 ? null : (
                     <div className='pl-1 flex flex-col gap-2'>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                className='w-6 h-6'
-                                type='checkbox'
-                                checked={userPermission}
-                                onChange={() => setUserPermission(!userPermission)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>DELETE/VIEW</label>{' '}
-                                usersDetail
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={itemPermission}
-                                onChange={() => setItemPermission(!itemPermission)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>ADD/DELETE</label> item
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={paymentPermission}
-                                onChange={() => setPaymentPermission(!paymentPermission)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>ADD/DELETE</label>{' '}
-                                payment Method
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={pdfDetailPermission}
-                                onChange={() => setpdfDetailPermission(!pdfDetailPermission)}
-                            />
+                        <PermissionCard
+                            warningTypes={'DELETE/VIEW'}
+                            value={formik.values.userPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'userPermission',
+                                    !formik.values.userPermission
+                                )
+                            }
+                            type='UserDetail'
+                        />
+                        <PermissionCard
+                            value={formik.values.itemPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'itemPermission',
+                                    !formik.values.itemPermission
+                                )
+                            }
+                            type={'Item'}
+                            warningTypes={'ADD/DELETE'}
+                        />
+                        <PermissionCard
+                            value={formik.values.paymentPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'paymentPermission',
+                                    !formik.values.paymentPermission
+                                )
+                            }
+                            type={'Payment Method'}
+                            warningTypes={'ADD/DELETE'}
+                        />
+                        <PermissionCard
+                            value={formik.values.pdfDetailPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'pdfDetailPermission',
+                                    !formik.values.pdfDetailPermission
+                                )
+                            }
+                            type={'pdfDetail'}
+                            warningTypes={'VIEW/UPDATE'}
+                        />
+                        <PermissionCard
+                            value={formik.values.priceSheetPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'priceSheetPermission',
+                                    !formik.values.priceSheetPermission
+                                )
+                            }
+                            type={'Category Price'}
+                            warningTypes={'VIEW/UPDATE'}
+                        />
 
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>VIEW/UPDATE</label>{' '}
-                                pdfDetail
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={priceSheetPermission}
-                                onChange={() => setPriceSheetPermission(!priceSheetPermission)}
-                            />
-
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>VIEW/UPDATE</label>{' '}
-                                Category Price
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={feedbackPermission}
-                                onChange={() => setFeedBackPermission(!feedbackPermission)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>VIEW</label> the
-                                feedbacks
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={adminPermission}
-                                onChange={() => setAdminPermission(!adminPermission)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can give the{' '}
-                                <label style={styles.dangerLabel}>PERMISSION</label> to the Another
-                                user
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={termPermission}
-                                onChange={() => setTermPermission(!termPermission)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <lable style={styles.dangerLabel}>VIEW/UPDATE</lable> the
-                                TermAndCondition
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={privacyPermission}
-                                onChange={() => setPrivacyPermission(!privacyPermission)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>VIEW/UPDATE </label>the
-                                PrivacyPolicy
-                            </label>
-                        </div>
-                        <div className='form-check' style={styles.formCheckStyle}>
-                            <input
-                                type='checkbox'
-                                className='w-6 h-6'
-                                checked={addProduct}
-                                onChange={() => setAddProduct(!addProduct)}
-                            />
-                            <label
-                                style={styles.labelStyle}
-                                className='form-check-label'
-                                htmlFor='flexCheckChecked'
-                            >
-                                User can <label style={styles.dangerLabel}>ADD_PRODUCT</label>
-                            </label>
-                        </div>
+                        <PermissionCard
+                            value={formik.values.feedbackPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'feedbackPermission',
+                                    !formik.values.feedbackPermission
+                                )
+                            }
+                            type={'Feedback'}
+                            warningTypes={'VIEW'}
+                        />
+                        <PermissionCard
+                            value={formik.values.adminPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'adminPermission',
+                                    !formik.values.adminPermission
+                                )
+                            }
+                            type={'to the another user'}
+                            warningTypes={'PERMISSION'}
+                        />
+                        <PermissionCard
+                            value={formik.values.termPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'termPermission',
+                                    !formik.values.termPermission
+                                )
+                            }
+                            type={'TermAndCondition'}
+                            warningTypes={'VIEW/UPDATE'}
+                        />
+                        <PermissionCard
+                            value={formik.values.privacyPermission}
+                            onChange={() =>
+                                formik.setFieldValue(
+                                    'privacyPermission',
+                                    !formik.values.privacyPermission
+                                )
+                            }
+                            type={'PrivacyPolicy'}
+                            warningTypes={'VIEW/UPDATE'}
+                        />
+                        <PermissionCard
+                            value={formik.values.addProduct}
+                            onChange={() =>
+                                formik.setFieldValue('addProduct', !formik.values.addProduct)
+                            }
+                            type={'Product'}
+                            warningTypes={'ADD'}
+                        />
                     </div>
                 )}
                 <Button onClick={() => onSubmit()} title={id ? 'UPDATE' : 'SUBMIT'} />
