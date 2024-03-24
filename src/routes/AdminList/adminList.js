@@ -16,6 +16,8 @@ import { ConfirmationCard } from 'components/ConfirmationCard';
 import { Button } from 'component';
 import { Update } from '@mui/icons-material';
 
+import { getAdminSubUsers, getMyDetails } from '../../Firebase/admin/index';
+
 export default function AdminList() {
     const { push } = useHistory();
 
@@ -41,14 +43,12 @@ export default function AdminList() {
     const getUsers = async () => {
         try {
             const id = await localStorage.getItem('userID');
-            const userRef = ref(database, `/ADMIN/USERS/${id}`);
-            const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
-            onValue(subUserRef, (snapShot1) => {
-                setUsers(formateData(snapShot1.val()));
-            });
-            onValue(userRef, (snapShot) => {
-                setAdminLevel(snapShot.val()?.adminLevel);
-            });
+
+            const subUsers = await getAdminSubUsers(id);
+            setUsers(subUsers);
+
+            const myDetails = await getMyDetails();
+            setAdminLevel(myDetails?.adminLevel);
         } catch (error) {
             console.log(error);
         }

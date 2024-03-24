@@ -2,16 +2,19 @@ import React from 'react';
 import { ArrowForwardIos } from '@material-ui/icons';
 import { ArrowDropDown } from '@mui/icons-material';
 import { useState } from 'react';
-import { onValue, ref, set, update } from 'firebase/database';
 import { v4 as uuid } from 'uuid';
-import { database } from 'configs/firebaseConfig';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
-import { formateData } from 'util/formateData';
 import ItemDescriptionInput from './Components/ItemDescriptionInput';
 import ItemDetailsInputs from './Components/ItemDetailInput';
 import MarginsInputs from './Components/MarginsInputs';
 import { notify } from 'util/notify';
+import {
+    createMaterialItem,
+    deleteMaterialItem,
+    getAllMaterialList,
+    updateMaterialItem
+} from '../../Firebase/materialList/index';
 
 export default function MaterialList() {
     const [open, setOpen] = useState(true);
@@ -24,17 +27,14 @@ export default function MaterialList() {
     const [search, setSearch] = useState('');
     const [filter, setFilter] = useState(null);
 
-    //DESCRIPTION|CATEGORY|PRICE|UM|MARGINS|NULL
-
     useEffect(() => {
-        getMaterialList();
+        getInitialDetails();
     }, []);
 
-    const getMaterialList = async () => {
-        const starCount = ref(database, `/ADMIN/MATERIAL_LIST`);
-        onValue(starCount, (data) => {
-            setMaterialList(formateData(data.val()));
-        });
+    const getInitialDetails = async () => {
+        const list = await getAllMaterialList();
+        console.log('list: ', list);
+        setMaterialList(list);
     };
 
     const formik = useFormik({
@@ -52,9 +52,7 @@ export default function MaterialList() {
         enableReinitialize: true,
         onSubmit: async (values) => {
             if (selectedId) {
-                const updateRef = ref(database, `/ADMIN/MATERIAL_LIST/${selectedId}`);
-
-                await update(updateRef, {
+                await updateMaterialItem(selectedId, {
                     description: values.description,
                     category: values.category,
                     price: values.price,
@@ -65,11 +63,8 @@ export default function MaterialList() {
                         tier3: values.margins.tier3
                     }
                 });
-                notify('Material Item Successfully updated!', 1);
             } else {
-                const starCount = ref(database, `/ADMIN/MATERIAL_LIST/${id}`);
-
-                await set(starCount, {
+                await createMaterialItem(id, {
                     id: id,
                     description: values.description,
                     category: values.category,
@@ -89,7 +84,6 @@ export default function MaterialList() {
                         um: ''
                     }
                 });
-                notify('Material Item Successfully Added!', 1);
             }
 
             formik.resetForm();
@@ -99,10 +93,8 @@ export default function MaterialList() {
         }
     });
 
-    const removeItem = (id) => {
-        const starCount = ref(database, `/ADMIN/MATERIAL_LIST/${id}`);
-        set(starCount, null);
-        notify('Material Item Successfully Removed!', 1);
+    const removeItem = async (id) => {
+        await deleteMaterialItem(id);
         setIsCreateNewItem(false);
         setSelectedId(null);
         setSelectedItem(null);
@@ -112,8 +104,8 @@ export default function MaterialList() {
         search != ''
             ? materialList?.filter((item) =>
                   item?.description?.toLowerCase().includes(search.toLowerCase())
-              )
-            : materialList;
+              ) ?? []
+            : materialList ?? [];
 
     if (filter) {
         if (filter === 'DESCRIPTION') {
@@ -234,7 +226,7 @@ export default function MaterialList() {
                             price={formik.values.price}
                             um={formik.values.um}
                             onCategoryChange={formik.handleChange('category')}
-                            onPriceChange={formik.handleChange('price')}
+                            onPriceChange={(e) => formik.handleChange('price')}
                             onUmChange={(value) => {
                                 console.log(value.target.value);
                                 formik.setFieldValue('um', value.target.value, false);
@@ -335,7 +327,11 @@ export default function MaterialList() {
                                             price={formik.values.price}
                                             um={formik.values.um}
                                             onCategoryChange={formik.handleChange('category')}
-                                            onPriceChange={formik.handleChange('price')}
+                                            onPriceChange={(e) => {
+                                                const value = e.target.value.toString();
+                                                formik.setFieldValue('price', value, false);
+                                                console.log('price', value);
+                                            }}
                                             onUmChange={formik.handleChange('um')}
                                         />
                                         <MarginsInputs

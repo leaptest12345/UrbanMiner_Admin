@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useTheme } from 'react-jss';
-import { onValue, ref, set, update, remove } from 'firebase/database';
+import { onValue, ref, update, remove } from 'firebase/database';
 import { ToastContainer } from 'react-toastify';
 import { useHistory } from 'react-router-dom';
 

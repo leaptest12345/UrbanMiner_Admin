@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from 'react-jss';
 import { ToastContainer } from 'react-toastify';
 
-import { Grid, Paper, Avatar, TextField } from '@material-ui/core';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { Grid, Paper, TextField } from '@material-ui/core';
 
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { onValue, ref } from 'firebase/database';
@@ -17,7 +16,7 @@ import { UserContext } from 'util/userContext';
 import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
 import { Button } from 'component';
-import { Lock, LockClockSharp, LockOpen } from '@mui/icons-material';
+import { LockOpen } from '@mui/icons-material';
 
 const Login = () => {
     const auth = getAuth();
