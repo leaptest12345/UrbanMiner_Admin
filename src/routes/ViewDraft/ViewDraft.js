@@ -104,7 +104,7 @@ export default function ViewDraft(props) {
                     </div>
                 ) : null}
                 {invoices &&
-                    invoices.map((item, index) => {
+                    invoices?.map((item, index) => {
                         if (item.WeightType == 'unit') {
                             return (
                                 <div style={styles.div1}>
@@ -121,7 +121,7 @@ export default function ViewDraft(props) {
                                     <br />
                                     <div style={styles.container}>
                                         {invoiceImg.length != 0 &&
-                                            invoiceImg[parseInt(item.ID) - 1].map((item) => {
+                                            invoiceImg[parseInt(item.ID) - 1]?.map((item) => {
                                                 if (item) {
                                                     return (
                                                         <ImageModal
@@ -154,7 +154,7 @@ export default function ViewDraft(props) {
                                     <br />
                                     <div style={styles.container}>
                                         {invoiceImg.length != 0 &&
-                                            invoiceImg[parseInt(item.ID) - 1].map((item) => {
+                                            invoiceImg[parseInt(item.ID) - 1]?.map((item) => {
                                                 if (item) {
                                                     return (
                                                         <ImageModal

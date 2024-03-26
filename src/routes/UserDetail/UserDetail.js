@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useTheme } from 'react-jss';
-import { onValue, ref, update, remove } from 'firebase/database';
+import { onValue, ref, update, remove, get, orderByChild, query, equalTo } from 'firebase/database';
 import { ToastContainer } from 'react-toastify';
 import { useHistory } from 'react-router-dom';
 
@@ -36,6 +36,8 @@ import { uploadLicences } from 'util/uploadProductImage';
 import ImagePicker from 'components/ImagePicker';
 import { ConfirmationCard } from 'components/ConfirmationCard';
 import { Button } from 'component';
+import CardComponent from 'components/cards/CardComponent';
+import MiniCardComponent from 'components/cards/MiniCardComponent';
 
 export default function UserDetail(props) {
     const theme = useTheme();
@@ -50,6 +52,7 @@ export default function UserDetail(props) {
     const [paymentTypes, setPaymentTypes] = useState([]);
     const [customerDelete, setCustomerDetele] = useState(null);
     const [isVisible, setIsVisible] = useState(false);
+    const [totalInvoices, setTotalInvoices] = useState(0);
 
     useEffect(() => {
         getUserDetail();
@@ -109,12 +112,25 @@ export default function UserDetail(props) {
         }
     };
 
-    const getPaymentList = () => {
+    const getPaymentList = async () => {
+        try {
+            console.log('userId', id);
+            const refDetail = ref(database, `/INVOICE_LIST`);
+            const invoiceQuery = query(refDetail, orderByChild('userId'), equalTo(id));
+
+            const snapShot = await get(invoiceQuery);
+            const data = snapShot.val();
+
+            setTotalInvoices(formateData(data).length);
+        } catch (error) {
+            console.log('error', error);
+        }
+
         try {
             const starCountRef = ref(database, '/ADMIN/PAYMENTTYPE');
             onValue(starCountRef, (snapshot) => {
                 const data = formateData(snapshot.val());
-                const labelValuePairs = data.map((item) => {
+                const labelValuePairs = data?.map((item) => {
                     return { label: item.title, value: item.title };
                 });
                 setPaymentTypes(labelValuePairs);
@@ -133,7 +149,6 @@ export default function UserDetail(props) {
             });
 
             onValue(refDetail, (snapShot) => {
-                console.log('approval details', snapShot.val()?.isApproved);
                 setIsApproved(snapShot.val()?.isApproved);
                 setUser(snapShot.val());
             });
@@ -179,6 +194,10 @@ export default function UserDetail(props) {
     return (
         <div>
             <div className='flex flex-col gap-6'>
+                <div className='flex gap-4 items-center'>
+                    <MiniCardComponent title={'Customers'} value={data.length} />
+                    <MiniCardComponent title={'Invoices'} value={totalInvoices} />
+                </div>
                 <ConfirmationCard
                     isVisible={isVisible}
                     onClose={() => setIsVisible(false)}
@@ -740,7 +759,7 @@ export default function UserDetail(props) {
                     )}
                     <TableBody>
                         {data &&
-                            data.map((item, index) => (
+                            data?.map((item, index) => (
                                 <StyledTableRow align='left' key={item.id}>
                                     <StyledTableCell component='th' scope='row'>
                                         {index + 1}
@@ -752,7 +771,10 @@ export default function UserDetail(props) {
                                         {item.BusinessEmail}
                                     </StyledTableCell>
                                     <StyledTableCell align='left' style={styles.leftDiv}>
-                                        <Button onClick={() => onViewDetailClick(item)}>
+                                        <Button
+                                            title={'View Detail'}
+                                            onClick={() => onViewDetailClick(item)}
+                                        >
                                             View Detail
                                         </Button>
                                         <Delete
