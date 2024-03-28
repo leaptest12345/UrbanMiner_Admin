@@ -58,9 +58,9 @@ export const UserCard = ({
                                 <RestorePageSharp className='cursor-pointer' />
                                 <h5>Restore User</h5>
                             </div>
-                        ) : (
+                        ) : onDelete ? (
                             <Delete className='text-red-600' onClick={onDelete} />
-                        )}
+                        ) : null}
                     </div>
                 </div>
             </div>
