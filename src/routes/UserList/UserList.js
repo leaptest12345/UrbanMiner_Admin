@@ -3,30 +3,27 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 
-import { Delete, RemoveRedEye } from '@material-ui/icons';
-
-import ImageModal from 'components/ImageModal/ImageModal';
-
 import { database } from 'configs/firebaseConfig';
-import { onValue, ref, update } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 
-import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
 
 import SLUGS from 'resources/slugs';
 import { convertSlugToUrl } from 'resources/utilities';
 
 import { ConfirmationCard } from 'components/ConfirmationCard';
-import { RestorePageSharp } from '@mui/icons-material';
+import { UserCard } from './UserCard';
+import { UserTableHeader } from './UserTableHeader';
+import { Input } from 'components/Input';
+import { deleteUser, restoreUser } from '../../Firebase/user/index';
 
 export default function UserList() {
     const { push } = useHistory();
 
     const [user, setUsers] = useState([]);
-    const [deletedUser, setDeletedUser] = useState([]);
-    const [adminLevel, setAdminLevel] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
-    const [userDeletetionData, setUserDeletionData] = useState(null);
+    const [userDeletionData, setUserDeletionData] = useState(null);
+    const [search, setSearch] = useState('');
 
     useEffect(() => {
         getUserList();
@@ -48,9 +45,8 @@ export default function UserList() {
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
             onValue(userRef, (snapshot) => {
-                setAdminLevel(snapshot.val().adminLevel);
                 if (snapshot.val().adminLevel == '2') {
-                    //can only see subusers data
+                    //can only see subUsers data
                     onValue(subUserRef, (snapshot) => {
                         const data = snapshot.val();
                         setUsers(formateData(data));
@@ -60,8 +56,8 @@ export default function UserList() {
                     const starCountRef = ref(database, '/USERS');
                     onValue(starCountRef, (snapshot) => {
                         const data = snapshot.val();
-                        setUsers(formateData(data).filter((item) => item.isDeleted != true));
-                        setDeletedUser(formateData(data).filter((item) => item.isDeleted == true));
+                        const user = formateData(data);
+                        setUsers(user?.filter((item) => item.isApproved == true));
                     });
                 } else {
                     //no need to show this for level3 user
@@ -82,218 +78,100 @@ export default function UserList() {
         });
     }
 
-    const onRestore = async (item) => {
-        try {
-            const id = await localStorage.getItem('userID');
-            if (id != item.ID) {
-                const starCountRef = ref(database, `/USERS/${item.ID}`);
-                if (starCountRef) {
-                    update(starCountRef, {
-                        isDeleted: false
-                    });
-                    setTimeout(() => {
-                        notify(`User has been Activated Successfully`, !item.isDeleted ? 0 : 1);
-                    }, 200);
-                }
-            } else {
-                notify("You can't delete this User", 0);
-            }
-        } catch (error) {
-            console.log('error');
-        }
-    };
+    const userList = user?.filter(
+        (item) =>
+            (item.isDeleted != true &&
+                item?.firstName?.toLowerCase().includes(search.toLowerCase())) ||
+            item?.lastName?.toLowerCase().includes(search.toLowerCase())
+    );
 
-    const onAction = async () => {
-        try {
-            setIsVisible(false);
-            const id = await localStorage.getItem('userID');
-            if (id != userDeletetionData.ID) {
-                const starCountRef = ref(database, `/USERS/${userDeletetionData.ID}`);
-                if (starCountRef) {
-                    update(starCountRef, {
-                        isDeleted: !userDeletetionData.isDeleted
-                    });
-                    setTimeout(() => {
-                        notify(
-                            `User has been ${
-                                !userDeletetionData.isDeleted ? 'Deleted' : 'Activated'
-                            } Successfully`,
-                            !userDeletetionData.isDeleted ? 0 : 1
-                        );
-                    }, 200);
-                }
-            } else {
-                notify("You can't delete this User", 0);
-            }
-        } catch (error) {
-            console.log('error');
-        }
-    };
-    const users = user?.filter((item) => item.email != undefined);
+    const deletedUser = user.filter((item) => item.isDeleted == true);
+
+    const isEmptyList = userList.length === 0 && deletedUser.length === 0;
 
     return (
-        <>
+        <div className='flex flex-col gap-6'>
+            {/* <div className='w-1/2'>
+                <Input
+                    placeholder={'Search User'}
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+            </div> */}
+
+            {isEmptyList && (
+                <div className='flex h-96 items-center justify-center'>
+                    <h1>No User Found</h1>
+                </div>
+            )}
             <ConfirmationCard
                 isVisible={isVisible}
                 onClose={() => setIsVisible(false)}
-                onDelete={() => onAction()}
+                onDelete={() => {
+                    if (userDeletionData.isDeleted) {
+                        restoreUser(userDeletionData.ID);
+                    } else {
+                        deleteUser(userDeletionData.ID);
+                    }
+                    setIsVisible(false);
+                }}
                 type={'User'}
             />
-            <section>
-                <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
-                    <h5 className='w-[100px]'>No</h5>
-                    <h5 className='w-[100px]'>Photo</h5>
-                    <div className='flex flex-1 items-center justify-between'>
-                        <h5 className='flex-1'>Name</h5>
-                        <div className='flex flex-1 items-center justify-between'>
-                            <h5 className='flex-1'>PhoneNumber</h5>
-                            <h5 className='flex-1'>Actions</h5>
-                        </div>
-                    </div>
-                </div>
-                {users &&
-                    users.map((itemDetails, index) => {
-                        const item = getUserDetail(itemDetails.ID);
+            {userList.length > 0 && (
+                <section className='flex flex-col gap-4'>
+                    <div className='text-xl font-bold text-black'>Approved Users</div>
+                    <UserTableHeader />
+                    {userList &&
+                        userList.map((itemDetails, index) => {
+                            const item = getUserDetail(itemDetails.ID);
+                            return (
+                                <UserCard
+                                    key={'user' + index}
+                                    index={index}
+                                    totalUsers={userList.length}
+                                    photo={item?.photo}
+                                    name={item?.firstName + ' ' + item?.lastName}
+                                    phoneNumber={item?.phoneNumber}
+                                    onViewDetails={() =>
+                                        onClick(SLUGS.UserDetail, { id: item?.ID })
+                                    }
+                                    onDelete={() => {
+                                        setUserDeletionData(item);
+                                        setIsVisible(true);
+                                    }}
+                                />
+                            );
+                        })}
+                </section>
+            )}
+            {deletedUser.length > 0 && (
+                <div className='flex flex-col gap-6'>
+                    <h2 className='text-xl font-bold text-black'>DeletedUser</h2>
+                    <section>
+                        <UserTableHeader />
+                        {deletedUser &&
+                            deletedUser.map((itemDetails, index) => {
+                                const item = getUserDetail(itemDetails.ID);
 
-                        return (
-                            <div
-                                className={`flex border ${
-                                    index + 1 != users.length && 'border-b-0'
-                                } flex-1 items-center font-bold text-black text-sm ${
-                                    index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
-                                } p-4`}
-                            >
-                                <h5 className='w-[100px]'>{index + 1}</h5>
-                                <h5 className='w-[100px]'>
-                                    {item?.photo ? (
-                                        <ImageModal
-                                            url={item?.photo}
-                                            className='w-12 h-12 -ml-2 rounded-full'
-                                        />
-                                    ) : (
-                                        <div className='w-12 h-12  rounded-full'>-----</div>
-                                    )}
-                                </h5>
-                                <div className='flex flex-1 items-center justify-between'>
-                                    <h5 className='flex-1'>
-                                        {item?.firstName == undefined
-                                            ? item?.email ?? '-----'
-                                            : item?.firstName + '   ' + item?.lastName}
-                                    </h5>
-                                    <div className='flex flex-1 items-center justify-between'>
-                                        <h5 className='flex-1'>
-                                            {item?.phoneNumber
-                                                ? (item?.phoneNumber + '').substring(0, 3) +
-                                                  '   ' +
-                                                  (item?.phoneNumber + '').substring(3, 6) +
-                                                  '   ' +
-                                                  (item?.phoneNumber + '').substring(6, 10) +
-                                                  '   '
-                                                : '--- --- --- ----'}
-                                        </h5>
-                                        <div className='flex-1 flex items-center gap-14'>
-                                            <RemoveRedEye
-                                                onClick={() =>
-                                                    onClick(SLUGS.UserDetail, { id: item?.ID })
-                                                }
-                                                className='cursor-pointer text-blue-900 hover:text-blue-700'
-                                            />
-                                            <Delete
-                                                onClick={() => {
-                                                    setUserDeletionData(item);
-                                                    setIsVisible(true);
-                                                }}
-                                                className='cursor-pointer text-red-600 hover:text-red-800'
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-            </section>
-            <h2
-                style={{
-                    marginTop: 50,
-                    marginBottom: 50
-                }}
-            >
-                DeletedUser
-            </h2>
-            <section>
-                <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
-                    <h5 className='w-[100px]'>No</h5>
-                    <h5 className='w-[100px]'>Photo</h5>
-                    <div className='flex flex-1 items-center justify-between'>
-                        <h5 className='flex-1'>Name</h5>
-                        <div className='flex flex-1 items-center justify-between'>
-                            <h5 className='flex-1'>PhoneNumber</h5>
-                            <h5 className='flex-1'>Actions</h5>
-                        </div>
-                    </div>
+                                return (
+                                    <UserCard
+                                        key={'deletedUser' + index}
+                                        index={index}
+                                        name={item?.firstName + ' ' + item?.lastName}
+                                        onRestore={() => restoreUser(item.ID)}
+                                        onViewDetails={() =>
+                                            onClick(SLUGS.UserDetail, { id: item?.ID })
+                                        }
+                                        phoneNumber={item?.phoneNumber}
+                                        photo={item?.photo}
+                                        totalUsers={deletedUser.length}
+                                    />
+                                );
+                            })}
+                    </section>
                 </div>
-                {deletedUser &&
-                    deletedUser.map((itemDetails, index) => {
-                        const item = getUserDetail(itemDetails.ID);
-
-                        return (
-                            <div
-                                className={`flex border ${
-                                    index + 1 != users.length && 'border-b-0'
-                                } flex-1 items-center font-bold text-black text-sm ${
-                                    index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
-                                } p-4`}
-                            >
-                                <h5 className='w-[100px]'>{index + 1}</h5>
-                                <h5 className='w-[100px]'>
-                                    {item?.photo ? (
-                                        <ImageModal
-                                            url={item?.photo}
-                                            className='w-12 h-12 -ml-2 rounded-full'
-                                        />
-                                    ) : (
-                                        <div className='w-12 h-12  rounded-full'>-----</div>
-                                    )}
-                                </h5>
-                                <div className='flex flex-1 items-center justify-between'>
-                                    <h5 className='flex-1'>
-                                        {item?.firstName == undefined
-                                            ? item?.email ?? '-----'
-                                            : item?.firstName + '   ' + item?.lastName}
-                                    </h5>
-                                    <div className='flex flex-1 items-center justify-between'>
-                                        <h5 className='flex-1'>
-                                            {item?.phoneNumber
-                                                ? (item?.phoneNumber + '').substring(0, 3) +
-                                                  '   ' +
-                                                  (item?.phoneNumber + '').substring(3, 6) +
-                                                  '   ' +
-                                                  (item?.phoneNumber + '').substring(6, 10) +
-                                                  '   '
-                                                : '--- --- --- ----'}
-                                        </h5>
-                                        <div className='flex-1 flex items-center gap-14'>
-                                            <RemoveRedEye
-                                                onClick={() =>
-                                                    onClick(SLUGS.UserDetail, { id: item?.ID })
-                                                }
-                                                className='cursor-pointer text-blue-900 hover:text-blue-700'
-                                            />
-                                            <div
-                                                className='flex items-center gap-2 cursor-pointer  text-red-600 hover:text-red-800'
-                                                onClick={() => onRestore(item)}
-                                            >
-                                                <RestorePageSharp className='cursor-pointer' />
-                                                <h5>Restore User</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-            </section>
+            )}
             <ToastContainer />
-        </>
+        </div>
     );
 }

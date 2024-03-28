@@ -75,6 +75,12 @@ function SidebarComponent(props) {
                             onClick={() => onClick(SLUGS.UserList)}
                         />
                     ) : null}
+                    <MenuItem
+                        id={SLUGS.unApprovedList}
+                        title='UnApproved Users'
+                        icon={<DataUsageRounded className='text-white' />}
+                        onClick={() => onClick(SLUGS.unApprovedList)}
+                    />
                     {permission?.item ? (
                         <MenuItem
                             id={SLUGS.items}

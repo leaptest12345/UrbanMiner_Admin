@@ -28,5 +28,6 @@ export default {
     categoryImages: '/CategoryImages',
     blog: '/blog',
     blogDetails: '/blogDetails',
-    materialList: '/materialList'
+    materialList: '/materialList',
+    unApprovedList: '/unApprovedList'
 };
