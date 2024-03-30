@@ -5,8 +5,9 @@ import { ToastContainer } from 'react-toastify';
 
 import { Grid, Paper, TextField } from '@material-ui/core';
 
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { onValue, ref } from 'firebase/database';
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { get, onValue, ref, set } from 'firebase/database';
+import { v4 as uuid } from 'uuid';
 
 import { database } from 'configs/firebaseConfig';
 
@@ -55,41 +56,72 @@ const Login = () => {
         else {
             setLoading(true);
             try {
-                let emailResult = false;
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                if (userCredential.user.uid) {
-                    users &&
-                        users.map((item, index) => {
-                            if (item.email == email) {
-                                emailResult = true;
-                                signIn1(item.ID + '', item.role.PermissionStatus);
-                                notify('Login Successfully Done!', 1);
-                                setLoading(false);
-                                return;
+                const refDetail = ref(database, '/ADMIN/USERS/');
+                const userSnapShot = await get(refDetail);
+
+                if (!userSnapShot.exists()) {
+                    const firstAdminEmail = 'sutharbipinn25899@gmail.com';
+                    const firstAdminPassword = '12345678';
+
+                    const adminUserId = uuid();
+
+                    const adminUserCredential = await createUserWithEmailAndPassword(
+                        auth,
+                        firstAdminEmail,
+                        firstAdminPassword
+                    );
+
+                    if (adminUserCredential.user.uid) {
+                        const refDetail = ref(database, `/ADMIN/USERS/${adminUserId}`);
+
+                        const PermissionStatus = {
+                            user: true,
+                            item: true,
+                            payment: true,
+                            privacy: true,
+                            term: true,
+                            addAdmin: true,
+                            feedback: true,
+                            addProduct: true,
+                            pdfDetail: true,
+                            priceSheet: true
+                        };
+
+                        await set(refDetail, {
+                            ID: adminUserId,
+                            email: firstAdminEmail,
+                            adminLevel: 1,
+                            role: {
+                                roleName: 'admin',
+                                PermissionStatus: PermissionStatus
                             }
                         });
-                }
 
-                if (!emailResult) {
-                    notify('Invalid UserName and Password', 0);
-                    setLoading(false);
+                        signIn1(adminUserId + '', PermissionStatus);
+                        notify('Admin User Created Successfully!', 1);
+                        setLoading(false);
+                    }
+                } else {
+                    let emailResult = false;
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    if (userCredential.user.uid) {
+                        users &&
+                            users.map((item, index) => {
+                                if (item.email == email) {
+                                    emailResult = true;
+                                    signIn1(item.ID + '', item.role.PermissionStatus);
+                                    notify('Login Successfully Done!', 1);
+                                    setLoading(false);
+                                    return;
+                                }
+                            });
+                    }
+
+                    if (!emailResult) {
+                        notify('Invalid UserName and Password', 0);
+                        setLoading(false);
+                    }
                 }
-                // const refDetail=ref(database,'/USERS/1')
-                // update(refDetail,{
-                //    ID:1,
-                //    role:{
-                //       roleName:'admin',
-                //       PermissionStatus:{
-                //         user:true,
-                //          item:true,
-                //          payment:true,
-                //          privacy:true,
-                //          term:true,
-                //          addAdmin:true,
-                //          feedback:true
-                //       }
-                //     }
-                // })
             } catch (error) {
                 setLoading(false);
                 const errorMessage = error.message;

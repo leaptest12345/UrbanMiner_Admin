@@ -16,6 +16,7 @@ export default function FeedBackList() {
         const toggleReadMore = () => {
             setIsReadMore(!isReadMore);
         };
+
         return (
             <p className='text'>
                 {isReadMore ? text?.slice(0, 150) : text}
@@ -38,13 +39,15 @@ export default function FeedBackList() {
         try {
             const starCountRef = ref(database, '/ADMIN/FeedBack');
             onValue(starCountRef, (snapshot) => {
-                if (Array.isArray(snapshot.val())) {
-                    let newArr = snapshot.val();
-                    setData(newArr);
-                } else {
-                    let arr = [];
-                    Object.keys(snapshot.val()).map((key) => arr.push(snapshot.val()[key]));
-                    setData(arr);
+                if (snapshot.exists()) {
+                    if (Array.isArray(snapshot.val())) {
+                        let newArr = snapshot.val();
+                        setData(newArr);
+                    } else {
+                        let arr = [];
+                        Object.keys(snapshot.val()).map((key) => arr.push(snapshot.val()[key]));
+                        setData(arr);
+                    }
                 }
             });
         } catch (error) {

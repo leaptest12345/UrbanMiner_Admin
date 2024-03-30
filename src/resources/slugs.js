@@ -29,5 +29,6 @@ export default {
     blog: '/blog',
     blogDetails: '/blogDetails',
     materialList: '/materialList',
+    ml: '/ml',
     unApprovedList: '/unApprovedList'
 };

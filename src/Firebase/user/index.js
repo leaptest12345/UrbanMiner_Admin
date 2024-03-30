@@ -94,12 +94,12 @@ export const getUserListByAdminLevel = async () => {
 
         const subUserRef = ref(Config.database, `/ADMIN/USERS/${id}/SUB_USERS`);
 
-        if (userDetail.adminLevel === 2) {
+        if (userDetail?.adminLevel === 2) {
             await onValue(subUserRef, (snapshot) => {
                 const data = snapshot.val();
                 userList = formateData(data);
             });
-        } else if (userDetail.adminLevel === 1) {
+        } else if (userDetail?.adminLevel === 1) {
             const userRef = ref(Config.database, '/USERS');
             await onValue(userRef, (snapshot) => {
                 const data = snapshot.val();

@@ -76,6 +76,12 @@ function SidebarComponent(props) {
                         />
                     ) : null}
                     <MenuItem
+                        id={SLUGS.ml}
+                        title='Ml'
+                        icon={<DataUsageRounded className='text-white' />}
+                        onClick={() => onClick(SLUGS.ml)}
+                    />
+                    <MenuItem
                         id={SLUGS.unApprovedList}
                         title='UnApproved Users'
                         icon={<DataUsageRounded className='text-white' />}
