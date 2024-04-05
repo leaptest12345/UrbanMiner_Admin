@@ -59,7 +59,6 @@ export default function MaterialList() {
         },
         enableReinitialize: true,
         onSubmit: async (values) => {
-            console.log('values', values);
             if (selectedId) {
                 await updateMaterialItem(selectedId, {
                     description: values.description,
@@ -237,7 +236,6 @@ export default function MaterialList() {
                             formik.handleSubmit();
                         } else {
                             if (isCreateNewItem) {
-                                console.log(formik.values);
                                 if (
                                     formik.values.description &&
                                     formik.values.category &&
@@ -306,6 +304,12 @@ export default function MaterialList() {
                             onClick={() => setOpen(!open)}
                         />
                         <ItemDetailsInputs
+                            CategoryList={categoryList.map((item) => {
+                                return {
+                                    value: item.category,
+                                    label: item.category
+                                };
+                            })}
                             category={formik.values.category}
                             price={formik.values.price}
                             um={formik.values.um}
@@ -408,6 +412,12 @@ export default function MaterialList() {
                                             open={open}
                                         />
                                         <ItemDetailsInputs
+                                            CategoryList={categoryList.map((item) => {
+                                                return {
+                                                    value: item.category,
+                                                    label: item.category
+                                                };
+                                            })}
                                             category={formik.values.category}
                                             price={formik.values.price}
                                             um={formik.values.um}
@@ -415,7 +425,6 @@ export default function MaterialList() {
                                             onPriceChange={(e) => {
                                                 const value = e.target.value.toString();
                                                 formik.setFieldValue('price', value, false);
-                                                console.log('price', value);
                                             }}
                                             onUmChange={formik.handleChange('um')}
                                         />

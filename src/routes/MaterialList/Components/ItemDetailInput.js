@@ -7,7 +7,8 @@ const ItemDetailsInputs = ({
     um,
     onCategoryChange,
     onPriceChange,
-    onUmChange
+    onUmChange,
+    CategoryList
 }) => {
     const inputClassName =
         'h-9 bg-white border rounded-lg outline-none px-4 font-bold text-sm placeholder:text-gray-400 placeholder:font-bold text-black';
@@ -22,14 +23,18 @@ const ItemDetailsInputs = ({
 
     return (
         <div className='flex items-center gap-2'>
-            <div className='flex flex-col gap-1 w-[150px]'>
+            <div className='flex flex-col gap-1 w-[100px]'>
                 <div className='text-sm'>CATEGORY</div>
-                <input
+                <select
                     value={category}
                     onChange={onCategoryChange}
-                    placeholder={'category'}
-                    className={`${inputClassName}`}
-                />
+                    placeholder={'Category'}
+                    className={`${inputClassName} w-[100px]`}
+                >
+                    {CategoryList?.map((item) => {
+                        return <option value={item.value}>{item.label}</option>;
+                    })}
+                </select>
             </div>
 
             <div className='flex flex-col gap-1 w-[100px]'>
