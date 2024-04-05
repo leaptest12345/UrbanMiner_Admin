@@ -15,6 +15,9 @@ import {
     getAllMaterialList,
     updateMaterialItem
 } from '../../Firebase/materialList/index';
+import { onValue, ref } from 'firebase/database';
+import { formateData } from 'util/formateData';
+import * as Config from '../../configs/index';
 
 export default function MaterialList() {
     const [open, setOpen] = useState(true);
@@ -32,9 +35,14 @@ export default function MaterialList() {
     }, []);
 
     const getInitialDetails = async () => {
-        const list = await getAllMaterialList();
-        console.log('list: ', list);
-        setMaterialList(list);
+        const materialRef = ref(Config.database, '/ADMIN/MATERIAL_LIST');
+
+        await onValue(materialRef, (snapshot) => {
+            const results = snapshot.val();
+            const data = formateData(results);
+
+            setMaterialList(data);
+        });
     };
 
     const formik = useFormik({
@@ -51,6 +59,7 @@ export default function MaterialList() {
         },
         enableReinitialize: true,
         onSubmit: async (values) => {
+            console.log('values', values);
             if (selectedId) {
                 await updateMaterialItem(selectedId, {
                     description: values.description,
@@ -226,9 +235,10 @@ export default function MaterialList() {
                             price={formik.values.price}
                             um={formik.values.um}
                             onCategoryChange={formik.handleChange('category')}
-                            onPriceChange={(e) => formik.handleChange('price')}
+                            onPriceChange={(e) => {
+                                formik.setFieldValue('price', e.target.value, false);
+                            }}
                             onUmChange={(value) => {
-                                console.log(value.target.value);
                                 formik.setFieldValue('um', value.target.value, false);
                             }}
                         />
