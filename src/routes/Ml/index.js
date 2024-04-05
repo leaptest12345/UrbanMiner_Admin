@@ -1,7 +1,12 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { DropzoneArea } from 'material-ui-dropzone';
-import { Backdrop, Chip, CircularProgress, Grid, Stack } from '@mui/material';
+import { Backdrop, Button, Chip, CircularProgress, Grid, Stack } from '@mui/material';
+import { uploadWheelImage } from 'util/uploadProductImage';
+import { get, ref, set } from 'firebase/database';
+import { database } from 'configs';
+import { v4 as uuid } from 'uuid';
+import { formateData } from 'util/formateData';
 
 function Ml() {
     const [model, setModel] = useState(null);
@@ -9,10 +14,20 @@ function Ml() {
     const [loading, setLoading] = useState(false);
     const [confidence, setConfidence] = useState(null);
     const [predictedClass, setPredictedClass] = useState(null);
+    const [files, setFiles] = useState([]);
+    const [predictedLabel, setPredictedLabel] = useState(null);
+    const [images, setImages] = useState([]);
 
     useEffect(() => {
         const loadModel = async () => {
             try {
+                const starCount = ref(database, `/Wheel/`);
+                const snapShot = await get(starCount);
+                const data = formateData(snapShot.val());
+
+                console.log('vales', data);
+                setImages(data);
+
                 const model_url = 'tfjs/model/model.json';
 
                 const model = await tf.loadLayersModel(model_url, {
@@ -62,6 +77,8 @@ function Ml() {
     };
 
     const handleImageChange = async (files) => {
+        // setPredictedLabel(null);
+        // setImages([]);
         if (files.length === 0) {
             setConfidence(null);
             setPredictedClass(null);
@@ -74,7 +91,7 @@ function Ml() {
             const image = await createHTMLImageElement(imageSrc);
 
             // tf.tidy for automatic memory cleanup
-            const [predictedClass, confidence] = tf.tidy(() => {
+            const predictedClasses = tf.tidy(() => {
                 const tensorImg = tf.browser
                     .fromPixels(image)
                     .resizeNearestNeighbor([224, 224])
@@ -82,22 +99,73 @@ function Ml() {
                     .expandDims();
 
                 const result = model.predict(tensorImg);
-
                 const predictions = result.dataSync();
-                console.log('predictions', predictions);
+
+                const predictedClasses = [];
+
                 const predicted_index = result.as1D().argMax().dataSync()[0];
 
-                console.log('predicted_index', predicted_index);
+                const predictedLabel = classLabels[predicted_index];
 
-                const predictedClass = classLabels[predicted_index];
-                const confidence = Math.round(predictions[predicted_index] * 100);
+                console.log('predicted label', predictedLabel);
+                setPredictedLabel(predictedLabel);
 
-                return [predictedClass, confidence];
+                return [
+                    {
+                        predictedClass: predictedLabel,
+                        confidence: Math.round(predictions[predicted_index] * 100)
+                    }
+                ];
+                // Iterate over prediction scores
+                // for (let i = 0; i < predictions.length; i++) {
+                //     const predictedClass = classLabels[i];
+                //     const confidence = Math.round(predictions[i] * 100);
+                //     predictedClasses.push({
+                //         predictedClass: predictedClass,
+                //         confidence: confidence
+                //     });
+                // }
+
+                // Return array of predicted classes and confidences
+                // return predictedClasses;
+
+                // const confidence = Math.round(predictions[predicted_index] * 100);
+
+                // return [predictedClass, confidence];
             });
 
-            setPredictedClass(predictedClass);
-            setConfidence(confidence);
+            setPredictedClass(predictedClasses);
+            // setConfidence(confidence);
             setLoading(false);
+        }
+    };
+
+    const addImages = async () => {
+        let count = 0;
+
+        for (const wheelImage of files) {
+            const url = await uploadWheelImage(wheelImage);
+
+            const id = uuid().slice(0, 8);
+
+            const starCount = ref(database, `/Wheel/${id}`);
+
+            console.log('uploaded', count);
+
+            // "wire"
+            // "steal"
+            // "sand"
+            // "MudTerrain"
+            // "carbonFiber"
+            // "alloy"
+
+            await set(starCount, {
+                id: id,
+                url: url,
+                label: 'wire'
+            });
+
+            count++;
         }
     };
 
@@ -123,26 +191,43 @@ function Ml() {
                         filesLimit={1}
                         showAlerts={['error']}
                     />
-                    <Stack style={{ marginTop: '2em', width: '12rem' }} direction='row' spacing={1}>
-                        <Chip
-                            label={
-                                predictedClass === null
-                                    ? 'Prediction:'
-                                    : `Prediction: ${predictedClass}`
-                            }
-                            style={{ justifyContent: 'left' }}
-                            variant='outlined'
-                        />
-                        <Chip
-                            label={
-                                confidence === null ? 'Confidence:' : `Confidence: ${confidence}%`
-                            }
-                            style={{ justifyContent: 'left' }}
-                            variant='outlined'
-                        />
-                    </Stack>
+                    {predictedClass?.map((item) => {
+                        return (
+                            <Stack
+                                style={{ marginTop: '2em', width: '12rem' }}
+                                direction='row'
+                                spacing={1}
+                            >
+                                <Chip
+                                    label={
+                                        item.predictedClass === null
+                                            ? 'Prediction:'
+                                            : `Prediction: ${item.predictedClass}`
+                                    }
+                                    style={{ justifyContent: 'left' }}
+                                    variant='outlined'
+                                />
+                                <Chip
+                                    label={
+                                        item.confidence === null
+                                            ? 'Confidence:'
+                                            : `Confidence: ${item.confidence}%`
+                                    }
+                                    style={{ justifyContent: 'left' }}
+                                    variant='outlined'
+                                />
+                            </Stack>
+                        );
+                    })}
                 </Grid>
             </Grid>
+            <div className='flex flex-wrap flex-1'>
+                {images
+                    .filter((item) => item.label == predictedLabel)
+                    .map((item, index) => {
+                        return <img key={index} src={item.url} alt={item.label} />;
+                    })}
+            </div>
 
             <Backdrop
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
