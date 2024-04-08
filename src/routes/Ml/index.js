@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import * as tf from '@tensorflow/tfjs';
 import { DropzoneArea } from 'material-ui-dropzone';
-import { Backdrop, Button, Chip, CircularProgress, Grid, Stack } from '@mui/material';
+import { Backdrop, Chip, CircularProgress, Grid, Stack } from '@mui/material';
 import { uploadWheelImage } from 'util/uploadProductImage';
 import { get, ref, set } from 'firebase/database';
 import { database } from 'configs';
@@ -17,6 +17,7 @@ function Ml() {
     const [files, setFiles] = useState([]);
     const [predictedLabel, setPredictedLabel] = useState(null);
     const [images, setImages] = useState([]);
+    const [internetImages, setInternetImages] = useState([]);
 
     useEffect(() => {
         const loadModel = async () => {
@@ -25,7 +26,6 @@ function Ml() {
                 const snapShot = await get(starCount);
                 const data = formateData(snapShot.val());
 
-                console.log('vales', data);
                 setImages(data);
 
                 const model_url = 'tfjs/model/model.json';
@@ -55,6 +55,41 @@ function Ml() {
         loadModel();
         getClassLabels();
     }, []);
+
+    const getDataFromTheInternet = async (search) => {
+        try {
+            const data = await fetch(
+                `https://www.googleapis.com/customsearch/v1?key=AIzaSyDo1hBtiyWPBN-PiwQx8vdrlNo6zkBcJJY&cx=b04e1e934ab2c49f8&q=${
+                    search + ' wheel' + ' images'
+                }`
+            );
+
+            const json = await data.json();
+
+            // Extract image URLs from the JSON response
+
+            // Display image URLs in a list
+
+            const imagesWithLinks = json.items.flatMap((item) => {
+                if (item.pagemap && item.pagemap.cse_image && item.pagemap.cse_image.length > 0) {
+                    return item.pagemap.cse_image.map((image) => ({
+                        image: image.src,
+                        link: item.link
+                    }));
+                } else {
+                    return [];
+                }
+            });
+
+            console.log('list', imagesWithLinks);
+
+            setInternetImages(imagesWithLinks);
+
+            console.log('json', json.items);
+        } catch (e) {
+            console.log('error', e);
+        }
+    };
 
     const readImageFile = (file) => {
         return new Promise((resolve) => {
@@ -110,12 +145,15 @@ function Ml() {
                 console.log('predicted label', predictedLabel);
                 setPredictedLabel(predictedLabel);
 
+                getDataFromTheInternet(predictedLabel);
+
                 return [
                     {
                         predictedClass: predictedLabel,
                         confidence: Math.round(predictions[predicted_index] * 100)
                     }
                 ];
+
                 // Iterate over prediction scores
                 // for (let i = 0; i < predictions.length; i++) {
                 //     const predictedClass = classLabels[i];
@@ -151,14 +189,6 @@ function Ml() {
             const starCount = ref(database, `/Wheel/${id}`);
 
             console.log('uploaded', count);
-
-            // "wire"
-            // "steal"
-            // "sand"
-            // "MudTerrain"
-            // "carbonFiber"
-            // "alloy"
-
             await set(starCount, {
                 id: id,
                 url: url,
@@ -177,15 +207,14 @@ function Ml() {
                 direction='column'
                 alignItems='center'
                 justifyContent='center'
-                marginTop='12%'
             >
-                <Grid item>
+                <Grid className='my-10'>
                     <h1 style={{ textAlign: 'center', marginBottom: '1.5em' }}>
-                        UrbanMiner Image Classifier
+                        UrbanMiner Wheels Classifier
                     </h1>
                     <DropzoneArea
                         acceptedFiles={['image/*']}
-                        dropzoneText={'Add an image'}
+                        dropzoneText={'Select an image'}
                         onChange={handleImageChange}
                         maxFileSize={10000000}
                         filesLimit={1}
@@ -221,12 +250,47 @@ function Ml() {
                     })}
                 </Grid>
             </Grid>
+            <div className='text-3xl font-bold my-4 text-slate-700'>Library Images</div>
+
             <div className='flex flex-wrap flex-1'>
                 {images
-                    .filter((item) => item.label == predictedLabel)
-                    .map((item, index) => {
-                        return <img key={index} src={item.url} alt={item.label} />;
+                    ?.filter((item) => item.label == predictedLabel)
+                    ?.map((item, index) => {
+                        return (
+                            <img
+                                onClick={() => window.open(item.url)}
+                                key={index}
+                                src={item.url}
+                                style={{
+                                    width: '200px',
+                                    height: '200px',
+                                    margin: '10px',
+                                    borderRadius: 4
+                                }}
+                                alt={item.label}
+                            />
+                        );
                     })}
+            </div>
+            <div className='text-3xl text-black font-bold my-4'>Internet Images</div>
+
+            <div className='flex flex-wrap flex-1'>
+                {internetImages.map((item, index) => {
+                    return (
+                        <img
+                            onClick={() => window.open(item.link)}
+                            key={index}
+                            src={item.image}
+                            style={{
+                                width: '200px',
+                                height: '200px',
+                                margin: '10px',
+                                borderRadius: 4
+                            }}
+                            alt={item.label}
+                        />
+                    );
+                })}
             </div>
 
             <Backdrop
