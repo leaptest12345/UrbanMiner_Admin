@@ -251,7 +251,6 @@ function Ml() {
                 </Grid>
             </Grid>
             <div className='text-3xl font-bold my-4 text-slate-700'>Library Images</div>
-
             <div className='flex flex-wrap flex-1'>
                 {images
                     ?.filter((item) => item.label == predictedLabel)
