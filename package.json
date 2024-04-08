@@ -11,6 +11,7 @@
         "@mui/icons-material": "^5.10.9",
         "@mui/material": "^5.10.13",
         "@reduxjs/toolkit": "^1.9.0",
+        "@tensorflow/tfjs": "^4.17.0",
         "firebase": "^9.13.0",
         "formik": "^2.4.3",
         "glamor": "^2.20.40",
