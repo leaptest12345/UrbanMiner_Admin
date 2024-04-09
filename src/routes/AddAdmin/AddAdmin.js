@@ -36,6 +36,14 @@ export default function AddAdmin(props) {
     const [userList, setUserList] = useState([]);
     const [adminLevel, setAdminLevel] = useState('');
     const [adminUsers, setAdminUsers] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [companyName, setCompanyName] = useState('');
+    const [street, setStreet] = useState('');
+    const [city, setCity] = useState('');
+    const [state, setState] = useState('');
+    const [zip, setZip] = useState('');
 
     useEffect(() => {
         getUsers();
@@ -118,7 +126,14 @@ export default function AddAdmin(props) {
                     //if user  exist
                     const id = await localStorage.getItem('userID');
                     const userDetailRef = ref(database, `/USERS/${subUserID}`);
+
                     onValue(userDetailRef, async (snapShot) => {
+                        const data = snapShot.val();
+                        setFirstName(data.firstName);
+                        setLastName(data.lastName);
+                        setPhoneNumber(data.phoneNumber);
+                        setCompanyName(data.companyName);
+
                         const userRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS/${subUserID}`);
                         set(userRef, {
                             ID: subUserID,
@@ -165,14 +180,22 @@ export default function AddAdmin(props) {
                                 ID: userUniqueID,
                                 email: email,
                                 isDeleted: false,
-                                firstName: email,
-                                lastName: '',
+                                firstName: firstName,
+                                lastName: lastName,
                                 photo: '',
                                 photoName: '',
-                                phoneNumber: '',
+                                phoneNumber: phoneNumber,
+                                companyName: companyName,
                                 isApproved: true,
                                 cca2: 'US',
-                                countryCode: '1'
+                                countryCode: '1',
+                                address: {
+                                    street: street,
+                                    city: city,
+                                    state: state,
+                                    zipCode: zip
+                                },
+                                companyName: ''
                             });
 
                             const id = await localStorage.getItem('userID');
@@ -293,8 +316,66 @@ export default function AddAdmin(props) {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </div>
+
+                        <div className='flex gap-10 items-center'>
+                            <Input
+                                label='FirstName'
+                                placeholder='Enter FirstName'
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                            />
+                            <Input
+                                label='LastName'
+                                placeholder='Enter LastName'
+                                value={lastName}
+                                onChange={(e) => setLastName(e.target.value)}
+                            />
+                        </div>
+                        <div className='flex gap-10 items-center'>
+                            <Input
+                                label='PhoneNumber'
+                                placeholder='Enter PhoneNumber'
+                                value={phoneNumber}
+                                onChange={(e) => setPhoneNumber(e.target.value)}
+                            />
+                            <Input
+                                label='CompanyName'
+                                placeholder='Enter CompanyName'
+                                value={companyName}
+                                onChange={(e) => setCompanyName(e.target.value)}
+                            />
+                        </div>
+                        <div className='flex gap-10 items-center'>
+                            <Input
+                                label='Street'
+                                placeholder='Enter Street'
+                                value={street}
+                                onChange={(e) => setStreet(e.target.value)}
+                            />
+                            <Input
+                                label='City'
+                                placeholder='Enter City'
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
+                            />
+                        </div>
+                        <div className='flex gap-10 items-center'>
+                            <Input
+                                label='State'
+                                placeholder='Enter State'
+                                value={state}
+                                onChange={(e) => setState(e.target.value)}
+                            />
+                            <Input
+                                label='Zip'
+                                placeholder='Enter Zip'
+                                value={zip}
+                                onChange={(e) => setZip(e.target.value)}
+                            />
+                        </div>
                     </>
                 )}
+
                 {adminLevel != 1 ? null : (
                     <div className='pl-1 flex flex-col gap-2'>
                         <div className='form-check' style={styles.formCheckStyle}>

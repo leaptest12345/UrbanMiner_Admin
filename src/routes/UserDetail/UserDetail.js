@@ -151,6 +151,8 @@ export default function UserDetail(props) {
             onValue(refDetail, (snapShot) => {
                 setIsApproved(snapShot.val()?.isApproved);
                 setUser(snapShot.val());
+
+                console.log('deatils', snapShot.val());
             });
         } catch (error) {
             console.log(error);
@@ -219,14 +221,17 @@ export default function UserDetail(props) {
                         <Formik
                             enableReinitialize
                             initialValues={{
-                                firstName: userDetails?.firstName ?? user?.firstName ?? '',
-                                lastName: userDetails?.lastName ?? user?.lastName ?? '',
-                                phoneNumber: userDetails?.phoneNumber ?? user?.phoneNumber ?? '',
-                                emailAddress: userDetails?.emailAddress ?? user?.email ?? ' ',
-                                streetAddress: userDetails?.streetAddress ?? '',
-                                city: userDetails?.city ?? '',
-                                state: userDetails?.state ?? '',
-                                postalCode: userDetails?.postalCode ?? '',
+                                firstName: user?.firstName ?? '',
+                                lastName: user?.lastName ?? '',
+                                phoneNumber: user?.phoneNumber ?? '',
+                                emailAddress: user?.email ?? ' ',
+                                companyName: user?.companyName ?? '',
+                                address: {
+                                    street: user?.address?.street ?? '',
+                                    city: user?.address?.city ?? '',
+                                    state: user?.address?.state ?? '',
+                                    zipCode: user?.address?.zipCode ?? ''
+                                },
                                 country: userDetails?.country ?? user?.cca2 ?? '',
                                 recyclingDate: userDetails?.recyclingDate
                                     ? new Date(userDetails?.recyclingDate)
@@ -290,10 +295,6 @@ export default function UserDetail(props) {
                                         lastName: values.lastName,
                                         phoneNumber: values.phoneNumber,
                                         emailAddress: values.emailAddress,
-                                        streetAddress: values.streetAddress,
-                                        city: values.city,
-                                        state: values.state,
-                                        postalCode: values.postalCode,
                                         country: values.country,
                                         recyclingDate: values.recyclingDate,
                                         materialType: values.materialType,
@@ -314,7 +315,6 @@ export default function UserDetail(props) {
                                         recyclingLoyaltyId: values.recyclingLoyaltyId,
                                         recyclingLoyaltyCurrentPoint:
                                             values.recyclingLoyaltyCurrentPoint,
-
                                         license: {
                                             driver: {
                                                 photo: values?.license?.driver?.photo ?? '',
@@ -333,13 +333,16 @@ export default function UserDetail(props) {
                                                 photo: values?.license?.federal?.photo ?? '',
                                                 expireDate: values?.license?.federal?.expireDate
                                             }
-                                        }
+                                        },
+                                        companyName: values.companyName
                                     });
                                     await update(refDetail, {
                                         firstName: values.firstName,
                                         lastName: values.lastName,
                                         email: values.emailAddress,
-                                        phoneNumber: values.phoneNumber
+                                        phoneNumber: values.phoneNumber,
+                                        companyName: values.companyName,
+                                        address: values.address
                                     });
                                     notify('UserDetail Successfully Updated!', 1);
                                 } catch (error) {
@@ -352,7 +355,7 @@ export default function UserDetail(props) {
                                     <div className='flex flex-col gap-6'>
                                         <div className='flex flex-col gap-2'>
                                             <h3 className='font-bold text-xl text-black'>
-                                                1) Full Name
+                                                1) Personal Information
                                             </h3>
                                             <InputWithLabel
                                                 value={values.firstName}
@@ -367,6 +370,13 @@ export default function UserDetail(props) {
                                                     setFieldValue('lastName', value, false)
                                                 }
                                                 label='LastName:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.companyName}
+                                                onChange={(value) =>
+                                                    setFieldValue('companyName', value, false)
+                                                }
+                                                label='companyName:'
                                             />
                                         </div>
                                         <div className='flex flex-col gap-2'>
@@ -503,31 +513,31 @@ export default function UserDetail(props) {
                                                 3) Address
                                             </h3>
                                             <InputWithLabel
-                                                value={values.streetAddress}
+                                                value={values.address.street}
                                                 onChange={(value) =>
-                                                    setFieldValue('streetAddress', value, false)
+                                                    setFieldValue('address.street', value, false)
                                                 }
                                                 label='Street Address:'
                                             />
                                             <InputWithLabel
                                                 label='City:'
-                                                value={values.city}
+                                                value={values.address.city}
                                                 onChange={(value) =>
-                                                    setFieldValue('city', value, false)
+                                                    setFieldValue('address.city', value, false)
                                                 }
                                             />
                                             <InputWithLabel
                                                 label='State/Province:'
-                                                value={values.state}
+                                                value={values.address.state}
                                                 onChange={(value) =>
-                                                    setFieldValue('state', value, false)
+                                                    setFieldValue('address.state', value, false)
                                                 }
                                             />
                                             <InputWithLabel
                                                 label='Postal/ZIP Code:'
-                                                value={values.postalCode}
+                                                value={values.address.zipCode}
                                                 onChange={(value) =>
-                                                    setFieldValue('postalCode', value, false)
+                                                    setFieldValue('address.zipCode', value, false)
                                                 }
                                             />
                                             <InputWithLabel
