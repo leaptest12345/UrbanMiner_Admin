@@ -45,13 +45,13 @@ export default function UserList() {
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
             onValue(userRef, (snapshot) => {
-                if (snapshot.val().adminLevel == '2') {
+                if (snapshot.val()?.adminLevel == '2') {
                     //can only see subUsers data
                     onValue(subUserRef, (snapshot) => {
                         const data = snapshot.val();
                         setUsers(formateData(data));
                     });
-                } else if (snapshot.val().adminLevel == '1') {
+                } else if (snapshot.val()?.adminLevel == '1') {
                     //level 1 admin will be able to see all the user data
                     const starCountRef = ref(database, '/USERS');
                     onValue(starCountRef, (snapshot) => {

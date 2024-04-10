@@ -81,6 +81,12 @@ function SidebarComponent(props) {
                         icon={<DataUsageRounded className='text-white' />}
                         onClick={() => onClick(SLUGS.unApprovedList)}
                     />
+                    <MenuItem
+                        id={SLUGS.categoryList}
+                        title='Category List'
+                        icon={<ViewListSharp className='text-white' />}
+                        onClick={() => onClick(SLUGS.categoryList)}
+                    />
                     {permission?.item ? (
                         <MenuItem
                             id={SLUGS.items}

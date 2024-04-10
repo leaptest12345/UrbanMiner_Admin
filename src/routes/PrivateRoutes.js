@@ -23,6 +23,7 @@ import Blog from './Blog/Blog';
 import BlogDetails from './BlogDetails/BlogDetails';
 import MaterialList from './MaterialList';
 import { UnApprovedUserList } from './UnApprovedUserList';
+import CategoryList, { categoryList } from './categoryList';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -79,6 +80,12 @@ function PrivateRoutes() {
                     path={SLUGS.UserPermission}
                     component={UserPermission}
                     render={() => <div>User Permission</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.categoryList}
+                    component={CategoryList}
+                    render={() => <div>Category List</div>}
                 />
                 <Route
                     exact

@@ -59,7 +59,7 @@ function DashboardComponent() {
             const id = await localStorage.getItem('userID');
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             onValue(userRef, (snapshot) => {
-                setAdminLevel(snapshot.val().adminLevel);
+                setAdminLevel(snapshot.val()?.adminLevel);
             });
             const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
             onValue(subUserRef, (snapshot) => {

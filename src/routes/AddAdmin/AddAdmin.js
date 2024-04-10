@@ -79,7 +79,7 @@ export default function AddAdmin(props) {
             const id = await localStorage.getItem('userID');
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             onValue(userRef, (snapshot) => {
-                setAdminLevel(snapshot.val().adminLevel);
+                setAdminLevel(snapshot.val()?.adminLevel);
                 setAdminUsers(snapshot.val().users);
             });
             const refDetail = ref(database, '/ADMIN/USERS');
