@@ -1,1 +1,23 @@
-{"tfjsVersion":"1.3.1","tmVersion":"2.4.7","packageVersion":"0.8.4-alpha2","packageName":"@teachablemachine/image","timeStamp":"2024-04-02T06:10:00.218Z","userMetadata":{},"modelName":"tm-my-image-model","labels":["wire","steal","sand","MudTerrain","carbonFiber","alloy"],"imageSize":224}
+{
+    "tfjsVersion": "1.3.1",
+    "tmVersion": "2.4.7",
+    "packageVersion": "0.8.4-alpha2",
+    "packageName": "@teachablemachine/image",
+    "timeStamp": "2024-04-10T07:46:09.912Z",
+    "userMetadata": {},
+    "modelName": "tm-my-image-model",
+    "labels": [
+        "honda",
+        "nissan",
+        "bremmer",
+        "asa",
+        "ford",
+        "kmc",
+        "ultra",
+        "sparco",
+        "rtx",
+        "americal racing",
+        "alpha"
+    ],
+    "imageSize": 224
+}

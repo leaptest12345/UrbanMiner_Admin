@@ -7,6 +7,7 @@ import { get, ref, set } from 'firebase/database';
 import { database } from 'configs';
 import { v4 as uuid } from 'uuid';
 import { formateData } from 'util/formateData';
+import { notify } from 'util/notify';
 
 function Ml() {
     const [model, setModel] = useState(null);
@@ -18,11 +19,12 @@ function Ml() {
     const [predictedLabel, setPredictedLabel] = useState(null);
     const [images, setImages] = useState([]);
     const [internetImages, setInternetImages] = useState([]);
+    const [count, setCount] = useState(0);
 
     useEffect(() => {
         const loadModel = async () => {
             try {
-                const starCount = ref(database, `/Wheel/`);
+                const starCount = ref(database, `/WHEEL/`);
                 const snapShot = await get(starCount);
                 const data = formateData(snapShot.val());
 
@@ -142,7 +144,6 @@ function Ml() {
 
                 const predictedLabel = classLabels[predicted_index];
 
-                console.log('predicted label', predictedLabel);
                 setPredictedLabel(predictedLabel);
 
                 getDataFromTheInternet(predictedLabel);
@@ -154,7 +155,6 @@ function Ml() {
                     }
                 ];
 
-                // Iterate over prediction scores
                 // for (let i = 0; i < predictions.length; i++) {
                 //     const predictedClass = classLabels[i];
                 //     const confidence = Math.round(predictions[i] * 100);
@@ -164,7 +164,6 @@ function Ml() {
                 //     });
                 // }
 
-                // Return array of predicted classes and confidences
                 // return predictedClasses;
 
                 // const confidence = Math.round(predictions[predicted_index] * 100);
@@ -186,17 +185,32 @@ function Ml() {
 
             const id = uuid().slice(0, 8);
 
-            const starCount = ref(database, `/Wheel/${id}`);
+            const starCount = ref(database, `/WHEEL/${id}`);
 
-            console.log('uploaded', count);
+            // "bbs",
+            // "honda",
+            // "nissan",
+            // "bremmer",
+            // "asa",
+            // "kmc",
+            // "ford",
+            // "ultra",
+            // "sparco",
+            // "rtx",
+            // "americal racing",
+            // "alpha"
+
             await set(starCount, {
                 id: id,
                 url: url,
-                label: 'wire'
+                label: 'alpha'
             });
 
             count++;
+            setCount(count);
         }
+        setImages([]);
+        notify('Images uploaded successfully', 1);
     };
 
     return (
@@ -208,6 +222,11 @@ function Ml() {
                 alignItems='center'
                 justifyContent='center'
             >
+                {/* <input type='file' multiple onChange={(e) => setFiles(e.target.files)} />
+                <div className='text-red-500 font-medium text-lg'>{count}</div>
+                <div onClick={addImages} className='p-4 bg-red-50 cursor-pointer'>
+                    <div>upload </div>
+                </div> */}
                 <Grid className='my-10'>
                     <h1 style={{ textAlign: 'center', marginBottom: '1.5em' }}>
                         UrbanMiner Wheels Classifier
