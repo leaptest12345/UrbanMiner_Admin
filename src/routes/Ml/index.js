@@ -36,7 +36,6 @@ function Ml() {
                     strict: false
                 });
 
-                console.log('loaded');
                 setModel(model);
             } catch (e) {
                 console.log(e);
@@ -49,7 +48,6 @@ function Ml() {
             const res = await fetch(labelsUrl);
 
             const data = await res.json();
-            console.log('details', data.labels);
 
             setClassLabels(data.labels);
         };
@@ -60,34 +58,41 @@ function Ml() {
 
     const getDataFromTheInternet = async (search) => {
         try {
+            // const API_KEY = 'AIzaSyDo1hBtiyWPBN-PiwQx8vdrlNo6zkBcJJY';
+
+            const API_KEY = 'AIzaSyDqKgBNPXatFbJMGmRGR5uVX4po2cgZRLM';
+
             const data = await fetch(
-                `https://www.googleapis.com/customsearch/v1?key=AIzaSyDo1hBtiyWPBN-PiwQx8vdrlNo6zkBcJJY&cx=b04e1e934ab2c49f8&q=${
-                    search + ' wheel' + ' images'
-                }`
+                `https://www.googleapis.com/customsearch/v1?key=${API_KEY}&cx=b04e1e934ab2c49f8&q=${
+                    search + ' tier wheel' + ' images'
+                }&searchType=image`
             );
 
             const json = await data.json();
 
+            console.log('json values', json);
             // Extract image URLs from the JSON response
 
             // Display image URLs in a list
 
-            const imagesWithLinks = json.items.flatMap((item) => {
-                if (item.pagemap && item.pagemap.cse_image && item.pagemap.cse_image.length > 0) {
-                    return item.pagemap.cse_image.map((image) => ({
-                        image: image.src,
-                        link: item.link
-                    }));
-                } else {
-                    return [];
-                }
+            const imagesWithLinks = json?.items?.map((item) => {
+                console.log('item', item);
+                // if (item.pagemap && item.pagemap.cse_image && item.pagemap.cse_image.length > 0) {
+                // return item.pagemap.cse_image?.map((image) => ({
+                //     image: image.src,
+                //     link: item.link
+                // }));
+                // } else {
+                //     return [];
+                // }
+
+                return {
+                    image: item?.image?.thumbnailLink,
+                    link: item?.image?.contextLink
+                };
             });
 
-            console.log('list', imagesWithLinks);
-
             setInternetImages(imagesWithLinks);
-
-            console.log('json', json.items);
         } catch (e) {
             console.log('error', e);
         }
@@ -144,27 +149,29 @@ function Ml() {
 
                 const predictedLabel = classLabels[predicted_index];
 
+                console.log('predicted label', predictedLabel);
+
                 setPredictedLabel(predictedLabel);
 
                 getDataFromTheInternet(predictedLabel);
 
-                return [
-                    {
-                        predictedClass: predictedLabel,
-                        confidence: Math.round(predictions[predicted_index] * 100)
-                    }
-                ];
+                // return [
+                //     {
+                //         predictedClass: predictedLabel,
+                //         confidence: Math.round(predictions[predicted_index] * 100)
+                //     }
+                // ];
 
-                // for (let i = 0; i < predictions.length; i++) {
-                //     const predictedClass = classLabels[i];
-                //     const confidence = Math.round(predictions[i] * 100);
-                //     predictedClasses.push({
-                //         predictedClass: predictedClass,
-                //         confidence: confidence
-                //     });
-                // }
+                for (let i = 0; i < predictions.length; i++) {
+                    const predictedClass = classLabels[i];
+                    const confidence = Math.round(predictions[i] * 100);
+                    predictedClasses.push({
+                        predictedClass: predictedClass,
+                        confidence: confidence
+                    });
+                }
 
-                // return predictedClasses;
+                return predictedClasses;
 
                 // const confidence = Math.round(predictions[predicted_index] * 100);
 
@@ -177,41 +184,41 @@ function Ml() {
         }
     };
 
-    const addImages = async () => {
-        let count = 0;
+    // const addImages = async () => {
+    //     let count = 0;
 
-        for (const wheelImage of files) {
-            const url = await uploadWheelImage(wheelImage);
+    //     for (const wheelImage of files) {
+    //         const url = await uploadWheelImage(wheelImage);
 
-            const id = uuid().slice(0, 8);
+    //         const id = uuid().slice(0, 8);
 
-            const starCount = ref(database, `/WHEEL/${id}`);
+    //         const starCount = ref(database, `/WHEEL/${id}`);
 
-            // "bbs",
-            // "honda",
-            // "nissan",
-            // "bremmer",
-            // "asa",
-            // "kmc",
-            // "ford",
-            // "ultra",
-            // "sparco",
-            // "rtx",
-            // "americal racing",
-            // "alpha"
+    //         // "bbs",
+    //         // "honda",
+    //         // "nissan",
+    //         // "bremmer",
+    //         // "asa",
+    //         // "kmc",
+    //         // "ford",
+    //         // "ultra",
+    //         // "sparco",
+    //         // "rtx",
+    //         // "americal racing",
+    //         // "alpha"
 
-            await set(starCount, {
-                id: id,
-                url: url,
-                label: 'alpha'
-            });
+    //         await set(starCount, {
+    //             id: id,
+    //             url: url,
+    //             label: 'honda'
+    //         });
 
-            count++;
-            setCount(count);
-        }
-        setImages([]);
-        notify('Images uploaded successfully', 1);
-    };
+    //         count++;
+    //         setCount(count);
+    //     }
+    //     setImages([]);
+    //     notify('Images uploaded successfully', 1);
+    // };
 
     return (
         <Fragment>
@@ -239,34 +246,36 @@ function Ml() {
                         filesLimit={1}
                         showAlerts={['error']}
                     />
-                    {predictedClass?.map((item) => {
-                        return (
-                            <Stack
-                                style={{ marginTop: '2em', width: '12rem' }}
-                                direction='row'
-                                spacing={1}
-                            >
-                                <Chip
-                                    label={
-                                        item.predictedClass === null
-                                            ? 'Prediction:'
-                                            : `Prediction: ${item.predictedClass}`
-                                    }
-                                    style={{ justifyContent: 'left' }}
-                                    variant='outlined'
-                                />
-                                <Chip
-                                    label={
-                                        item.confidence === null
-                                            ? 'Confidence:'
-                                            : `Confidence: ${item.confidence}%`
-                                    }
-                                    style={{ justifyContent: 'left' }}
-                                    variant='outlined'
-                                />
-                            </Stack>
-                        );
-                    })}
+                    <div className='flex items-center gap-2 flex-wrap'>
+                        {predictedClass?.map((item) => {
+                            return (
+                                <Stack
+                                    style={{ marginTop: '2em', width: '12rem' }}
+                                    direction='row'
+                                    spacing={1}
+                                >
+                                    <Chip
+                                        label={
+                                            item.predictedClass === null
+                                                ? 'Prediction:'
+                                                : `Prediction: ${item.predictedClass} ${item.confidence}%`
+                                        }
+                                        style={{ justifyContent: 'left' }}
+                                        variant='outlined'
+                                    />
+                                    {/* <Chip
+                                        label={
+                                            item.confidence === null
+                                                ? 'Confidence:'
+                                                : `Confidence: ${item.confidence}%`
+                                        }
+                                        style={{ justifyContent: 'left' }}
+                                        variant='outlined'
+                                    /> */}
+                                </Stack>
+                            );
+                        })}
+                    </div>
                 </Grid>
             </Grid>
             <div className='text-3xl font-bold my-4 text-slate-700'>Library Images</div>
@@ -293,7 +302,7 @@ function Ml() {
             <div className='text-3xl text-black font-bold my-4'>Internet Images</div>
 
             <div className='flex flex-wrap flex-1'>
-                {internetImages.map((item, index) => {
+                {internetImages?.map((item, index) => {
                     return (
                         <img
                             onClick={() => window.open(item.link)}
