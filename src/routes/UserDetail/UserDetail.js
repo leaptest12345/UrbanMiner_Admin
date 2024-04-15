@@ -226,6 +226,8 @@ export default function UserDetail(props) {
                                 phoneNumber: user?.phoneNumber ?? '',
                                 emailAddress: user?.email ?? ' ',
                                 companyName: user?.companyName ?? '',
+                                companyEmail: user?.companyEmail ?? '',
+                                companyPhone: user?.companyPhone ?? '',
                                 address: {
                                     street: user?.address?.street ?? '',
                                     city: user?.address?.city ?? '',
@@ -342,7 +344,9 @@ export default function UserDetail(props) {
                                         email: values.emailAddress,
                                         phoneNumber: values.phoneNumber,
                                         companyName: values.companyName,
-                                        address: values.address
+                                        address: values.address,
+                                        companyEmail: values.companyEmail,
+                                        companyPhone: values.companyPhone
                                     });
                                     notify('UserDetail Successfully Updated!', 1);
                                 } catch (error) {
@@ -377,6 +381,20 @@ export default function UserDetail(props) {
                                                     setFieldValue('companyName', value, false)
                                                 }
                                                 label='companyName:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.companyEmail}
+                                                onChange={(value) =>
+                                                    setFieldValue('companyEmail', value, false)
+                                                }
+                                                label='companyEmail:'
+                                            />
+                                            <InputWithLabel
+                                                value={values.companyPhone}
+                                                onChange={(value) =>
+                                                    setFieldValue('companyPhone', value, false)
+                                                }
+                                                label='companyPhone:'
                                             />
                                         </div>
                                         <div className='flex flex-col gap-2'>
