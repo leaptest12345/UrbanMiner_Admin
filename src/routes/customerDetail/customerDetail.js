@@ -29,9 +29,8 @@ import ImagePicker from 'components/ImagePicker';
 import { uploadLicences } from 'util/uploadProductImage';
 import RadioButtonGroupWithLabel from 'components/RadioButtonGroupWithLabel';
 import DropdownListWithLabel from 'components/DropdownListWithLabel';
-import { customerTypes, formateDate, jobTitles } from './utilts';
+import { customerTypes, jobTitles } from './utilts';
 import { notify } from 'util/notify';
-import moment from 'moment';
 import CustomDatePicker from 'components/CustomDatePicker';
 
 export default function CustomerDetail(props) {
@@ -66,6 +65,7 @@ export default function CustomerDetail(props) {
             fontSize: 14
         }
     }))(TableCell);
+
     const StyledTableRow = withStyles(() => ({
         root: {
             '&:nth-of-type(odd)': {
@@ -191,7 +191,6 @@ export default function CustomerDetail(props) {
                             thumbPrint: user?.thumbPrint ?? ''
                         }}
                         onSubmit={async (values) => {
-                            console.log('insde');
                             const refDetail = ref(
                                 database,
                                 `/USER_CUSTOMER/${userId}/CUSTOMER/${customerId}`

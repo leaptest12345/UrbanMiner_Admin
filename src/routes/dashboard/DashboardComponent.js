@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Column, Row } from 'simple-flexbox';
 import { database } from 'configs/firebaseConfig';
-import { child, onValue, ref } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import { createUseStyles, useTheme } from 'react-jss';
 import { formateData } from 'util/formateData';
 import MiniCardComponent from 'components/cards/MiniCardComponent';
+import { getAllInvoiceTotal } from '../../Firebase/contact/index';
 
 const useStyles = createUseStyles({
     cardsContainer: {
@@ -49,13 +50,15 @@ function DashboardComponent() {
     const [totalUser, setTotalUser] = useState('');
     const [totalSubUser, setTotalSubUser] = useState('');
     const [totalItem, setTotalItem] = useState('');
-    const [totalInvoice, setTotalInvoice] = useState('');
-    const [subUserInvoice, setSubUserInvoice] = useState('');
     const [adminLevel, setAdminLevel] = useState(1);
     const [subUserIds, setSubUserId] = useState([]);
 
+    const [listOfInvoiceCount, setListOfInvoiceCount] = useState([]);
+
     const getAllData = async () => {
         try {
+            const list = await getAllInvoiceTotal();
+            setListOfInvoiceCount(list);
             const id = await localStorage.getItem('userID');
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             onValue(userRef, (snapshot) => {
@@ -80,15 +83,6 @@ function DashboardComponent() {
                 const newArr = snapshot.val();
                 setTotalUser(formateData(newArr).filter((item) => item.isDeleted != true).length);
             });
-            const starCountRef1 = ref(database, '/INVOICE_LIST');
-            onValue(starCountRef1, (snapshot) => {
-                const newArr = snapshot.val();
-
-                setSubUserInvoice(
-                    formateData(newArr).filter((item) => subUserIds.includes(item.userId)).length
-                );
-                setTotalInvoice(formateData(newArr).length);
-            });
             const starCountRef2 = ref(database, '/ADMIN/ITEM');
             onValue(starCountRef2, (snapshot) => {
                 const newArr = snapshot.val();
@@ -105,7 +99,7 @@ function DashboardComponent() {
 
     const classes = useStyles(theme);
     return (
-        <Column>
+        <Column className='flex flex-col gap-8'>
             <Row
                 className={classes.cardsContainer}
                 wrap
@@ -135,13 +129,46 @@ function DashboardComponent() {
                         title='Total Items'
                         value={totalItem}
                     />
+                    <MiniCardComponent
+                        className={classes.miniCardContainer}
+                        title='Total Contacts'
+                        value={listOfInvoiceCount[0]?.total}
+                    />
                 </Row>
-                <MiniCardComponent
-                    className={classes.miniCardContainer}
-                    title='TotalInvoice'
-                    value={adminLevel == 1 ? totalInvoice : subUserInvoice}
-                />
+                <Row
+                    className={classes.cardRow}
+                    wrap
+                    flexGrow={1}
+                    horizontal='space-between'
+                    breakpoints={{ 384: 'column' }}
+                >
+                    <MiniCardComponent
+                        className={classes.miniCardContainer}
+                        title='Total Buy Items'
+                        value={listOfInvoiceCount[1]?.total}
+                    />
+                    <MiniCardComponent
+                        className={classes.miniCardContainer}
+                        title='Total Sell Items'
+                        value={listOfInvoiceCount[2]?.total}
+                    />
+                    <MiniCardComponent
+                        className={classes.miniCardContainer}
+                        title='Total Packing Items'
+                        value={listOfInvoiceCount[3]?.total}
+                    />
+                    <MiniCardComponent
+                        className={classes.miniCardContainer}
+                        title='Total Sales Items'
+                        value={listOfInvoiceCount[4]?.total}
+                    />
+                </Row>
             </Row>
+            <MiniCardComponent
+                className={classes.miniCardContainer}
+                title='Total Inventory Items'
+                value={listOfInvoiceCount[5]?.total}
+            />
         </Column>
     );
 }

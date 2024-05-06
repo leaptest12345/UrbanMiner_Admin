@@ -6,6 +6,70 @@ export const buy_item_list_table = 'BUY_ITEM_LIST';
 export const sell_item_list_table = 'SELL_ITEM_LIST';
 export const packing_item_list_table = 'PACKING_ITEM_LIST';
 
+export const getAllInvoiceTotal = async (type) => {
+    let contactRef = ref(Config.database, `/CONTACTS/`);
+    let buyRef = ref(Config.database, `/BUY_ITEM_LIST/`);
+    let sellRef = ref(Config.database, `/SELL_ITEM_LIST/`);
+    let packingRef = ref(Config.database, `/PACKING_ITEM_LIST/`);
+    let salesRef = ref(Config.database, `/SALES_CONTRACT_LIST/`);
+    let inventoryRef = ref(Config.database, `/INVENTORY_ITEMS/`);
+
+    let list = [contactRef, buyRef, sellRef, packingRef, salesRef, inventoryRef];
+
+    let invoiceTotalList = [
+        {
+            type: 'CONTACTS',
+            total: 0
+        },
+        {
+            type: 'BUY',
+            total: 0
+        },
+        {
+            type: 'SELL',
+            total: 0
+        },
+        {
+            type: 'PACKING',
+            total: 0
+        },
+        {
+            type: 'SALES',
+            total: 0
+        },
+        {
+            type: 'INVENTORY',
+            total: 0
+        }
+    ];
+
+    list.forEach((invoiceRef, index) => {
+        onValue(invoiceRef, (snapshot) => {
+            const contacts = snapshot.val();
+
+            if (contacts) {
+                const values = Object.values(contacts);
+
+                let count = 0;
+
+                values.forEach((item) => {
+                    if (item) {
+                        const keys = Object.keys(item);
+
+                        count = count + keys.length;
+                    }
+                });
+
+                invoiceTotalList[index].total = count;
+            } else {
+                invoiceTotalList[index].total = 0;
+            }
+        });
+    });
+
+    return invoiceTotalList;
+};
+
 export const getTotalInvoices = async (userId, type) => {
     let invoiceRef;
 
