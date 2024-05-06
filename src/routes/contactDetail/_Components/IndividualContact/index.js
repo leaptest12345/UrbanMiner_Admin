@@ -21,7 +21,7 @@ export const IndividualContact = ({ individualInfo }) => {
     });
 
     return (
-        <div>
+        <div className='w-10/12 flex flex-col gap-2'>
             <InputWithLabel
                 label={'Name'}
                 name={'name'}

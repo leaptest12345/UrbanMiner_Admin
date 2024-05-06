@@ -32,7 +32,7 @@ export const BusinessContact = ({ businessInfo }) => {
     });
 
     return (
-        <div className='w-10/12'>
+        <div className='w-10/12 flex flex-col gap-2'>
             <InputWithLabel
                 label={'Business Name'}
                 name={'businessName'}
