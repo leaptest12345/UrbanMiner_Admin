@@ -17,13 +17,15 @@ import AddAdmin from './AddAdmin/AddAdmin';
 import PdfDetail from './PdfDetail/PdfDetail';
 import PriceSheet from './PriceSheet/PriceSheet';
 import CategoryImages from './CategoryImages/CategoryImages';
-import EditCategory, { editCategory } from './editCategory/editCategory';
+import EditCategory from './editCategory/editCategory';
 import { UserPermission } from './UserPermission/UserPermission';
 import Blog from './Blog/Blog';
 import BlogDetails from './BlogDetails/BlogDetails';
 import MaterialList from './MaterialList';
 import { UnApprovedUserList } from './UnApprovedUserList';
-import CategoryList, { categoryList } from './categoryList';
+import CategoryList from './categoryList';
+import InvoiceList from './InvoiceList';
+import { ContactDetail } from './contactDetail';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -49,6 +51,12 @@ function PrivateRoutes() {
                     path={SLUGS.materialList}
                     component={MaterialList}
                     render={() => <div>MaterialList</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.invoiceList}
+                    component={InvoiceList}
+                    render={() => <div>Invoice List</div>}
                 />
                 <Route
                     exact
@@ -100,6 +108,12 @@ function PrivateRoutes() {
                     render={() => <div>PriceSheet</div>}
                 />
                 <Route exact path={SLUGS.items} component={Items} render={() => <div>items</div>} />
+                <Route
+                    exact
+                    path={SLUGS.ContactDetail}
+                    component={ContactDetail}
+                    render={() => <div>ContactDetail</div>}
+                />
                 <Route
                     exact
                     path={SLUGS.PaymentList}

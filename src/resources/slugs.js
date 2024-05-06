@@ -5,6 +5,7 @@ export default {
     ideasTwo: '/ideas/two',
     ideasThree: '/ideas/three',
     PaymentList: '/PaymentList',
+    ContactDetail: '/ContactDetail',
     FeedBack: '/FeedBack',
     articles: '/articles',
     TermAndCondition: '/TermAndCondition',
@@ -29,6 +30,7 @@ export default {
     blog: '/blog',
     blogDetails: '/blogDetails',
     materialList: '/materialList',
+    invoiceList: '/invoiceList',
     unApprovedList: '/unApprovedList',
     categoryList: '/categoryList'
 };

@@ -34,12 +34,18 @@ const useStyles = createUseStyles((theme) => ({
     }
 }));
 
-function MiniCardComponent({ className = '', title, value }) {
+function MiniCardComponent({ className = '', title, value, onClick }) {
     const theme = useTheme();
     const classes = useStyles({ theme });
     const composedClassName = [classes.container, className].join(' ');
     return (
-        <Column flexGrow={1} className={composedClassName} horizontal='center' vertical='center'>
+        <Column
+            onClick={onClick}
+            flexGrow={1}
+            className={composedClassName}
+            horizontal='center'
+            vertical='center'
+        >
             <span className={classes.title}>{title}</span>
             <span className={classes.value}>{value}</span>
         </Column>

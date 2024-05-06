@@ -1,131 +1,86 @@
 import React, { useEffect, useState } from 'react';
 
-import { useTheme } from 'react-jss';
-import { onValue, ref, update, remove, get, orderByChild, query, equalTo } from 'firebase/database';
-import { ToastContainer } from 'react-toastify';
+import { onValue, ref, update } from 'firebase/database';
 import { useHistory } from 'react-router-dom';
 
 import { database } from 'configs/firebaseConfig';
 
-import { withStyles } from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import { Delete } from '@material-ui/icons';
-
 import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
+import { uploadLicences } from 'util/uploadProductImage';
 
 import { convertSlugToUrl } from 'resources/utilities';
 import SLUGS from 'resources/slugs';
 
 import ImageModal from 'components/ImageModal/ImageModal';
-
-import userDetailStyle from './styles';
 import InputWithLabel from 'components/InputWithLabel';
 import DatePickerWithLabel from 'components/DatePickerWithLabel';
 import DropdownListWithLabel from 'components/DropdownListWithLabel';
 import RadioButtonGroupWithLabel from 'components/RadioButtonGroupWithLabel';
-import { Formik } from 'formik';
-import { interactionType, materialTypes, recyclingMethod, referralSources } from './utils';
-import { uploadLicences } from 'util/uploadProductImage';
 import ImagePicker from 'components/ImagePicker';
-import { ConfirmationCard } from 'components/ConfirmationCard';
-import { Button } from 'component';
-import CardComponent from 'components/cards/CardComponent';
 import MiniCardComponent from 'components/cards/MiniCardComponent';
 
+import { Formik } from 'formik';
+import { Button } from 'component';
+import userDetailStyle from './styles';
+import { interactionType, materialTypes, recyclingMethod, referralSources } from './utils';
+import { getTotalInvoices } from '../../Firebase/contact/index';
+
 export default function UserDetail(props) {
-    const theme = useTheme();
     const { push } = useHistory();
     const { styles } = userDetailStyle;
     const { id } = props.location.state;
 
-    const [data, setData] = useState([]);
     const [user, setUser] = useState('');
     const [isApproved, setIsApproved] = useState(false);
     const [userDetails, setUserDetails] = useState('');
     const [paymentTypes, setPaymentTypes] = useState([]);
-    const [customerDelete, setCustomerDetele] = useState(null);
-    const [isVisible, setIsVisible] = useState(false);
-    const [totalInvoices, setTotalInvoices] = useState(0);
+
+    const [invoicesTotal, setInvoicesTotal] = useState({
+        totalContacts: 0,
+        totalBuyInvoices: 0,
+        totalSellInvoices: 0,
+        totalPackingInvoices: 0,
+        totalSalesInvoices: 0,
+        totalInventoryItems: 0
+    });
 
     useEffect(() => {
         getUserDetail();
-        getUserCustomer();
         getPaymentList();
+        getInitialValues();
     }, []);
 
-    function onClick(slug, data, parameters = {}) {
-        push({
-            pathname: convertSlugToUrl(slug, parameters),
-
-            state: data
-        });
-    }
-
-    const btn = {
-        position: 'absolute',
-        top: '20%',
-        right: '8%',
-        height: 50,
-        width: '10%',
-        borderRadius: 10,
-        borderWidth: 0.5,
-        backgroundColor: theme.color.veryDarkGrayishBlue,
-        color: 'white',
-        marginLeft: 40
-    };
-
-    const StyledTableCell = withStyles(() => ({
-        head: {
-            backgroundColor: theme.color.veryDarkGrayishBlue,
-            color: theme.color.white
-        },
-        body: {
-            fontSize: 14
-        }
-    }))(TableCell);
-    const StyledTableRow = withStyles(() => ({
-        root: {
-            '&:nth-of-type(odd)': {
-                backgroundColor: theme.color.lightGrayishBlue
-            }
-        }
-    }))(TableRow);
-
-    const getUserCustomer = () => {
+    const getInitialValues = async () => {
         try {
-            const refDetail = ref(database, `/USER_CUSTOMER/${id}`);
-            onValue(refDetail, (snapShot) => {
-                const data = snapShot.val();
-                if (data) {
-                    setData(formateData(data?.CUSTOMER));
-                }
+            const totalContacts = await getTotalInvoices(id, 'CONTACTS');
+            const totalBuyInvoices = await getTotalInvoices(id, 'BUY');
+            const totalSellInvoices = await getTotalInvoices(id, 'SELL');
+            const totalPackingInvoices = await getTotalInvoices(id, 'PACKING');
+            const totalSalesInvoices = await getTotalInvoices(id, 'SALES');
+            const totalInventoryItems = await getTotalInvoices(id, 'INVENTORY');
+
+            setInvoicesTotal({
+                totalBuyInvoices: totalBuyInvoices,
+                totalSellInvoices: totalSellInvoices,
+                totalPackingInvoices: totalPackingInvoices,
+                totalSalesInvoices: totalSalesInvoices,
+                totalInventoryItems: totalInventoryItems,
+                totalContacts: totalContacts
             });
         } catch (error) {
             console.log(error);
         }
     };
 
+    function onClick(slug, data, parameters = {}) {
+        push({
+            pathname: convertSlugToUrl(slug, parameters),
+            state: data
+        });
+    }
+
     const getPaymentList = async () => {
-        try {
-            console.log('userId', id);
-            const refDetail = ref(database, `/INVOICE_LIST`);
-            const invoiceQuery = query(refDetail, orderByChild('userId'), equalTo(id));
-
-            const snapShot = await get(invoiceQuery);
-            const data = snapShot.val();
-
-            setTotalInvoices(formateData(data).length);
-        } catch (error) {
-            console.log('error', error);
-        }
-
         try {
             const starCountRef = ref(database, '/ADMIN/PAYMENTTYPE');
             onValue(starCountRef, (snapshot) => {
@@ -151,8 +106,6 @@ export default function UserDetail(props) {
             onValue(refDetail, (snapShot) => {
                 setIsApproved(snapShot.val()?.isApproved);
                 setUser(snapShot.val());
-
-                console.log('deatils', snapShot.val());
             });
         } catch (error) {
             console.log(error);
@@ -171,41 +124,54 @@ export default function UserDetail(props) {
         }
     };
 
-    const onDelete = async () => {
-        try {
-            setIsVisible(false);
-            const starCountRef = ref(
-                database,
-                `/USER_CUSTOMER/${id}/CUSTOMER/${customerDelete.ID}`
-            );
-            remove(starCountRef, null);
-            notify('Customer has been Deleted Successfully', 0);
-            getUserCustomer();
-        } catch (error) {
-            console.log('error', error);
-        }
-    };
-
-    const onViewDetailClick = (item) => {
-        onClick(SLUGS.CustomerDetail, {
-            userId: id,
-            customerId: item.ID
-        });
-    };
-
     return (
         <div>
             <div className='flex flex-col gap-6'>
-                <div className='flex gap-4 items-center'>
-                    <MiniCardComponent title={'Customers'} value={data.length} />
-                    <MiniCardComponent title={'Invoices'} value={totalInvoices} />
+                <div className='flex flex-col gap-4'>
+                    <div className='flex flex-row gap-4'>
+                        <MiniCardComponent
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, { userId: id, type: 'CONTACT' })
+                            }
+                            title={'Contacts'}
+                            value={invoicesTotal.totalContacts}
+                        />
+                        <MiniCardComponent
+                            onClick={() => onClick(SLUGS.invoiceList, { userId: id, type: 'BUY' })}
+                            title={'Buy Invoice'}
+                            value={invoicesTotal?.totalBuyInvoices}
+                        />
+                        <MiniCardComponent
+                            onClick={() => onClick(SLUGS.invoiceList, { userId: id, type: 'SELL' })}
+                            title={'Sell Invoice'}
+                            value={invoicesTotal?.totalSellInvoices}
+                        />
+                    </div>
+                    <div className='flex flex-row gap-4'>
+                        <MiniCardComponent
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, { userId: id, type: 'PACKING' })
+                            }
+                            title={'Packing Invoice'}
+                            value={invoicesTotal?.totalPackingInvoices}
+                        />
+                        <MiniCardComponent
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, { userId: id, type: 'SALES' })
+                            }
+                            title={'Sales Invoice'}
+                            value={invoicesTotal?.totalSalesInvoices}
+                        />
+                        <MiniCardComponent
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, { userId: id, type: 'INVENTORY' })
+                            }
+                            title={'Inventory Items'}
+                            value={invoicesTotal?.totalInventoryItems}
+                        />
+                    </div>
                 </div>
-                <ConfirmationCard
-                    isVisible={isVisible}
-                    onClose={() => setIsVisible(false)}
-                    onDelete={() => onDelete()}
-                    type={'Customer'}
-                />
+
                 {user?.photo ? <ImageModal url={user?.photo} imageStyle={styles.img} /> : null}
                 {!isApproved ? <Button title='Approve User' onClick={() => onApproved()} /> : null}
                 <Button
@@ -762,7 +728,6 @@ export default function UserDetail(props) {
                                                 label='Current Recycling Loyalty Points:'
                                             />
                                         </div>
-
                                         <Button title='Update Details' onClick={handleSubmit} />
                                     </div>
                                 );
@@ -771,53 +736,6 @@ export default function UserDetail(props) {
                     }
                 </div>
             </div>
-
-            {data.length != 0 && <h1 style={styles.title}>CustomerList</h1>}
-            <TableContainer component={Paper}>
-                <Table aria-label='customized table'>
-                    {data.length != 0 && (
-                        <TableHead>
-                            <TableRow>
-                                <StyledTableCell align='left'>No.</StyledTableCell>
-                                <StyledTableCell align='left'>Name</StyledTableCell>
-                                <StyledTableCell align='left'>Email</StyledTableCell>
-                                <StyledTableCell align='left'>Actions</StyledTableCell>
-                            </TableRow>
-                        </TableHead>
-                    )}
-                    <TableBody>
-                        {data &&
-                            data?.map((item, index) => (
-                                <StyledTableRow align='left' key={item.id}>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {index + 1}
-                                    </StyledTableCell>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {item?.UserFirstName + '  ' + item.UserLastName}
-                                    </StyledTableCell>
-                                    <StyledTableCell component='th' scope='row'>
-                                        {item.BusinessEmail}
-                                    </StyledTableCell>
-                                    <StyledTableCell align='left' style={styles.leftDiv}>
-                                        <Button
-                                            title={'View Detail'}
-                                            onClick={() => onViewDetailClick(item)}
-                                        >
-                                            View Detail
-                                        </Button>
-                                        <Delete
-                                            onClick={() => {
-                                                setCustomerDetele(item);
-                                                setIsVisible(true);
-                                            }}
-                                        ></Delete>
-                                    </StyledTableCell>
-                                </StyledTableRow>
-                            ))}
-                    </TableBody>
-                </Table>
-                <ToastContainer />
-            </TableContainer>
         </div>
     );
 }
