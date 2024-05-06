@@ -92,3 +92,21 @@ export const getList = async (userId, type) => {
 
     return list;
 };
+
+export const getContactDetail = async (userId, itemId) => {
+    const invoiceRef = ref(Config.database, `/CONTACTS/${userId}/${itemId}`);
+
+    let detail = {};
+
+    onValue(invoiceRef, (snapshot) => {
+        const contacts = snapshot.val();
+
+        if (contacts) {
+            detail = contacts;
+        } else {
+            detail = {};
+        }
+    });
+
+    return detail;
+};

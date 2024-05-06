@@ -2,14 +2,17 @@ import React from 'react';
 import { useEffect } from 'react';
 
 import moment from 'moment';
+import { useHistory } from 'react-router-dom';
 
 import { deleteItem, getList } from '../../Firebase/contact/index';
 import { CustomizedTable } from './utils';
 import { getPdf } from '../../Firebase/pdf/index';
+import { convertSlugToUrl } from 'resources/utilities';
+import slugs from 'resources/slugs';
 
 export default function InvoiceList(props) {
     const { userId, type } = props.location.state;
-
+    const { push } = useHistory();
     const [list, setList] = React.useState([]);
 
     useEffect(() => {
@@ -45,6 +48,16 @@ export default function InvoiceList(props) {
                                     itemDetail: item
                                 };
                             })}
+                            onClick={(item) => {
+                                push({
+                                    pathname: convertSlugToUrl(slugs.ContactDetail, {}),
+                                    state: {
+                                        userId: userId,
+                                        itemId: item.id,
+                                        type: item.contactType
+                                    }
+                                });
+                            }}
                             onDelete={async (id) => {
                                 await deleteItem(userId, type, id);
                                 getItemList();
@@ -138,6 +151,10 @@ export default function InvoiceList(props) {
                                     itemDetail: item
                                 };
                             })}
+                            onClick={async (item) => {
+                                const pdf = await getPdf(userId, item.customerId, item.id);
+                                window.open(pdf?.invoicePdf);
+                            }}
                             onDelete={async (id) => {
                                 await deleteItem(userId, type, id);
                                 getItemList();
