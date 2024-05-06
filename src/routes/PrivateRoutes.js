@@ -9,7 +9,6 @@ import FeedBackList from './FeedbackList/FeedbackList';
 import UserList from './UserList/UserList';
 import TermAndConditions from './TermAndConditions/TermAndConditions';
 import UserDetail from './UserDetail/UserDetail';
-import CustomerDetail from './customerDetail/customerDetail';
 import AddProduct from './AddProduct/AddProduct';
 import AdminList from './AdminList/adminList';
 import AddAdmin from './AddAdmin/AddAdmin';
@@ -70,12 +69,7 @@ function PrivateRoutes() {
                     component={ViewDraft}
                     render={() => <div>DraftInvoice</div>}
                 />
-                <Route
-                    exact
-                    path={SLUGS.CustomerDetail}
-                    component={CustomerDetail}
-                    render={() => <div>CustomerDetail</div>}
-                />
+
                 <Route exact path={SLUGS.dashboard} component={DashboardComponent} />
                 <Route
                     exact
