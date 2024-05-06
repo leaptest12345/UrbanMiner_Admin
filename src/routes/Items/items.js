@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { ToastContainer } from 'react-toastify';
 import { v4 as uuid } from 'uuid';
-
-import { Delete } from '@material-ui/icons';
 
 import { database } from 'configs/firebaseConfig';
 import { onValue, ref, set } from 'firebase/database';
@@ -12,6 +9,7 @@ import { notify } from 'util/notify';
 import { formateData } from 'util/formateData';
 import { Button } from 'component';
 import { Input } from 'components/Input';
+import { CustomizedTable } from 'components/CustomizedTable';
 
 export default function Items() {
     const id = uuid().slice(0, 8);
@@ -67,9 +65,9 @@ export default function Items() {
         }
     };
 
-    const onDelete = (item) => {
+    const onDelete = (id) => {
         try {
-            const starCount = ref(database, `/ADMIN/ITEM/${item.ID}`);
+            const starCount = ref(database, `/ADMIN/ITEM/${id}`);
             set(starCount, null);
             setTimeout(() => {
                 notify('Item has been Deleted!', 0);
@@ -87,35 +85,19 @@ export default function Items() {
                     <Button title='Add' />
                 </div>
             </form>
-            <section>
-                <div className='flex flex-1 items-center font-bold text-white text-base bg-veryDarkGrayishBlue p-4 rounded-t-md'>
-                    <h5 className='w-[100px]'>No</h5>
-                    <div className='flex items-center justify-between flex-1 pr-10'>
-                        <h5>ItemName</h5>
-                        <h5>Action</h5>
-                    </div>
-                </div>
-                {data &&
-                    data.map((item, index) => (
-                        <div
-                            className={`flex border ${
-                                index + 1 != data.length && 'border-b-0'
-                            } flex-1 items-center font-bold text-black text-sm ${
-                                index % 2 == 0 ? 'bg-lightGrayishBlue' : 'bg-white'
-                            } p-4`}
-                        >
-                            <h5 className='w-[100px]'>{index + 1}</h5>
-                            <div className='flex items-center justify-between flex-1 pr-10'>
-                                <h5>{item.title}</h5>
-                                <Delete
-                                    onClick={() => onDelete(item)}
-                                    className='text-red-600 cursor-pointer hover:text-red-900'
-                                />
-                            </div>
-                        </div>
-                    ))}
-            </section>
-            <ToastContainer />
+            <CustomizedTable
+                headerLabelList={['ItemName']}
+                bodyItemList={data.map((item, index) => {
+                    return {
+                        list: [item.title],
+                        itemDetail: item
+                    };
+                })}
+                type={'ITEM'}
+                onDelete={(id) => {
+                    onDelete(id);
+                }}
+            />
         </div>
     );
 }

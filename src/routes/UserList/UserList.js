@@ -81,8 +81,8 @@ export default function UserList() {
     const userList = user?.filter(
         (item) =>
             (item.isDeleted != true &&
-                item?.firstName?.toLowerCase().includes(search.toLowerCase())) ||
-            item?.lastName?.toLowerCase().includes(search.toLowerCase())
+                item?.firstName?.toLowerCase().trim().includes(search.toLowerCase().trim())) ||
+            item?.lastName?.toLowerCase().trim().includes(search.toLowerCase().trim())
     );
 
     const deletedUser = user.filter((item) => item.isDeleted == true);
@@ -91,13 +91,13 @@ export default function UserList() {
 
     return (
         <div className='flex flex-col gap-6'>
-            {/* <div className='w-1/2'>
+            <div className='w-1/2'>
                 <Input
                     placeholder={'Search User'}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-            </div> */}
+            </div>
 
             {isEmptyList && (
                 <div className='flex h-96 items-center justify-center'>

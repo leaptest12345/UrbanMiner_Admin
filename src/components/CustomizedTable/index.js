@@ -50,6 +50,7 @@ export const CustomizedTable = ({ headerLabelList, type, bodyItemList, onClick, 
             <Table aria-label='customized table'>
                 <TableHead>
                     <TableRow>
+                        <StyledTableCell align='left'>No</StyledTableCell>
                         {headerLabelList?.map((item, index) => (
                             <StyledTableCell key={index} align='left'>
                                 {item}
@@ -68,6 +69,7 @@ export const CustomizedTable = ({ headerLabelList, type, bodyItemList, onClick, 
                     )}
                     {bodyItemList?.map((item, index) => (
                         <StyledTableRow>
+                            <StyledTableCell align='left'>{index + 1}</StyledTableCell>
                             {item?.list?.map((subItem, subIndex) => (
                                 <StyledTableCell key={subIndex} align='left'>
                                     {subItem}
@@ -88,11 +90,16 @@ export const CustomizedTable = ({ headerLabelList, type, bodyItemList, onClick, 
                                     <div
                                         onClick={() => {
                                             setIsVisible(true);
-                                            setDeleteItemId(item.itemDetail.id);
+                                            setDeleteItemId(
+                                                item.itemDetail.id ?? item.itemDetail.ID
+                                            );
                                         }}
                                         className='cursor-pointer'
                                     >
-                                        <Delete color='red' />
+                                        <Delete
+                                            color='red'
+                                            className='text-red-600 cursor-pointer hover:text-red-900'
+                                        />
                                     </div>
                                 </div>
                             </StyledTableCell>

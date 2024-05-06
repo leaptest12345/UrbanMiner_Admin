@@ -5,10 +5,10 @@ import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 
 import { deleteItem, getList } from '../../Firebase/contact/index';
-import { CustomizedTable } from './utils';
 import { getPdf } from '../../Firebase/pdf/index';
 import { convertSlugToUrl } from 'resources/utilities';
 import slugs from 'resources/slugs';
+import { CustomizedTable } from 'components/CustomizedTable';
 
 export default function InvoiceList(props) {
     const { userId, type } = props.location.state;
