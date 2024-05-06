@@ -110,3 +110,28 @@ export const getContactDetail = async (userId, itemId) => {
 
     return detail;
 };
+
+export const buy_item_table = 'BUY_ITEM';
+export const sell_item_table = 'SELL_ITEM';
+export const packing_item_table = 'PACKING_ITEM';
+
+export const getItemDetail = async (itemId, type) => {
+    const path =
+        type == 'BUY' ? buy_item_table : type == 'SELL' ? sell_item_table : packing_item_table;
+
+    const invoiceRef = ref(Config.database, `/${path}/${itemId}`);
+
+    let detail = {};
+
+    onValue(invoiceRef, (snapshot) => {
+        const values = snapshot.val();
+
+        if (values) {
+            detail = values;
+        } else {
+            detail = {};
+        }
+    });
+
+    return detail;
+};

@@ -11,14 +11,14 @@ const color = {
     paleBlue: '#DDE2FF',
     paleBlueTransparent: 'rgba(221, 226, 255, 0.08)',
     veryDarkGrayishBlue: '#373a47',
-white:'#ffff',
-BLACK: '#171616',
-  WHITE: '#FFFFFF',
-  BG: '#DCDEE1',
-  BORDER: '#707070',
-  BORDER1: '#999999',
-  TEXT: '#707070',
-  BOX: '#C7CBD1',
+    white: '#ffff',
+    BLACK: '#171616',
+    WHITE: '#FFFFFF',
+    BG: '#DCDEE1',
+    BORDER: '#707070',
+    BORDER1: '#999999',
+    TEXT: '#707070',
+    BOX: '#C7CBD1'
 };
 
 const typography = {

@@ -75,14 +75,16 @@ export const CustomizedTable = ({ headerLabelList, type, bodyItemList, onClick, 
                             ))}
                             <StyledTableCell>
                                 <div className='flex flex-row items-center gap-4'>
-                                    <div
-                                        onClick={() => {
-                                            onClick && onClick(item.itemDetail);
-                                        }}
-                                        className='p-2 bg-slate-500 text-white font-medium rounded-md text-sm cursor-pointer'
-                                    >
-                                        View Detail
-                                    </div>
+                                    {onClick && (
+                                        <div
+                                            onClick={() => {
+                                                onClick && onClick(item.itemDetail);
+                                            }}
+                                            className='p-2 bg-slate-500 text-white font-medium rounded-md text-sm cursor-pointer'
+                                        >
+                                            View Detail
+                                        </div>
+                                    )}
                                     <div
                                         onClick={() => {
                                             setIsVisible(true);

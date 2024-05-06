@@ -10,7 +10,6 @@ import UserList from './UserList/UserList';
 import TermAndConditions from './TermAndConditions/TermAndConditions';
 import UserDetail from './UserDetail/UserDetail';
 import CustomerDetail from './customerDetail/customerDetail';
-import ViewDraft from './ViewDraft/ViewDraft';
 import AddProduct from './AddProduct/AddProduct';
 import AdminList from './AdminList/adminList';
 import AddAdmin from './AddAdmin/AddAdmin';
@@ -26,6 +25,7 @@ import { UnApprovedUserList } from './UnApprovedUserList';
 import CategoryList from './categoryList';
 import InvoiceList from './InvoiceList';
 import { ContactDetail } from './contactDetail';
+import { ViewDraft } from './ViewDraft';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 

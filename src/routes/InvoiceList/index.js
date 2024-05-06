@@ -89,7 +89,18 @@ export default function InvoiceList(props) {
                             })}
                             onClick={async (item) => {
                                 const pdf = await getPdf(userId, item.supplierId, item.id);
-                                window.open(pdf?.invoicePdf);
+                                if (pdf?.invoicePdf) {
+                                    window.open(pdf?.invoicePdf);
+                                } else {
+                                    push({
+                                        pathname: convertSlugToUrl(slugs.ViewDraft, {}),
+                                        state: {
+                                            userId: userId,
+                                            type: type,
+                                            id: item.id
+                                        }
+                                    });
+                                }
                             }}
                             onDelete={async (id) => {
                                 await deleteItem(userId, type, id);
@@ -118,10 +129,6 @@ export default function InvoiceList(props) {
                                     itemDetail: item
                                 };
                             })}
-                            onClick={async (item) => {
-                                const pdf = await getPdf(userId, item.supplierId, item.id);
-                                window.open(pdf?.invoicePdf);
-                            }}
                             onDelete={async (id) => {
                                 await deleteItem(userId, type, id);
                                 getItemList();
@@ -152,8 +159,19 @@ export default function InvoiceList(props) {
                                 };
                             })}
                             onClick={async (item) => {
-                                const pdf = await getPdf(userId, item.customerId, item.id);
-                                window.open(pdf?.invoicePdf);
+                                const pdf = await getPdf(userId, item.supplierId, item.id);
+                                if (pdf?.invoicePdf) {
+                                    window.open(pdf?.invoicePdf);
+                                } else {
+                                    push({
+                                        pathname: convertSlugToUrl(slugs.ViewDraft, {}),
+                                        state: {
+                                            userId: userId,
+                                            type: type,
+                                            id: item.id
+                                        }
+                                    });
+                                }
                             }}
                             onDelete={async (id) => {
                                 await deleteItem(userId, type, id);
