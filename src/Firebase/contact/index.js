@@ -1,4 +1,4 @@
-import { ref, remove, set, update, onValue } from 'firebase/database';
+import { ref, remove, get, onValue } from 'firebase/database';
 
 import * as Config from '../../configs/index';
 
@@ -179,23 +179,29 @@ export const buy_item_table = 'BUY_ITEM';
 export const sell_item_table = 'SELL_ITEM';
 export const packing_item_table = 'PACKING_ITEM';
 
-export const getItemDetail = async (itemId, type) => {
+export const getItemDetail = async (userId, itemId, type) => {
     const path =
-        type == 'BUY' ? buy_item_table : type == 'SELL' ? sell_item_table : packing_item_table;
+        type === 'BUY'
+            ? buy_item_table
+            : type === 'SELL'
+            ? sell_item_table
+            : type === 'SALES'
+            ? `/SALES_CONTRACT_LIST/${userId}/`
+            : packing_item_table;
 
-    const invoiceRef = ref(Config.database, `/${path}/${itemId}`);
+    const invoiceRef = ref(Config.database, path + `/${itemId}`);
 
-    let detail = {};
-
-    onValue(invoiceRef, (snapshot) => {
+    try {
+        const snapshot = await get(invoiceRef);
         const values = snapshot.val();
 
         if (values) {
-            detail = values;
+            return type === 'SALES' ? values?.salesContractItemList ?? [] : values;
         } else {
-            detail = {};
+            return {};
         }
-    });
-
-    return detail;
+    } catch (error) {
+        console.error('Error fetching item detail:', error);
+        throw error; // Propagate the error
+    }
 };

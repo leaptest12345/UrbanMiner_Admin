@@ -5,7 +5,7 @@ import moment from 'moment';
 import { useHistory } from 'react-router-dom';
 
 import { deleteItem, getList } from '../../Firebase/contact/index';
-import { getPdf } from '../../Firebase/pdf/index';
+import { getPdf, getSalesPdf } from '../../Firebase/pdf/index';
 import { convertSlugToUrl } from 'resources/utilities';
 import slugs from 'resources/slugs';
 import { CustomizedTable } from 'components/CustomizedTable';
@@ -71,7 +71,6 @@ export default function InvoiceList(props) {
                                 'SupplierName',
                                 'Status',
                                 'Quantity',
-                                'Price',
                                 'CreatedDate'
                             ]}
                             bodyItemList={list.map((item, index) => {
@@ -81,7 +80,6 @@ export default function InvoiceList(props) {
                                         item.supplierName,
                                         item.status,
                                         item.totalItems,
-                                        `$${item.totalAmount}`,
                                         moment(item.createdDate).format('DD-MM-YYYY')
                                     ],
                                     itemDetail: item
@@ -159,7 +157,8 @@ export default function InvoiceList(props) {
                                 };
                             })}
                             onClick={async (item) => {
-                                const pdf = await getPdf(userId, item.supplierId, item.id);
+                                const pdf = await getSalesPdf(userId, item.customerId, item.id);
+
                                 if (pdf?.invoicePdf) {
                                     window.open(pdf?.invoicePdf);
                                 } else {
