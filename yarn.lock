@@ -9064,6 +9064,11 @@ react-collapsible-content@^1.0.0:
   resolved "https://registry.yarnpkg.com/react-collapsible-content/-/react-collapsible-content-1.0.0.tgz#58e36cda78ae1e1d085acb3461b4f3e1bfd47ae9"
   integrity sha512-WnTbWkSQpPtbOZQ1vnOXY0kSMJfcZNT1dmx1Wn2TyOOhOeuhsmFo8mEKiAzheyscKFpoRyRX17jpHmYWi44y8w==
 
+react-csv@^2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/react-csv/-/react-csv-2.2.2.tgz#5bbf0d72a846412221a14880f294da9d6def9bfb"
+  integrity sha512-RG5hOcZKZFigIGE8LxIEV/OgS1vigFQT4EkaHeKgyuCbUAu9Nbd/1RYq++bJcJJ9VOqO/n9TZRADsXNDR4VEpw==
+
 react-datepicker@^4.16.0:
   version "4.16.0"
   resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-4.16.0.tgz#b9dd389bb5611a1acc514bba1dd944be21dd877f"

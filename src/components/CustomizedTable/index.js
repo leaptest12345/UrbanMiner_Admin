@@ -10,6 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import { Delete } from '@mui/icons-material';
 import { ConfirmationCard } from 'components/ConfirmationCard';
 import { useState } from 'react';
+import { CSVLink } from 'react-csv';
 
 export const StyledTableCell = withStyles(() => ({
     head: {
@@ -33,81 +34,104 @@ export const CustomizedTable = ({ headerLabelList, type, bodyItemList, onClick, 
     const [isVisible, setIsVisible] = useState(false);
     const [deleteItemId, setDeleteItemId] = useState(null);
 
-    return (
-        <TableContainer component={Paper}>
-            <ConfirmationCard
-                isVisible={isVisible}
-                onClose={() => setIsVisible(false)}
-                onDelete={() => {
-                    if (onDelete) {
-                        onDelete(deleteItemId);
-                    }
-                    setIsVisible(false);
-                }}
-                type={type?.toLowerCase()}
-            />
+    const list = bodyItemList.map((item, index) => {
+        return {
+            No: index + 1,
+            ...item.list.reduce((acc, cur, index) => {
+                acc[headerLabelList[index]] = cur;
+                return acc;
+            }, {})
+        };
+    });
 
-            <Table aria-label='customized table'>
-                <TableHead>
-                    <TableRow>
-                        <StyledTableCell align='left'>No</StyledTableCell>
-                        {headerLabelList?.map((item, index) => (
-                            <StyledTableCell key={index} align='left'>
-                                {item}
-                            </StyledTableCell>
-                        ))}
-                        <StyledTableCell align='left'>Action</StyledTableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {bodyItemList?.length === 0 && (
-                        <StyledTableRow>
-                            <StyledTableCell colSpan={headerLabelList.length + 1} align='center'>
-                                No data available
-                            </StyledTableCell>
-                        </StyledTableRow>
-                    )}
-                    {bodyItemList?.map((item, index) => (
-                        <StyledTableRow>
-                            <StyledTableCell align='left'>{index + 1}</StyledTableCell>
-                            {item?.list?.map((subItem, subIndex) => (
-                                <StyledTableCell key={subIndex} align='left'>
-                                    {subItem}
+    console.log(list);
+
+    return (
+        <div className='flex flex-col gap-4 items-end'>
+            <CSVLink
+                className='p-2 bg-slate-500 text-white font-bold w-fit rounded-md text-xl cursor-pointer'
+                data={list}
+                filename={type + '.csv'}
+            >
+                Export CSV
+            </CSVLink>
+            <TableContainer component={Paper}>
+                <ConfirmationCard
+                    isVisible={isVisible}
+                    onClose={() => setIsVisible(false)}
+                    onDelete={() => {
+                        if (onDelete) {
+                            onDelete(deleteItemId);
+                        }
+                        setIsVisible(false);
+                    }}
+                    type={type?.toLowerCase()}
+                />
+                <Table aria-label='customized table'>
+                    <TableHead>
+                        <TableRow>
+                            <StyledTableCell align='left'>No</StyledTableCell>
+                            {headerLabelList?.map((item, index) => (
+                                <StyledTableCell key={index} align='left'>
+                                    {item}
                                 </StyledTableCell>
                             ))}
-                            <StyledTableCell>
-                                <div className='flex flex-row items-center gap-4'>
-                                    {onClick && (
+                            <StyledTableCell align='left'>Action</StyledTableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {bodyItemList?.length === 0 && (
+                            <StyledTableRow>
+                                <StyledTableCell
+                                    colSpan={headerLabelList.length + 1}
+                                    align='center'
+                                >
+                                    No data available
+                                </StyledTableCell>
+                            </StyledTableRow>
+                        )}
+                        {bodyItemList?.map((item, index) => (
+                            <StyledTableRow>
+                                <StyledTableCell align='left'>{index + 1}</StyledTableCell>
+                                {item?.list?.map((subItem, subIndex) => (
+                                    <StyledTableCell key={subIndex} align='left'>
+                                        {subItem}
+                                    </StyledTableCell>
+                                ))}
+                                <StyledTableCell>
+                                    <div className='flex flex-row items-center gap-4'>
+                                        {onClick && (
+                                            <div
+                                                onClick={() => {
+                                                    onClick && onClick(item.itemDetail);
+                                                }}
+                                                className='p-2 bg-slate-500 text-white font-medium rounded-md text-sm cursor-pointer'
+                                            >
+                                                View Detail
+                                            </div>
+                                        )}
                                         <div
                                             onClick={() => {
-                                                onClick && onClick(item.itemDetail);
+                                                setIsVisible(true);
+                                                setDeleteItemId(
+                                                    item.itemDetail.id ?? item.itemDetail.ID
+                                                );
                                             }}
-                                            className='p-2 bg-slate-500 text-white font-medium rounded-md text-sm cursor-pointer'
+                                            className='cursor-pointer'
                                         >
-                                            View Detail
+                                            <Delete
+                                                color='red'
+                                                className='text-red-600 cursor-pointer hover:text-red-900'
+                                            />
                                         </div>
-                                    )}
-                                    <div
-                                        onClick={() => {
-                                            setIsVisible(true);
-                                            setDeleteItemId(
-                                                item.itemDetail.id ?? item.itemDetail.ID
-                                            );
-                                        }}
-                                        className='cursor-pointer'
-                                    >
-                                        <Delete
-                                            color='red'
-                                            className='text-red-600 cursor-pointer hover:text-red-900'
-                                        />
                                     </div>
-                                </div>
-                            </StyledTableCell>
-                        </StyledTableRow>
-                    ))}
-                </TableBody>
-            </Table>
-            <ToastContainer />
-        </TableContainer>
+                                </StyledTableCell>
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+                <ToastContainer />
+            </TableContainer>
+        </div>
     );
 };

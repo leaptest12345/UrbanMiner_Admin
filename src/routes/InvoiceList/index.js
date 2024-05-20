@@ -9,6 +9,7 @@ import { getPdf, getSalesPdf } from '../../Firebase/pdf/index';
 import { convertSlugToUrl } from 'resources/utilities';
 import slugs from 'resources/slugs';
 import { CustomizedTable } from 'components/CustomizedTable';
+import { CSVLink } from 'react-csv';
 
 export default function InvoiceList(props) {
     const { userId, type } = props.location.state;
