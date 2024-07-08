@@ -4,6 +4,7 @@ import { Button } from 'component';
 import { generateOne } from 'util/referralCode';
 
 import * as Firebase from '../../Firebase';
+import { notify } from 'util/notify';
 
 export const ReferralCode = () => {
     const [generatedReferralCode, setGeneratedReferralCode] = useState();
@@ -54,7 +55,7 @@ export const ReferralCode = () => {
             <div className='flex items-center gap-10'>
                 <Button
                     title={'Generate Code'}
-                    onClick={() => {
+                    onClick={async () => {
                         const newReferralCode = generateOne({
                             charset:
                                 '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -70,6 +71,7 @@ export const ReferralCode = () => {
                     onClick={async () => {
                         if (generatedReferralCode) {
                             await Firebase.setReferralCode(generatedReferralCode);
+                            notify('Referral Code updated successfully');
                         }
                     }}
                 />
