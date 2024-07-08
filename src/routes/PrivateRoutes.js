@@ -25,6 +25,7 @@ import CategoryList from './categoryList';
 import InvoiceList from './InvoiceList';
 import { ContactDetail } from './contactDetail';
 import { ViewDraft } from './ViewDraft';
+import { ReferralCode } from './ReferralCode';
 
 const DashboardComponent = lazy(() => import('./dashboard'));
 
@@ -50,6 +51,12 @@ function PrivateRoutes() {
                     path={SLUGS.materialList}
                     component={MaterialList}
                     render={() => <div>MaterialList</div>}
+                />
+                <Route
+                    exact
+                    path={SLUGS.referralCode}
+                    component={ReferralCode}
+                    render={() => <div>ReferralCode</div>}
                 />
                 <Route
                     exact

@@ -87,6 +87,12 @@ function SidebarComponent(props) {
                         icon={<ViewListSharp className='text-white' />}
                         onClick={() => onClick(SLUGS.categoryList)}
                     />
+                    <MenuItem
+                        id={SLUGS.referralCode}
+                        title='ReferralCode'
+                        icon={<ViewListSharp className='text-white' />}
+                        onClick={() => onClick(SLUGS.referralCode)}
+                    />
                     {permission?.item ? (
                         <MenuItem
                             id={SLUGS.items}

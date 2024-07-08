@@ -58,6 +58,21 @@ export const createAdmin = async (email, adminLevel, permissionStatus) => {
     });
 };
 
+export const setReferralCode = async (code) => {
+    const adminRef = ref(Config.database, `/ADMIN/REFERRAL`);
+    await set(adminRef, {
+        code: code
+    });
+};
+
+export const getReferralCode = async () => {
+    const adminRef = ref(Config.database, `/ADMIN/REFERRAL`);
+
+    const result = await get(adminRef);
+
+    return result.val();
+};
+
 export const updateAdminUser = async (id, data) => {
     const adminRef = ref(Config.database, `/ADMIN/USERS/${id}`);
     await update(adminRef, data);

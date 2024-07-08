@@ -31,5 +31,6 @@ export default {
     materialList: '/materialList',
     invoiceList: '/invoiceList',
     unApprovedList: '/unApprovedList',
-    categoryList: '/categoryList'
+    categoryList: '/categoryList',
+    referralCode: '/referralCode'
 };
