@@ -308,19 +308,19 @@ export default function MaterialList() {
                                         />
                                     </div>
                                     <div className='font-bold text-lg line-clamp-1'>
-                                        {item?.description.toUpperCase()}
+                                        {item?.description?.toUpperCase()}
                                     </div>
                                 </div>
                                 {!isSelected && (
                                     <div className='flex items-center '>
                                         <div className='font-bold text-lg w-[200px] '>
-                                            {item?.category.toUpperCase()}
+                                            {item?.category?.toUpperCase()}
                                         </div>
                                         <div className='font-bold text-lg w-[100px]'>
                                             {`$ ${item?.price}`}
                                         </div>
                                         <div className='font-bold text-lg w-[90px]'>
-                                            {item?.um.toUpperCase()}
+                                            {item?.um?.toUpperCase()}
                                         </div>
                                         <div className='flex font-bold text-sm  items-center w-[300px]'>
                                             <h5 className='w-[100px]'>
