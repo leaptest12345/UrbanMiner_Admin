@@ -25,16 +25,26 @@ import { Button } from 'component';
 import userDetailStyle from './styles';
 import { interactionType, materialTypes, recyclingMethod, referralSources } from './utils';
 import { getTotalInvoices } from '../../Firebase/contact/index';
+import { UserTableHeader } from 'routes/UserList/UserTableHeader';
+import { getAllMyUsers } from '../../Firebase/user/index';
+import { UserCard } from 'routes/UserList/UserCard';
+import { ArrowBack } from '@mui/icons-material';
 
 export default function UserDetail(props) {
-    const { push } = useHistory();
+    const history = useHistory();
     const { styles } = userDetailStyle;
-    const { id } = props.location.state;
 
+    const { id: givenId } = props.location.state;
+
+    const [id, setId] = useState(givenId);
     const [user, setUser] = useState('');
+    const [subUserList, setSubUserList] = useState([]);
     const [isApproved, setIsApproved] = useState(false);
     const [userDetails, setUserDetails] = useState('');
     const [paymentTypes, setPaymentTypes] = useState([]);
+    const [refetch, setRefetch] = useState(false);
+    const [parentUserId, setParentUserId] = useState(null);
+    const [userLevel, setUserLevel] = useState(1);
 
     const [invoicesTotal, setInvoicesTotal] = useState({
         totalContacts: 0,
@@ -49,7 +59,7 @@ export default function UserDetail(props) {
         getUserDetail();
         getPaymentList();
         getInitialValues();
-    }, []);
+    }, [refetch]);
 
     const getInitialValues = async () => {
         try {
@@ -59,6 +69,22 @@ export default function UserDetail(props) {
             const totalPackingInvoices = await getTotalInvoices(id, 'PACKING');
             const totalSalesInvoices = await getTotalInvoices(id, 'SALES');
             const totalInventoryItems = await getTotalInvoices(id, 'INVENTORY');
+
+            const allUserLevel2 = await getAllMyUsers(id);
+            const users = [];
+
+            for (const user of allUserLevel2) {
+                if (user?.userLevel != 3) {
+                    users.push(user);
+                    const allUserLevel3 = await getAllMyUsers(user?.ID);
+
+                    for (const user3 of allUserLevel3) {
+                        users.push(user3);
+                    }
+                }
+            }
+
+            setSubUserList(users.filter((item) => item.isDeleted != true));
 
             setInvoicesTotal({
                 totalBuyInvoices: totalBuyInvoices,
@@ -74,7 +100,7 @@ export default function UserDetail(props) {
     };
 
     function onClick(slug, data, parameters = {}) {
-        push({
+        history.push({
             pathname: convertSlugToUrl(slug, parameters),
             state: data
         });
@@ -105,7 +131,10 @@ export default function UserDetail(props) {
 
             onValue(refDetail, (snapShot) => {
                 setIsApproved(snapShot.val()?.isApproved);
+
                 setUser(snapShot.val());
+
+                setUserLevel(snapShot?.val()?.userLevel ?? 1);
             });
         } catch (error) {
             console.log(error);
@@ -126,6 +155,17 @@ export default function UserDetail(props) {
 
     return (
         <div>
+            {userLevel === 2 || userLevel === 3 ? (
+                <div
+                    onClick={() => {
+                        setId(parentUserId);
+                        setRefetch(!refetch);
+                    }}
+                    className='cursor-pointer p-4'
+                >
+                    <ArrowBack />
+                </div>
+            ) : null}
             <div className='flex flex-col gap-6'>
                 <div className='flex flex-col gap-4'>
                     <div className='flex flex-row gap-4'>
@@ -182,6 +222,40 @@ export default function UserDetail(props) {
                         });
                     }}
                 />
+                {subUserList?.length > 0 && (
+                    <>
+                        <div className='text-2xl font-bold text-black'>My Sub Users</div>
+                        <UserTableHeader isSecondary={true} />
+                        {subUserList &&
+                            subUserList.map((item, index) => {
+                                return (
+                                    <UserCard
+                                        userType={
+                                            item?.userLevel === 2 ? 'Individual Yard' : 'Employee'
+                                        }
+                                        key={'user' + index}
+                                        index={index}
+                                        // totalUsers={subUserList.length}
+                                        totalUsers={0}
+                                        photo={item?.photo}
+                                        name={item?.firstName + ' ' + item?.lastName}
+                                        phoneNumber={item?.phoneNumber}
+                                        onViewDetails={() => {
+                                            // history.goBack();
+                                            setId(item?.ID);
+                                            setParentUserId(givenId);
+                                            setRefetch(!refetch);
+                                        }}
+                                        // onDelete={() => {
+                                        //     setUserDeletionData(item);
+                                        //     setIsVisible(true);
+                                        // }}
+                                    />
+                                );
+                            })}
+                    </>
+                )}
+
                 <div style={{ marginTop: 20, width: '65%' }}>
                     {
                         <Formik

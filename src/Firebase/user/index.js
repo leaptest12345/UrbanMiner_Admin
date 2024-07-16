@@ -123,3 +123,19 @@ export const approveUser = async (id) => {
 
     notify(`User has been Approved Successfully`, 1);
 };
+
+export const getAllMyUsers = async (givenUserId) => {
+    const userRef = ref(Config.database, '/USERS');
+    const userId = await localStorage.getItem('userID');
+
+    const userQuery = query(
+        userRef,
+        orderByChild('referralByUserId'),
+        equalTo(givenUserId ?? userId)
+    );
+
+    const snapshot = await get(userQuery);
+
+    const users = snapshot.val();
+    return formateData(users);
+};

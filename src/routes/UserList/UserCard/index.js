@@ -12,7 +12,8 @@ export const UserCard = ({
     onViewDetails,
     onRestore,
     onDelete,
-    onApprove
+    onApprove,
+    userType
 }) => {
     return (
         <div
@@ -63,6 +64,7 @@ export const UserCard = ({
                         ) : null}
                     </div>
                 </div>
+                {userType && <h5 className='flex-1'>{userType}</h5>}
             </div>
         </div>
     );
