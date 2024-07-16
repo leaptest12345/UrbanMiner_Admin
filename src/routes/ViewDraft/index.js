@@ -65,9 +65,9 @@ export const ViewDraft = (props) => {
                                 <div className='text-base'>GrossWeight: {item.grossWeight}</div>
                                 <div className='text-base'>TareWeight: {item.tareWeight}</div>
                             </div>
-                            {item.photo && (
+                            {item?.photo && (
                                 <ImageModal
-                                    url={item.photo}
+                                    url={item?.photo}
                                     imageStyle={{
                                         width: '100px',
                                         height: '100px',

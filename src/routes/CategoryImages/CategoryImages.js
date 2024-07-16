@@ -125,7 +125,7 @@ export default function CategoryImages(props) {
                         >
                             <ImageModal
                                 imageStyle={styles.imgStyle}
-                                url={item != '' ? item.url : ''}
+                                url={item != '' ? item?.url : ''}
                             />
                             <Delete
                                 style={{ margin: 10 }}

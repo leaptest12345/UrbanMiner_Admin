@@ -214,7 +214,7 @@ function PriceSheet() {
             update(refDetail, {
                 productName: productName,
                 productPrice: productPrice,
-                image: url
+                image: url ?? ''
             });
         } else {
             update(refDetail, {
@@ -614,12 +614,12 @@ function PriceSheet() {
                                                                           width: '35%'
                                                                       }}
                                                                   >
-                                                                      {item1.image ? (
+                                                                      {item1?.image ? (
                                                                           <ImageModal
                                                                               imageStyle={
                                                                                   styles.imgStyle2
                                                                               }
-                                                                              url={item1.image}
+                                                                              url={item1?.image}
                                                                           />
                                                                       ) : (
                                                                           '-'

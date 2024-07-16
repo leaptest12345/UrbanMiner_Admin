@@ -12,7 +12,7 @@ export const getSalesPdf = (userId, customerId, invoiceId) => {
             const data = snapshot.val();
             if (data) {
                 resolve({
-                    invoicePdf: data[1].url
+                    invoicePdf: data[1]?.url
                 });
             } else {
                 resolve(null);
@@ -33,8 +33,8 @@ export const getPdf = (userId, customerId, invoiceId) => {
             const data = snapshot.val();
             if (data) {
                 resolve({
-                    invoicePdf: data[1].url,
-                    invoiceSummaryPdf: data[2].url
+                    invoicePdf: data[1]?.url,
+                    invoiceSummaryPdf: data[2]?.url
                 });
             } else {
                 resolve(null);
