@@ -80,12 +80,16 @@ export default function UserList() {
 
     const userList = user?.filter(
         (item) =>
-            (item.isDeleted != true &&
-                item?.firstName?.toLowerCase().trim().includes(search.toLowerCase().trim())) ||
-            item?.lastName?.toLowerCase().trim().includes(search.toLowerCase().trim())
+            item.isDeleted != true &&
+            item?.userLevel != 2 &&
+            item?.userLevel != 3 &&
+            (item?.firstName?.toLowerCase().trim().includes(search.toLowerCase().trim()) ||
+                item?.lastName?.toLowerCase().trim().includes(search.toLowerCase().trim()))
     );
 
-    const deletedUser = user.filter((item) => item.isDeleted == true);
+    const deletedUser = user.filter(
+        (item) => item.isDeleted == true && item?.userLevel != 2 && item?.userLevel != 3
+    );
 
     const isEmptyList = userList.length === 0 && deletedUser.length === 0;
 

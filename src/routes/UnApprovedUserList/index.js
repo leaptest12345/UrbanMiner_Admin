@@ -63,7 +63,9 @@ export const UnApprovedUserList = () => {
         });
     }
 
-    const unApprovedList = users?.filter((item) => item?.isApproved == false);
+    const unApprovedList = users?.filter(
+        (item) => item?.isApproved == false && item?.userLevel != 2 && item?.userLevel != 3
+    );
 
     const filteredList = unApprovedList.filter((item) => {
         return (
