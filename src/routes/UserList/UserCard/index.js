@@ -1,7 +1,14 @@
-import { Delete, RemoveRedEye, RestorePageSharp } from '@mui/icons-material';
-import { Button } from 'component';
-import ImageModal from 'components/ImageModal/ImageModal';
 import React from 'react';
+import ImageModal from 'components/ImageModal/ImageModal';
+
+import {
+    Delete,
+    KeyboardArrowDown,
+    KeyboardArrowUp,
+    RemoveRedEye,
+    RestorePageSharp
+} from '@mui/icons-material';
+import { Button } from 'component';
 
 export const UserCard = ({
     index,
@@ -14,7 +21,10 @@ export const UserCard = ({
     onDelete,
     onApprove,
     userType,
-    type
+    type,
+    onOpenSubUser,
+    leftIndex,
+    isOpen
 }) => {
     const textColor = type === 'user3' ? 'text-black' : 'text-white';
 
@@ -39,17 +49,18 @@ export const UserCard = ({
                         : 'font-bold text-xl text-white'
                 }`}
             >
+                {leftIndex ? `${leftIndex} -` : null}
                 {type === 'user2'
-                    ? `${index + 1})`
+                    ? `${index + 1}`
                     : type === 'user3'
-                    ? `${index + 1}.`
-                    : `(${index + 1})`}
+                    ? `${index + 1}`
+                    : `${index + 1}`}
             </h5>
-            <h5 className='w-[100px]'>
+            <h5 className='w-[100px] h-12 items-center flex'>
                 {photo ? (
-                    <ImageModal url={photo} className='w-12 h-12 -ml-2 rounded-full' />
+                    <ImageModal url={photo} className='w-14 h-12 -ml-2 rounded-full' />
                 ) : (
-                    <div className={`w-12 h-12  rounded-full ${textColor}`}>-----</div>
+                    <div className={textColor}>-------</div>
                 )}
             </h5>
             <div className={`flex flex-1 items-center justify-between ${textColor}`}>
@@ -82,6 +93,19 @@ export const UserCard = ({
                             </div>
                         ) : onDelete ? (
                             <Delete className='text-red-600' onClick={onDelete} />
+                        ) : null}
+                        {onOpenSubUser ? (
+                            !isOpen ? (
+                                <KeyboardArrowDown
+                                    onClick={onOpenSubUser}
+                                    className={`cursor-pointer ${textColor}`}
+                                />
+                            ) : (
+                                <KeyboardArrowUp
+                                    onClick={onOpenSubUser}
+                                    className={`cursor-pointer ${textColor}`}
+                                />
+                            )
                         ) : null}
                     </div>
                 </div>

@@ -26,6 +26,9 @@ export default function UserList() {
     const [userDeletionData, setUserDeletionData] = useState(null);
     const [search, setSearch] = useState('');
 
+    const [selectedUser1Id, setSelectedUser1Id] = useState(null);
+    const [selectedUser2Id, setSelectedUser2Id] = useState(null);
+
     useEffect(() => {
         getUserList();
     }, []);
@@ -78,7 +81,6 @@ export default function UserList() {
                         setUsers(userAndSubUsers?.filter((item) => item?.isApproved === true));
                     });
                 } else if (snapshot.val()?.adminLevel == '1') {
-                    console.log('1=======');
                     //level 1 admin will be able to see all the user data
                     const starCountRef = ref(database, '/USERS');
                     onValue(starCountRef, async (snapshot) => {
@@ -179,12 +181,17 @@ export default function UserList() {
                     {userList &&
                         userList.map((itemDetails, index) => {
                             const item = getUserDetail(itemDetails.ID);
-
                             const subUsers2 = itemDetails?.subUsers;
 
+                            const subUserLength = subUsers2?.length;
+
+                            const name = item?.firstName + ' ' + item?.lastName;
+
+                            const leftIndex = index + 1;
                             return (
                                 <>
                                     <UserCard
+                                        isOpen={selectedUser1Id === item.ID}
                                         key={'user' + index}
                                         index={index}
                                         totalUsers={userList?.length}
@@ -198,21 +205,39 @@ export default function UserList() {
                                             setUserDeletionData(item);
                                             setIsVisible(true);
                                         }}
+                                        onOpenSubUser={
+                                            subUserLength === 0
+                                                ? undefined
+                                                : () => {
+                                                      if (selectedUser1Id === item.ID) {
+                                                          setSelectedUser1Id(null);
+                                                      } else {
+                                                          setSelectedUser1Id(item?.ID);
+                                                      }
+                                                  }
+                                        }
                                     />
-                                    {subUsers2?.length > 0 ? (
+                                    {selectedUser1Id === item.ID && subUsers2?.length > 0 ? (
                                         <>
                                             <div className='text-base my-4 font-bold'>
-                                                Sub User2
+                                                {name} - Sub User
                                             </div>
                                             {subUsers2?.map((subUser, index) => {
                                                 const subUserItem = getUserDetail(subUser.ID);
-
                                                 const subUsers3 = subUser?.subUsers;
+
+                                                const name =
+                                                    subUserItem?.firstName +
+                                                    ' ' +
+                                                    subUserItem?.lastName;
+
+                                                const leftIndex2 = index + 1;
 
                                                 return (
                                                     <div>
                                                         <UserCard
                                                             type={'user2'}
+                                                            leftIndex={leftIndex}
                                                             key={'subUser' + index}
                                                             index={index}
                                                             totalUsers={subUsers2.length}
@@ -237,7 +262,7 @@ export default function UserList() {
                                                         {subUsers3?.length > 0 ? (
                                                             <>
                                                                 <div className='text-base my-4 font-bold'>
-                                                                    Sub User3
+                                                                    {name} - Sub User
                                                                 </div>
                                                                 {subUsers3?.map(
                                                                     (subUser3, index) => {
@@ -248,6 +273,7 @@ export default function UserList() {
 
                                                                         return (
                                                                             <UserCard
+                                                                                leftIndex={`${leftIndex}-${leftIndex2}`}
                                                                                 key={
                                                                                     'subUser3' +
                                                                                     index
