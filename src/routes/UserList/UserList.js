@@ -15,7 +15,8 @@ import { ConfirmationCard } from 'components/ConfirmationCard';
 import { UserCard } from './UserCard';
 import { UserTableHeader } from './UserTableHeader';
 import { Input } from 'components/Input';
-import { deleteUser, restoreUser } from '../../Firebase/user/index';
+import { deleteUser, getAllMyUsers, restoreUser } from '../../Firebase/user/index';
+import { removeDuplicatesById } from './utils';
 
 export default function UserList() {
     const { push } = useHistory();
@@ -47,17 +48,67 @@ export default function UserList() {
             onValue(userRef, (snapshot) => {
                 if (snapshot.val()?.adminLevel == '2') {
                     //can only see subUsers data
-                    onValue(subUserRef, (snapshot) => {
-                        const data = snapshot.val();
-                        setUsers(formateData(data));
+                    onValue(subUserRef, async (snapshot) => {
+                        const data = formateData(snapshot.val());
+
+                        let userAndSubUsers = await Promise.all(
+                            data.map(async (userDetail) => {
+                                const allUserLevel2 = await getAllMyUsers(userDetail?.ID);
+
+                                const subUsersLevel2 = await Promise.all(
+                                    allUserLevel2
+                                        .filter((user) => user?.userLevel !== 3)
+                                        .map(async (user) => {
+                                            const allUserLevel3 = await getAllMyUsers(user?.ID);
+
+                                            return {
+                                                ...user,
+                                                subUsers: removeDuplicatesById(allUserLevel3)
+                                            };
+                                        })
+                                );
+
+                                return {
+                                    ...userDetail,
+                                    subUsers: removeDuplicatesById(subUsersLevel2)
+                                };
+                            })
+                        );
+
+                        setUsers(userAndSubUsers?.filter((item) => item?.isApproved === true));
                     });
                 } else if (snapshot.val()?.adminLevel == '1') {
+                    console.log('1=======');
                     //level 1 admin will be able to see all the user data
                     const starCountRef = ref(database, '/USERS');
-                    onValue(starCountRef, (snapshot) => {
-                        const data = snapshot.val();
-                        const user = formateData(data);
-                        setUsers(user?.filter((item) => item.isApproved == true));
+                    onValue(starCountRef, async (snapshot) => {
+                        const data = formateData(snapshot.val());
+
+                        let userAndSubUsers = await Promise.all(
+                            data.map(async (userDetail) => {
+                                const allUserLevel2 = await getAllMyUsers(userDetail?.ID);
+
+                                const subUsersLevel2 = await Promise.all(
+                                    allUserLevel2
+                                        .filter((user) => user?.userLevel !== 3)
+                                        .map(async (user) => {
+                                            const allUserLevel3 = await getAllMyUsers(user?.ID);
+
+                                            return {
+                                                ...user,
+                                                subUsers: removeDuplicatesById(allUserLevel3)
+                                            };
+                                        })
+                                );
+
+                                return {
+                                    ...userDetail,
+                                    subUsers: removeDuplicatesById(subUsersLevel2)
+                                };
+                            })
+                        );
+
+                        setUsers(userAndSubUsers?.filter((item) => item?.isApproved === true));
                     });
                 } else {
                     //no need to show this for level3 user
@@ -128,22 +179,123 @@ export default function UserList() {
                     {userList &&
                         userList.map((itemDetails, index) => {
                             const item = getUserDetail(itemDetails.ID);
+
+                            const subUsers2 = itemDetails?.subUsers;
+
                             return (
-                                <UserCard
-                                    key={'user' + index}
-                                    index={index}
-                                    totalUsers={userList.length}
-                                    photo={item?.photo}
-                                    name={item?.firstName + ' ' + item?.lastName}
-                                    phoneNumber={item?.phoneNumber}
-                                    onViewDetails={() =>
-                                        onClick(SLUGS.UserDetail, { id: item?.ID })
-                                    }
-                                    onDelete={() => {
-                                        setUserDeletionData(item);
-                                        setIsVisible(true);
-                                    }}
-                                />
+                                <>
+                                    <UserCard
+                                        key={'user' + index}
+                                        index={index}
+                                        totalUsers={userList?.length}
+                                        photo={item?.photo}
+                                        name={item?.firstName + ' ' + item?.lastName}
+                                        phoneNumber={item?.phoneNumber}
+                                        onViewDetails={() =>
+                                            onClick(SLUGS.UserDetail, { id: item?.ID })
+                                        }
+                                        onDelete={() => {
+                                            setUserDeletionData(item);
+                                            setIsVisible(true);
+                                        }}
+                                    />
+                                    {subUsers2?.length > 0 ? (
+                                        <>
+                                            <div className='text-base my-4 font-bold'>
+                                                Sub User2
+                                            </div>
+                                            {subUsers2?.map((subUser, index) => {
+                                                const subUserItem = getUserDetail(subUser.ID);
+
+                                                const subUsers3 = subUser?.subUsers;
+
+                                                return (
+                                                    <div>
+                                                        <UserCard
+                                                            type={'user2'}
+                                                            key={'subUser' + index}
+                                                            index={index}
+                                                            totalUsers={subUsers2.length}
+                                                            photo={subUserItem?.photo}
+                                                            name={
+                                                                subUserItem?.firstName +
+                                                                ' ' +
+                                                                subUserItem?.lastName
+                                                            }
+                                                            phoneNumber={subUserItem?.phoneNumber}
+                                                            onViewDetails={() =>
+                                                                onClick(SLUGS.UserDetail, {
+                                                                    id: subUserItem?.ID
+                                                                })
+                                                            }
+                                                            onDelete={() => {
+                                                                setUserDeletionData(subUserItem);
+                                                                setIsVisible(true);
+                                                            }}
+                                                        />
+
+                                                        {subUsers3?.length > 0 ? (
+                                                            <>
+                                                                <div className='text-base my-4 font-bold'>
+                                                                    Sub User3
+                                                                </div>
+                                                                {subUsers3?.map(
+                                                                    (subUser3, index) => {
+                                                                        const subUserItem3 =
+                                                                            getUserDetail(
+                                                                                subUser3.ID
+                                                                            );
+
+                                                                        return (
+                                                                            <UserCard
+                                                                                key={
+                                                                                    'subUser3' +
+                                                                                    index
+                                                                                }
+                                                                                type={'user3'}
+                                                                                index={index}
+                                                                                totalUsers={
+                                                                                    subUsers3.length
+                                                                                }
+                                                                                photo={
+                                                                                    subUserItem3?.photo
+                                                                                }
+                                                                                name={
+                                                                                    subUserItem3?.firstName +
+                                                                                    ' ' +
+                                                                                    subUserItem3?.lastName
+                                                                                }
+                                                                                phoneNumber={
+                                                                                    subUserItem3?.phoneNumber
+                                                                                }
+                                                                                onViewDetails={() =>
+                                                                                    onClick(
+                                                                                        SLUGS.UserDetail,
+                                                                                        {
+                                                                                            id: subUserItem3?.ID
+                                                                                        }
+                                                                                    )
+                                                                                }
+                                                                                onDelete={() => {
+                                                                                    setUserDeletionData(
+                                                                                        subUserItem3
+                                                                                    );
+                                                                                    setIsVisible(
+                                                                                        true
+                                                                                    );
+                                                                                }}
+                                                                            />
+                                                                        );
+                                                                    }
+                                                                )}
+                                                            </>
+                                                        ) : null}
+                                                    </div>
+                                                );
+                                            })}
+                                        </>
+                                    ) : null}
+                                </>
                             );
                         })}
                 </section>

@@ -155,7 +155,7 @@ export default function UserDetail(props) {
 
     return (
         <div>
-            {userLevel === 2 || userLevel === 3 ? (
+            {/* {userLevel === 2 || userLevel === 3 ? (
                 <div
                     onClick={() => {
                         setId(parentUserId);
@@ -165,7 +165,7 @@ export default function UserDetail(props) {
                 >
                     <ArrowBack />
                 </div>
-            ) : null}
+            ) : null} */}
             <div className='flex flex-col gap-6'>
                 <div className='flex flex-col gap-4'>
                     <div className='flex flex-row gap-4'>
