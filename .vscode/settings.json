@@ -1,3 +1,13 @@
 {
-    "cSpell.words": ["formik", "Licences", "toastify", "urbanminer"]
+    "cSpell.words": [
+        "formik",
+        "Licences",
+        "toastify",
+        "urbanminer"
+    ],
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#143138",
+        "titleBar.activeBackground": "#1C454F",
+        "titleBar.activeForeground": "#F6FBFC"
+    }
 }
