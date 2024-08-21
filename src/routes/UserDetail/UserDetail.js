@@ -701,6 +701,67 @@ export default function UserDetail(props) {
         );
     };
 
+    const UserDetailOverview = () => {
+        return (
+            <div className='flex items-start gap-4'>
+                <div className='p-4 flex flex-col gap-4 border bg-white border-slate-200 flex-1 h-full rounded-md'>
+                    <div className='flex items-center gap-4'>
+                        <InfoCard
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, { userId: id, type: 'CONTACT' })
+                            }
+                            title={'Contacts'}
+                            value={invoicesTotal.totalContacts}
+                        />
+                        <InfoCard
+                            onClick={() => onClick(SLUGS.invoiceList, { userId: id, type: 'BUY' })}
+                            title={'Buy Invoice'}
+                            value={invoicesTotal?.totalBuyInvoices}
+                        />
+                        <InfoCard
+                            onClick={() => onClick(SLUGS.invoiceList, { userId: id, type: 'SELL' })}
+                            title={'Sell Invoice'}
+                            value={invoicesTotal?.totalSellInvoices}
+                        />
+                    </div>
+                    <div className='flex items-center gap-4'>
+                        <InfoCard
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, { userId: id, type: 'PACKING' })
+                            }
+                            title={'Packing Invoice'}
+                            value={invoicesTotal?.totalPackingInvoices}
+                        />
+                        <InfoCard
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, { userId: id, type: 'SALES' })
+                            }
+                            title={'Sales Invoice'}
+                            value={invoicesTotal?.totalSalesInvoices}
+                        />
+                        <InfoCard
+                            onClick={() =>
+                                onClick(SLUGS.invoiceList, {
+                                    userId: id,
+                                    type: 'INVENTORY'
+                                })
+                            }
+                            title={'Inventory Items'}
+                            value={invoicesTotal?.totalInventoryItems}
+                        />
+                    </div>
+                </div>
+                <ProfileCard
+                    name={user?.firstName + ' ' + user?.lastName}
+                    mobileNumber={user?.phoneNumber}
+                    Role={user?.userLevel}
+                    Status={isApproved ? 'Approved' : 'Not Approved'}
+                    createdAt={user?.createdAt}
+                />
+            </div>
+        );
+    };
+
     return (
         <div className='flex flex-col gap-8'>
             <Header
@@ -720,66 +781,20 @@ export default function UserDetail(props) {
                 isEditable ? (
                     <EditUserDetails />
                 ) : (
-                    <div className='flex items-start gap-4'>
-                        <div className='p-4 flex flex-col gap-4 border bg-white border-slate-200 flex-1 h-full rounded-md'>
-                            <div className='flex items-center gap-4'>
-                                <InfoCard
-                                    onClick={() =>
-                                        onClick(SLUGS.invoiceList, { userId: id, type: 'CONTACT' })
-                                    }
-                                    title={'Contacts'}
-                                    value={invoicesTotal.totalContacts}
-                                />
-                                <InfoCard
-                                    onClick={() =>
-                                        onClick(SLUGS.invoiceList, { userId: id, type: 'BUY' })
-                                    }
-                                    title={'Buy Invoice'}
-                                    value={invoicesTotal?.totalBuyInvoices}
-                                />
-                                <InfoCard
-                                    onClick={() =>
-                                        onClick(SLUGS.invoiceList, { userId: id, type: 'SELL' })
-                                    }
-                                    title={'Sell Invoice'}
-                                    value={invoicesTotal?.totalSellInvoices}
-                                />
-                            </div>
-                            <div className='flex items-center gap-4'>
-                                <InfoCard
-                                    onClick={() =>
-                                        onClick(SLUGS.invoiceList, { userId: id, type: 'PACKING' })
-                                    }
-                                    title={'Packing Invoice'}
-                                    value={invoicesTotal?.totalPackingInvoices}
-                                />
-                                <InfoCard
-                                    onClick={() =>
-                                        onClick(SLUGS.invoiceList, { userId: id, type: 'SALES' })
-                                    }
-                                    title={'Sales Invoice'}
-                                    value={invoicesTotal?.totalSalesInvoices}
-                                />
-                                <InfoCard
-                                    onClick={() =>
-                                        onClick(SLUGS.invoiceList, {
-                                            userId: id,
-                                            type: 'INVENTORY'
-                                        })
-                                    }
-                                    title={'Inventory Items'}
-                                    value={invoicesTotal?.totalInventoryItems}
-                                />
-                            </div>
-                        </div>
-                        <ProfileCard
-                            name={user?.firstName + ' ' + user?.lastName}
-                            mobileNumber={user?.phoneNumber}
-                            Role={user?.userLevel}
-                            Status={isApproved ? 'Approved' : 'Not Approved'}
-                            createdAt={user?.createdAt}
-                        />
-                    </div>
+                    <>
+                        <UserDetailOverview />
+
+                        {/* {userLevel != 1 && (
+                            <>
+                                <div>Switch User Role Here</div>
+                                <div>
+                                    {userLevel === 2
+                                        ? 'switch to user3'
+                                        : 'switch to user 2 and user3'}
+                                </div>
+                            </>
+                        )} */}
+                    </>
                 )
             ) : (
                 <Permission userId={id} />

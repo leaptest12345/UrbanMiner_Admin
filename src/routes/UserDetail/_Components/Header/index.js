@@ -13,7 +13,8 @@ export const Header = ({
     onDelete,
     onApproved,
     isApproved,
-    isEditable
+    isEditable,
+    onUserRoleClick
 }) => {
     return (
         <div className='bg-gradient-to-r rounded-md from-blue-100 via-blue-200 to-blue-300'>
@@ -29,6 +30,7 @@ export const Header = ({
                 </div>
                 <div className='flex items-center gap-4'>
                     {!isApproved && <ActionButton onClick={onApproved} title={'Approve User'} />}
+                    {/* <ActionButton onClick={onUserRoleClick} title={'Switch User Role'} /> */}
                     <ActionButton onClick={onEdit} title={isEditable ? 'Close' : 'Edit'} />
                     {!isEditable && <ActionButton onClick={onDelete} title={'Delete'} />}
                 </div>
