@@ -27,6 +27,7 @@ import { UserTableHeader } from 'routes/UserList/UserTableHeader';
 import { getAllMyUsers } from '../../Firebase/user/index';
 import { UserCard } from 'routes/UserList/UserCard';
 import { Header, InfoCard, Permission, ProfileCard } from './_Components';
+import { ConfirmationCard } from 'components/ConfirmationCard';
 
 export default function UserDetail(props) {
     const history = useHistory();
@@ -762,12 +763,30 @@ export default function UserDetail(props) {
         );
     };
 
+    const [isDeleteWarningVisible, setIsDeleteWarningVisible] = useState(false);
+
+    const handleDeleteUser = async () => {
+        try {
+            const refDetail = ref(database, `/USERS/${givenId}`);
+            await update(refDetail, {
+                isDeleted: true
+            });
+            notify('User Deleted Successfully!', 1);
+            setIsDeleteWarningVisible(false);
+
+            history.goBack();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <div className='flex flex-col gap-8'>
             <Header
                 isApproved={isApproved}
                 onApproved={onApproved}
                 selectedTab={selectedTab}
+                onDelete={() => setIsDeleteWarningVisible(true)}
                 fullName={user?.firstName + ' ' + user?.lastName}
                 photo={user?.photo}
                 isEditable={isEditable}
@@ -775,7 +794,7 @@ export default function UserDetail(props) {
                     setSelectedTab(value);
                     setIsEditable(false);
                 }}
-                onEdit={() => setIsEditable(!isEditable)}
+                onEdit={selectedTab === 'Overview' ? () => setIsEditable(!isEditable) : undefined}
             />
             {selectedTab === 'Overview' ? (
                 isEditable ? (
@@ -799,6 +818,13 @@ export default function UserDetail(props) {
             ) : (
                 <Permission userId={id} />
             )}
+
+            <ConfirmationCard
+                isVisible={isDeleteWarningVisible}
+                onClose={() => setIsDeleteWarningVisible(false)}
+                onDelete={handleDeleteUser}
+                type={'User'}
+            />
         </div>
     );
 }

@@ -31,7 +31,9 @@ export const Header = ({
                 <div className='flex items-center gap-4'>
                     {!isApproved && <ActionButton onClick={onApproved} title={'Approve User'} />}
                     {/* <ActionButton onClick={onUserRoleClick} title={'Switch User Role'} /> */}
-                    <ActionButton onClick={onEdit} title={isEditable ? 'Close' : 'Edit'} />
+                    {onEdit && (
+                        <ActionButton onClick={onEdit} title={isEditable ? 'Close' : 'Edit'} />
+                    )}
                     {!isEditable && <ActionButton onClick={onDelete} title={'Delete'} />}
                 </div>
             </div>
