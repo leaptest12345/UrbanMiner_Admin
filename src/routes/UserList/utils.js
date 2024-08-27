@@ -13,24 +13,26 @@ export const removeDuplicatesById = (array) => {
 };
 
 export const deleteUserPermanently = async ({ email, userId }) => {
-    try {
-        const response = await axios.post('https://urbanminer-web.vercel.app/api/deleteUser', {
-            email,
-            userId
-        });
+    var data = JSON.stringify({
+        email: 'referraluser3@gmail.com',
+        userId: '16456645-add0-4fdc-aa17-b9dd5ae14056'
+    });
 
-        if (response.status === 200) {
-            notify('User Deleted Successfully!', 1);
-        } else {
-            console.log('Unexpected status code:', response.status);
-            notify('Failed to delete user. Please try again.', 0);
-        }
-    } catch (error) {
-        console.log('Error deleting user:', error);
-        notify(
-            error?.response?.data?.message ||
-                'An error occurred while deleting the user. Please try again later.',
-            0
-        );
-    }
+    var config = {
+        method: 'post',
+        url: 'https://urbanminer-web.vercel.app/api/deleteUser',
+        headers: {
+            'User-Agent': 'Apidog/1.0.0 (https://apidog.com)',
+            'Content-Type': 'application/json'
+        },
+        data: data
+    };
+
+    axios(config)
+        .then(function (response) {
+            console.log(JSON.stringify(response.data));
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
 };

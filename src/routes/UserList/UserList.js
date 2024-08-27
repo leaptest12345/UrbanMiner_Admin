@@ -52,7 +52,6 @@ export default function UserList() {
         try {
             const id = await localStorage.getItem('userID');
 
-            console.log('my admin id', id);
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
             onValue(userRef, (snapshot) => {
