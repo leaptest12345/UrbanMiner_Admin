@@ -107,7 +107,7 @@ export const UserPermission = (props) => {
                     onChange={(e) => formik.setFieldValue('isBuyEditable', e.target.checked)}
                     type={'Buy Items'}
                     warningTypes={'EDIT'}
-                    value={formik.values.isBuyEditable}
+                    value={formik.vaxlues.isBuyEditable}
                 />
                 <PermissionCard
                     onChange={(e) =>

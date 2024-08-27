@@ -84,13 +84,16 @@ export const UserCard = ({
                         {onApprove ? (
                             <Button title={'Approve'} onClick={onApprove} />
                         ) : onRestore ? (
-                            <div
-                                className='flex items-center gap-2 cursor-pointer  text-white'
-                                onClick={onRestore}
-                            >
-                                <RestorePageSharp className='cursor-pointer' />
-                                <h5>Restore User</h5>
-                            </div>
+                            <>
+                                <div
+                                    className='flex items-center gap-2 cursor-pointer  text-white'
+                                    onClick={onRestore}
+                                >
+                                    <RestorePageSharp className='cursor-pointer' />
+                                    <h5>Restore User</h5>
+                                </div>
+                                <Delete className='text-red-600' onClick={onDelete} />
+                            </>
                         ) : onDelete ? (
                             <Delete className='text-red-600' onClick={onDelete} />
                         ) : null}

@@ -16,13 +16,18 @@ import { UserCard } from './UserCard';
 import { UserTableHeader } from './UserTableHeader';
 import { Input } from 'components/Input';
 import { deleteUser, getAllMyUsers, restoreUser } from '../../Firebase/user/index';
-import { removeDuplicatesById } from './utils';
+import { deleteUserPermanently, removeDuplicatesById } from './utils';
 
 export default function UserList() {
     const { push } = useHistory();
 
     const [user, setUsers] = useState([]);
     const [isVisible, setIsVisible] = useState(false);
+    const [isPermanentDelete, setIsPermanentDelete] = useState(false);
+    const [deleteUserData, setDeleteUserData] = useState({
+        email: '',
+        userId: ''
+    });
     const [userDeletionData, setUserDeletionData] = useState(null);
     const [search, setSearch] = useState('');
 
@@ -46,6 +51,8 @@ export default function UserList() {
     const getUserList = async () => {
         try {
             const id = await localStorage.getItem('userID');
+
+            console.log('my admin id', id);
             const userRef = ref(database, `/ADMIN/USERS/${id}`);
             const subUserRef = ref(database, `/ADMIN/USERS/${id}/SUB_USERS`);
             onValue(userRef, (snapshot) => {
@@ -174,6 +181,7 @@ export default function UserList() {
                 }}
                 type={'User'}
             />
+
             {userList.length > 0 && (
                 <section className='flex flex-col gap-4'>
                     <div className='text-xl font-bold text-black'>Approved Users</div>
@@ -336,23 +344,41 @@ export default function UserList() {
                                 const item = getUserDetail(itemDetails.ID);
 
                                 return (
-                                    <UserCard
-                                        key={'deletedUser' + index}
-                                        index={index}
-                                        name={item?.firstName + ' ' + item?.lastName}
-                                        onRestore={() => restoreUser(item.ID)}
-                                        onViewDetails={() =>
-                                            onClick(SLUGS.UserDetail, { id: item?.ID })
-                                        }
-                                        phoneNumber={item?.phoneNumber}
-                                        photo={item?.photo}
-                                        totalUsers={deletedUser.length}
-                                    />
+                                    <>
+                                        <UserCard
+                                            key={'deletedUser' + index}
+                                            index={index}
+                                            name={item?.firstName + ' ' + item?.lastName}
+                                            onRestore={() => restoreUser(item.ID)}
+                                            onViewDetails={() =>
+                                                onClick(SLUGS.UserDetail, { id: item?.ID })
+                                            }
+                                            phoneNumber={item?.phoneNumber}
+                                            photo={item?.photo}
+                                            totalUsers={deletedUser.length}
+                                            onDelete={() => {
+                                                setDeleteUserData({
+                                                    email: item.email,
+                                                    userId: item.ID
+                                                });
+                                                setIsPermanentDelete(true);
+                                            }}
+                                        />
+                                    </>
                                 );
                             })}
                     </section>
                 </div>
             )}
+            <ConfirmationCard
+                isVisible={isPermanentDelete}
+                onClose={() => setIsPermanentDelete(false)}
+                onDelete={async () => {
+                    await deleteUserPermanently(deleteUserData);
+                    setIsPermanentDelete(false);
+                }}
+                type={'User Permanently'}
+            />
             <ToastContainer />
         </div>
     );
