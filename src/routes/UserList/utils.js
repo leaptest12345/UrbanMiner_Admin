@@ -14,8 +14,8 @@ export const removeDuplicatesById = (array) => {
 
 export const deleteUserPermanently = async ({ email, userId }) => {
     var data = JSON.stringify({
-        email: 'referraluser3@gmail.com',
-        userId: '16456645-add0-4fdc-aa17-b9dd5ae14056'
+        email: email,
+        userId: userId
     });
 
     var config = {
@@ -31,8 +31,14 @@ export const deleteUserPermanently = async ({ email, userId }) => {
     axios(config)
         .then(function (response) {
             console.log(JSON.stringify(response.data));
+
+            notify('User deleted successfully', 1);
         })
         .catch(function (error) {
-            console.log(error);
+            notify(
+                error?.response?.data?.message ||
+                    'An error occurred while deleting the user. Please try again.',
+                0
+            );
         });
 };
